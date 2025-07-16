@@ -96,26 +96,26 @@ jobs:
   #     - name: 🔧 Docker Build Test (backend)
   #       run: docker build -f infra/docker/Dockerfile.backend -t jibangyoung-backend:latest .
 
-  vercel:
-    name: ▲ Deploy to Vercel
-    runs-on: ubuntu-latest
-    needs: frontend
+  # vercel:
+  #   name: ▲ Deploy to Vercel
+  #   runs-on: ubuntu-latest
+  #   needs: frontend
 
-    steps:
-      - name: ✅ Checkout Code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: ✅ Checkout Code
+  #       uses: actions/checkout@v4
 
-      - name: ⚙️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+  #     - name: ⚙️ Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
 
-      - name: 🔐 Install Vercel CLI
-        run: npm install -g vercel@25.1.0
+  #     - name: 🔐 Install Vercel CLI
+  #       run: npm install -g vercel@25.1.0
 
-      - name: 🚀 Deploy to Vercel (Production)
-        run: |
-          vercel --token=${{ secrets.VERCEL_TOKEN }} \
-                 --prod \
-                 --yes \
-                 --cwd frontend
+  #     - name: 🚀 Deploy to Vercel (Production)
+  #       run: |
+  #         vercel --token=${{ secrets.VERCEL_TOKEN }} \
+  #                --prod \
+  #                --yes \
+  #                --cwd frontend
