@@ -12,7 +12,7 @@ const dropdownItems = [
   { label: "대시보드", path: "/dashboard" },
   { label: "설문 응답", path: "/survey" },
   { label: "추천 결과", path: "/recommendation" },
-  { label: "정책 리스트", path: "/policy" },
+  { label: "정책 리스트", path: "/policy/totalPolicies" },
   { label: "찜한 정책", path: "/policy/favorites" },
   { label: "통합 검색", path: "/search" },
   { label: "커뮤니티 홈", path: "/community" },
