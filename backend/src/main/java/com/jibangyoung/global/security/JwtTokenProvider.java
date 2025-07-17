@@ -47,7 +47,7 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512) // ✅ 변경!
+                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -60,7 +60,7 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512) // ✅ 변경!
+                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -79,7 +79,7 @@ public class JwtTokenProvider {
     // 토큰 유효성 체크 (검증)
     public boolean validateToken(String token) {
         try {
-            parseClaims(token); // 예외 발생시 catch
+            parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -95,15 +95,21 @@ public class JwtTokenProvider {
         );
     }
 
-    // ✅ 클레임 파싱(내부전용) - 반드시 같은 Key로!
+    // ✅ 클레임 파싱(내부전용)
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(getSigningKey(jwtSecret)) // ✅ 변경!
+                .setSigningKey(getSigningKey(jwtSecret))
                 .parseClaimsJws(token)
                 .getBody();
     }
 
+    // getter 추가
     public long getAccessTokenValidityInMilliseconds() {
         return accessTokenValidityInMilliseconds;
+    }
+
+    // 이거 추가!
+    public long getRefreshTokenValidityInMilliseconds() {
+        return refreshTokenValidityInMilliseconds;
     }
 }

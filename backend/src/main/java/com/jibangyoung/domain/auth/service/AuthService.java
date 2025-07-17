@@ -19,6 +19,7 @@ import com.jibangyoung.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +30,10 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final TokenService tokenService;
+
+    // ✅ RefreshToken 관련 Repository는 이 클래스에 직접 의존하지 않음
+    // 모든 토큰 저장/조회/폐기 로직은 TokenService 내부에서 처리!
+    // (SOLID: 단일책임원칙, 유지보수/테스트/확장에 유리)
 
     public UserDto signup(SignupRequestDto signupRequest) {
         log.info("[SIGNUP] 요청 - username={}, email={}", signupRequest.getUsername(), signupRequest.getEmail());
@@ -73,7 +78,7 @@ public class AuthService {
             // 마지막 로그인 시간 업데이트
             userService.updateLastLogin(user);
 
-            // 토큰 생성 및 관리
+            // ✅ 토큰 생성/저장/관리 책임은 tokenService에 위임!
             LoginResponseDto loginResponse = tokenService.generateTokens(authentication, user);
 
             log.info("[LOGIN] 성공 - username: {}", user.getUsername());
@@ -91,6 +96,7 @@ public class AuthService {
     public LoginResponseDto refreshToken(String refreshToken) {
         log.info("[REFRESH] 토큰 재발급 요청");
         try {
+            // ✅ 리프레시토큰 검증/교체 책임도 tokenService가 전담
             LoginResponseDto dto = tokenService.refreshAccessToken(refreshToken);
             log.info("[REFRESH] 토큰 재발급 성공");
             return dto;
