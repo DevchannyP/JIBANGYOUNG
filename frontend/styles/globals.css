@@ -18,7 +18,7 @@ body {
   font-family: "SCDream", sans-serif;
   margin: 0;
   padding: 0;
-  background: #ffe140;
+  background: #fffdf3;
   color: #3a3c3f;
   height: 100%;
   width: 100%;
@@ -29,6 +29,12 @@ body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }

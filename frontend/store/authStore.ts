@@ -4,11 +4,23 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 // 1. 유저 타입
-export type User = {
+// store/authStore.ts 또는 관련 타입 선언부
+export interface User {
   id: number;
+  username: string; // 👈 이 라인 추가!
   email: string;
-  nickname: string;
-};
+  nickname?: string;
+  phone?: string;
+  profileImageUrl?: string;
+  birthDate?: string;
+  gender?: string;
+  region?: string;
+  role: "USER" | "ADMIN" | "MENTOR";
+  status: "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
+  lastLoginAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 // 2. 상태 구조
 export interface AuthState {
