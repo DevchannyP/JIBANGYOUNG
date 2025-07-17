@@ -8,7 +8,7 @@ const dropdownItems = [
   { label: "로그인", path: "/auth/login" },
   { label: "아이디 찾기", path: "/auth/find-id" },
   { label: "비밀번호 찾기", path: "/auth/find-password" },
-  { label: "회원가입", path: "/signup" },
+  { label: "회원가입", path: "register" },
   { label: "대시보드", path: "/dashboard" },
   { label: "설문 응답", path: "/survey" },
   { label: "추천 결과", path: "/recommendation" },

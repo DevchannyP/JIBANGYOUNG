@@ -19,7 +19,6 @@ import com.jibangyoung.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,23 +31,31 @@ public class AuthService {
     private final TokenService tokenService;
 
     public UserDto signup(SignupRequestDto signupRequest) {
+        log.info("[SIGNUP] 요청 - username={}, email={}", signupRequest.getUsername(), signupRequest.getEmail());
         validateSignupRequest(signupRequest);
 
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
+            log.warn("[SIGNUP] 실패 - 중복 username: {}", signupRequest.getUsername());
             throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
 
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
+            log.warn("[SIGNUP] 실패 - 중복 email: {}", signupRequest.getEmail());
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        User user = userService.createUser(signupRequest);
-        log.info("새로운 사용자가 가입했습니다: {}", user.getUsername());
-
-        return UserDto.from(user);
+        try {
+            User user = userService.createUser(signupRequest);
+            log.info("[SIGNUP] 성공 - username: {}", user.getUsername());
+            return UserDto.from(user);
+        } catch (Exception e) {
+            log.error("[SIGNUP] 내부 오류 - {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     public LoginResponseDto login(LoginRequestDto loginRequest) {
+        log.info("[LOGIN] 요청 - username={}", loginRequest.getUsername());
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -58,7 +65,10 @@ public class AuthService {
             );
 
             User user = userRepository.findByUsernameAndStatus(loginRequest.getUsername(), UserStatus.ACTIVE)
-                    .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        log.warn("[LOGIN] 실패 - 존재하지 않거나 비활성화된 사용자: {}", loginRequest.getUsername());
+                        return new BusinessException(ErrorCode.USER_NOT_FOUND);
+                    });
 
             // 마지막 로그인 시간 업데이트
             userService.updateLastLogin(user);
@@ -66,29 +76,55 @@ public class AuthService {
             // 토큰 생성 및 관리
             LoginResponseDto loginResponse = tokenService.generateTokens(authentication, user);
 
-            log.info("사용자 로그인 성공: {}", user.getUsername());
+            log.info("[LOGIN] 성공 - username: {}", user.getUsername());
             return loginResponse;
 
         } catch (AuthenticationException e) {
-            log.warn("로그인 실패: {}", loginRequest.getUsername());
+            log.warn("[LOGIN] 인증 실패 - username: {}, message: {}", loginRequest.getUsername(), e.getMessage());
             throw new BusinessException(ErrorCode.INVALID_LOGIN_CREDENTIALS);
+        } catch (Exception e) {
+            log.error("[LOGIN] 내부 오류 - username: {}, error: {}", loginRequest.getUsername(), e.getMessage(), e);
+            throw e;
         }
     }
 
     public LoginResponseDto refreshToken(String refreshToken) {
-        return tokenService.refreshAccessToken(refreshToken);
+        log.info("[REFRESH] 토큰 재발급 요청");
+        try {
+            LoginResponseDto dto = tokenService.refreshAccessToken(refreshToken);
+            log.info("[REFRESH] 토큰 재발급 성공");
+            return dto;
+        } catch (Exception e) {
+            log.error("[REFRESH] 토큰 재발급 실패 - {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     public void logout(String refreshToken) {
-        tokenService.revokeToken(refreshToken);
+        log.info("[LOGOUT] 로그아웃 요청 - refreshToken: {}", refreshToken);
+        try {
+            tokenService.revokeToken(refreshToken);
+            log.info("[LOGOUT] 로그아웃 성공");
+        } catch (Exception e) {
+            log.error("[LOGOUT] 실패 - {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     public void logoutAll(String username) {
-        tokenService.revokeAllUserTokens(username);
+        log.info("[LOGOUT_ALL] 전체 로그아웃 요청 - username: {}", username);
+        try {
+            tokenService.revokeAllUserTokens(username);
+            log.info("[LOGOUT_ALL] 전체 로그아웃 성공 - username: {}", username);
+        } catch (Exception e) {
+            log.error("[LOGOUT_ALL] 실패 - username: {}, error: {}", username, e.getMessage(), e);
+            throw e;
+        }
     }
 
     private void validateSignupRequest(SignupRequestDto signupRequest) {
         if (!signupRequest.isPasswordMatching()) {
+            log.warn("[SIGNUP] 비밀번호 불일치 - username: {}", signupRequest.getUsername());
             throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
         }
     }
