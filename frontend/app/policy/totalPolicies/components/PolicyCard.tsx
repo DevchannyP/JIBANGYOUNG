@@ -1,79 +1,89 @@
-// app/policy/totalPolicies/components/PolicyCard.tsx (정책 카드)
+//app/policy/totalPolicies/components/PolicyCard.tsx
 "use client";
 
-import { useState } from 'react';
-import { Policy } from './PolicyCardList';
+import React from 'react';
 import styles from '../../total_policy.module.css';
 
-interface PolicyCardProps extends Policy {
-  onClick: () => void;
+interface Policy {
+  No: number;
+  plcyNm: string;
+  summary: string;
+  support: string;
+  deadline: string;
+  category: string;
 }
 
-export default function PolicyCard({ 
-  id, 
-  title, 
-  summary, 
-  support, 
-  deadline, 
-  category,
-  onClick 
-}: PolicyCardProps) {
-  const [isBookmarked, setIsBookmarked] = useState(false);
+interface PolicyCardProps {
+  policy: Policy;
+  onClick: () => void;
+  isBookmarked?: boolean;
+  onBookmarkToggle?: (policyId: number) => void;
+}
 
+const PolicyCard: React.FC<PolicyCardProps> = ({ 
+  policy, 
+  onClick, 
+  isBookmarked = false, 
+  onBookmarkToggle 
+}) => {
   const handleBookmarkClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 카드 클릭 이벤트 중단
-    setIsBookmarked(!isBookmarked);
-    
-    // 여기서 백엔드 API 호출 (찜하기/취소)
-    // bookmarkApi.toggle(id);
+    e.stopPropagation(); // 카드 클릭 이벤트 방지
+    if (onBookmarkToggle) {
+      onBookmarkToggle(policy.No);
+    }
   };
 
   const formatDeadline = (deadline: string) => {
     const date = new Date(deadline);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
+    const today = new Date();
+    const diffTime = date.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays < 0) {
-      return { text: '마감', color: '#ef4444' };
+      return '마감됨';
     } else if (diffDays === 0) {
-      return { text: '오늘 마감', color: '#f59e0b' };
-    } else if (diffDays <= 7) {
-      return { text: `${diffDays}일 남음`, color: '#f59e0b' };
+      return '오늘 마감';
+    } else if (diffDays === 1) {
+      return '내일 마감';
     } else {
-      return { text: date.toLocaleDateString('ko-KR'), color: '#6b7280' };
+      return `${diffDays}일 남음`;
     }
   };
-
-  const deadlineInfo = formatDeadline(deadline);
 
   return (
     <div className={styles.item} onClick={onClick}>
       <div className={styles.cardHeader}>
-        <h3 className={styles.itemTitle}>{title}</h3>
-        <button 
-          className={styles.bookmarkButton}
-          onClick={handleBookmarkClick}
-          aria-label={isBookmarked ? "찜 취소" : "찜하기"}
-        >
-          <span className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}>
-            {isBookmarked ? '❤️' : '🤍'}
-          </span>
-        </button>
+        <h3 className={styles.itemTitle}>{policy.plcyNm}</h3>
+        {onBookmarkToggle && (
+          <button 
+            className={styles.bookmarkButton}
+            onClick={handleBookmarkClick}
+            aria-label={isBookmarked ? '찜 해제' : '찜하기'}
+          >
+            <span className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}>
+              {isBookmarked ? '♥' : '♡'}
+            </span>
+          </button>
+        )}
       </div>
       
-      <p className={styles.itemSummary}>{summary}</p>
+      <div className={styles.itemSummary}>
+        {policy.summary}
+      </div>
       
       <div className={styles.policyInfo}>
-        <p className={styles.itemSupport}>💰 {support}</p>
-        <p className={styles.itemCategory}>📂 {category}</p>
-        <p 
-          className={styles.itemDate}
-          style={{ color: deadlineInfo.color }}
-        >
-          📅 {deadlineInfo.text}
-        </p>
+        <div className={styles.itemSupport}>
+          {policy.support}
+        </div>
+        <div className={styles.itemCategory}>
+          {policy.category}
+        </div>
+        <div className={styles.itemDate}>
+          {formatDeadline(policy.deadline)}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default PolicyCard;

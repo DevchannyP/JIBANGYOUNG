@@ -17,20 +17,31 @@ export default function PolicyPage() {
   const [sortBy, setSortBy] = useState('date_desc');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  
+  // 찜한 정책 ID 목록 상태 관리
+  const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
+
+  // 컴포넌트 마운트 시 찜한 정책 ID 목록 로드
+  useEffect(() => {
+    // 실제로는 API 호출이나 로컬 스토리지에서 가져와야 함
+    // 예시로 몇 개의 정책을 찜한 상태로 설정
+    const savedBookmarks = [1, 3, 5, 7, 9]; // 예시 데이터
+    setBookmarkedPolicyIds(savedBookmarks);
+  }, []);
 
   const policies = [
-    { id: 1, title: '교육 지원 정책 1', summary: '2025년 교육 지원 프로그램', support: '500만 원', deadline: '2025-08-01', category: '교육' },
-    { id: 2, title: '복지 혜택 정책 2', summary: '저소득층 지원 안내', support: '300만 원', deadline: '2025-07-31', category: '복지' },
-    { id: 3, title: '환경 보호 정책 3', summary: '탄소 배출 저감 방안', support: '700만 원', deadline: '2025-07-30', category: '환경' },
-    { id: 4, title: '교육 지원 정책 4', summary: '온라인 학습 지원', support: '400만 원', deadline: '2025-07-29', category: '교육' },
-    { id: 5, title: '복지 혜택 정책 5', summary: '노인 복지 확대', support: '600만 원', deadline: '2025-07-28', category: '복지' },
-    { id: 6, title: '환경 보호 정책 6', summary: '재생에너지 도입', support: '800만 원', deadline: '2025-07-27', category: '환경' },
-    { id: 7, title: '교육 지원 정책 7', summary: '2025년 교육 지원 프로그램', support: '550만 원', deadline: '2025-08-01', category: '교육' },
-    { id: 8, title: '복지 혜택 정책 8', summary: '저소득층 지원 안내', support: '350만 원', deadline: '2025-07-31', category: '복지' },
-    { id: 9, title: '환경 보호 정책 9', summary: '탄소 배출 저감 방안', support: '750만 원', deadline: '2025-07-30', category: '환경' },
-    { id: 10, title: '교육 지원 정책 10', summary: '온라인 학습 지원', support: '450만 원', deadline: '2025-07-29', category: '교육' },
-    { id: 11, title: '복지 혜택 정책 11', summary: '노인 복지 확대', support: '650만 원', deadline: '2025-07-28', category: '복지' },
-    { id: 12, title: '환경 보호 정책 12', summary: '재생에너지 도입', support: '850만 원', deadline: '2025-07-27', category: '환경' }
+    { No: 1, plcyNm: '교육 지원 정책 1', summary: '2025년 교육 지원 프로그램', support: '500만 원', deadline: '2025-08-01', category: '교육' },
+    { No: 2, plcyNm: '복지 혜택 정책 2', summary: '저소득층 지원 안내', support: '300만 원', deadline: '2025-07-31', category: '복지' },
+    { No: 3, plcyNm: '환경 보호 정책 3', summary: '탄소 배출 저감 방안', support: '700만 원', deadline: '2025-07-30', category: '환경' },
+    { No: 4, plcyNm: '교육 지원 정책 4', summary: '온라인 학습 지원', support: '400만 원', deadline: '2025-07-29', category: '교육' },
+    { No: 5, plcyNm: '복지 혜택 정책 5', summary: '노인 복지 확대', support: '600만 원', deadline: '2025-07-28', category: '복지' },
+    { No: 6, plcyNm: '환경 보호 정책 6', summary: '재생에너지 도입', support: '800만 원', deadline: '2025-07-27', category: '환경' },
+    { No: 7, plcyNm: '교육 지원 정책 7', summary: '2025년 교육 지원 프로그램', support: '550만 원', deadline: '2025-08-01', category: '교육' },
+    { No: 8, plcyNm: '복지 혜택 정책 8', summary: '저소득층 지원 안내', support: '350만 원', deadline: '2025-07-31', category: '복지' },
+    { No: 9, plcyNm: '환경 보호 정책 9', summary: '탄소 배출 저감 방안', support: '750만 원', deadline: '2025-07-30', category: '환경' },
+    { No: 10, plcyNm: '교육 지원 정책 10', summary: '온라인 학습 지원', support: '450만 원', deadline: '2025-07-29', category: '교육' },
+    { No: 11, plcyNm: '복지 혜택 정책 11', summary: '노인 복지 확대', support: '650만 원', deadline: '2025-07-28', category: '복지' },
+    { No: 12, plcyNm: '환경 보호 정책 12', summary: '재생에너지 도입', support: '850만 원', deadline: '2025-07-27', category: '환경' }
   ];
 
   const itemsPerPage = 12;
@@ -47,7 +58,7 @@ export default function PolicyPage() {
     // 검색어 필터링
     if (searchQuery.trim()) {
       filtered = filtered.filter(policy => {
-        const searchField = policy[searchType as 'title' | 'summary'] || '';
+        const searchField = policy[searchType as 'plcyNm' | 'summary'] || '';
         return searchField.toLowerCase().includes(searchQuery.toLowerCase());
       });
     }
@@ -107,10 +118,31 @@ export default function PolicyPage() {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
+  // 찜 토글 처리 함수
+  const handleBookmarkToggle = (policyId: number) => {
+    setBookmarkedPolicyIds(prev => {
+      const isCurrentlyBookmarked = prev.includes(policyId);
+      let newBookmarks;
+      
+      if (isCurrentlyBookmarked) {
+        // 찜 해제
+        newBookmarks = prev.filter(id => id !== policyId);
+      } else {
+        // 찜 추가
+        newBookmarks = [...prev, policyId];
+      }
+      
+      // 실제로는 API 호출이나 로컬 스토리지 업데이트 필요
+      // updateBookmarksOnServer(newBookmarks);
+      
+      return newBookmarks;
+    });
+  };
+
   return (
     <div className={styles.main}>
       <div className={styles.content}>
-      <h1 className={styles.headerTitle}>정책 포털</h1>
+        <h1 className={styles.headerTitle}>전체 정책</h1>
         <PolicyCounter total={policies.length} filtered={totalFiltered} />
         <PolicyFilterBar
           searchType={searchType}
@@ -133,7 +165,12 @@ export default function PolicyPage() {
             </button>
           </div>
         ) : (
-          <PolicyCardList policies={paginatedPolicies} onCardClick={handleCardClick} />
+          <PolicyCardList 
+            policies={paginatedPolicies} 
+            onCardClick={handleCardClick}
+            bookmarkedPolicyIds={bookmarkedPolicyIds}
+            onBookmarkToggle={handleBookmarkToggle}
+          />
         )}
         
         {/* Pagination을 항상 노출하도록 수정 */}

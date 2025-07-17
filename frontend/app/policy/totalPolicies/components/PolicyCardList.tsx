@@ -5,8 +5,8 @@ import PolicyCard from './PolicyCard';
 import styles from '../../total_policy.module.css';
 
 export interface Policy {
-  id: number;
-  title: string;
+  No: number;
+  plcyNm: string;
   summary: string;
   support: string;
   deadline: string;
@@ -15,14 +15,27 @@ export interface Policy {
 
 interface PolicyCardListProps {
   policies: Policy[];
-  onCardClick: (id: number) => void;
+  onCardClick: (No: number) => void;
+  bookmarkedPolicyIds?: number[];
+  onBookmarkToggle?: (policyId: number) => void;
 }
 
-export default function PolicyCardList({ policies, onCardClick }: PolicyCardListProps) {
+export default function PolicyCardList({ 
+  policies, 
+  onCardClick, 
+  bookmarkedPolicyIds = [], 
+  onBookmarkToggle 
+}: PolicyCardListProps) {
   return (
     <div className={styles.list}>
       {policies.map((policy) => (
-        <PolicyCard key={policy.id} {...policy} onClick={() => onCardClick(policy.id)} />
+        <PolicyCard 
+          key={policy.No} 
+          policy={policy}
+          onClick={() => onCardClick(policy.No)}
+          isBookmarked={bookmarkedPolicyIds.includes(policy.No)}
+          onBookmarkToggle={onBookmarkToggle}
+        />
       ))}
     </div>
   );
