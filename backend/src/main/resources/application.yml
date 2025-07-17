@@ -14,10 +14,8 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
   redis:
-    host: ${REDIS_HOST:localhost} # 환경변수 없을 때 기본값
+    host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-    # timeout: 2000ms      # (선택) 연결 타임아웃
-    # password: xxx        # (보안/운영시 사용)
 
 logging:
   level:
