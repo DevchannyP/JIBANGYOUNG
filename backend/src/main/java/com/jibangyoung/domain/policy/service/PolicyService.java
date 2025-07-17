@@ -16,9 +16,21 @@ public class PolicyService {
     }
 
     public List<PolicyResponseDto> getNoPlcyNm() {
+    System.out.println("=== Service 호출됨 ===");
+    try {
         List<Object[]> results = policyRepository.findNoPlcyNm();
-        return results.stream()
+        System.out.println("DB 조회 결과 개수: " + results.size());
+        
+        List<PolicyResponseDto> dtos = results.stream()
             .map(result -> new PolicyResponseDto((Integer) result[0], (String) result[1]))
             .collect(Collectors.toList());
+        
+        System.out.println("DTO 변환 완료");
+        return dtos;
+    } catch (Exception e) {
+        System.err.println("Service 오류: " + e.getMessage());
+        e.printStackTrace();
+        throw e;
     }
+}
 }

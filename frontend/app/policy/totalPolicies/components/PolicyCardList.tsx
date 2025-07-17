@@ -7,10 +7,10 @@ import styles from '../../total_policy.module.css';
 export interface Policy {
   No: number;
   plcyNm: string;
-  summary: string;
-  support: string;
-  deadline: string;
-  category: string;
+  // summary: string;
+  // support: string;
+  // deadline: string;
+  // category: string;
 }
 
 interface PolicyCardListProps {

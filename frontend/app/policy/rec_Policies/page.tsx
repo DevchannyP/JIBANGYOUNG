@@ -13,18 +13,18 @@ import PolicyFilterBar from "../totalPolicies/components/PolicyFilterBar";
 
 // 전체 정책 데이터 (실제로는 API에서 가져와야 함)
 const allPolicies = [
-  { id: 1, title: '교육 지원 정책 1', summary: '2025년 교육 지원 프로그램', support: '500만 원', deadline: '2025-08-01', category: '교육' },
-  { id: 2, title: '복지 혜택 정책 2', summary: '저소득층 지원 안내', support: '300만 원', deadline: '2025-07-31', category: '복지' },
-  { id: 3, title: '환경 보호 정책 3', summary: '탄소 배출 저감 방안', support: '700만 원', deadline: '2025-07-30', category: '환경' },
-  { id: 4, title: '교육 지원 정책 4', summary: '온라인 학습 지원', support: '400만 원', deadline: '2025-07-29', category: '교육' },
-  { id: 5, title: '복지 혜택 정책 5', summary: '노인 복지 확대', support: '600만 원', deadline: '2025-07-28', category: '복지' },
-  { id: 6, title: '환경 보호 정책 6', summary: '재생에너지 도입', support: '800만 원', deadline: '2025-07-27', category: '환경' },
-  { id: 7, title: '교육 지원 정책 7', summary: '2025년 교육 지원 프로그램', support: '550만 원', deadline: '2025-08-01', category: '교육' },
-  { id: 8, title: '복지 혜택 정책 8', summary: '저소득층 지원 안내', support: '350만 원', deadline: '2025-07-31', category: '복지' },
-  { id: 9, title: '환경 보호 정책 9', summary: '탄소 배출 저감 방안', support: '750만 원', deadline: '2025-07-30', category: '환경' },
-  { id: 10, title: '교육 지원 정책 10', summary: '온라인 학습 지원', support: '450만 원', deadline: '2025-07-29', category: '교육' },
-  { id: 11, title: '복지 혜택 정책 11', summary: '노인 복지 확대', support: '650만 원', deadline: '2025-07-28', category: '복지' },
-  { id: 12, title: '환경 보호 정책 12', summary: '재생에너지 도입', support: '850만 원', deadline: '2025-07-27', category: '환경' }
+  { No: 1, plcyNm: '교육 지원 정책 1', summary: '2025년 교육 지원 프로그램', support: '500만 원', deadline: '2025-08-01', category: '교육' },
+  { No: 2, plcyNm: '복지 혜택 정책 2', summary: '저소득층 지원 안내', support: '300만 원', deadline: '2025-07-31', category: '복지' },
+  { No: 3, plcyNm: '환경 보호 정책 3', summary: '탄소 배출 저감 방안', support: '700만 원', deadline: '2025-07-30', category: '환경' },
+  { No: 4, plcyNm: '교육 지원 정책 4', summary: '온라인 학습 지원', support: '400만 원', deadline: '2025-07-29', category: '교육' },
+  { No: 5, plcyNm: '복지 혜택 정책 5', summary: '노인 복지 확대', support: '600만 원', deadline: '2025-07-28', category: '복지' },
+  { No: 6, plcyNm: '환경 보호 정책 6', summary: '재생에너지 도입', support: '800만 원', deadline: '2025-07-27', category: '환경' },
+  { No: 7, plcyNm: '교육 지원 정책 7', summary: '2025년 교육 지원 프로그램', support: '550만 원', deadline: '2025-08-01', category: '교육' },
+  { No: 8, plcyNm: '복지 혜택 정책 8', summary: '저소득층 지원 안내', support: '350만 원', deadline: '2025-07-31', category: '복지' },
+  { No: 9, plcyNm: '환경 보호 정책 9', summary: '탄소 배출 저감 방안', support: '750만 원', deadline: '2025-07-30', category: '환경' },
+  { No: 10, plcyNm: '교육 지원 정책 10', summary: '온라인 학습 지원', support: '450만 원', deadline: '2025-07-29', category: '교육' },
+  { No: 11, plcyNm: '복지 혜택 정책 11', summary: '노인 복지 확대', support: '650만 원', deadline: '2025-07-28', category: '복지' },
+  { No: 12, plcyNm: '환경 보호 정책 12', summary: '재생에너지 도입', support: '850만 원', deadline: '2025-07-27', category: '환경' }
 ];
 
 export default function RecPoliciesPage() {
@@ -50,7 +50,7 @@ export default function RecPoliciesPage() {
 
   // 찜한 정책만 필터링
   const bookmarkedPolicies = useMemo(() => {
-    return allPolicies.filter(policy => bookmarkedPolicyIds.includes(policy.id));
+    return allPolicies.filter(policy => bookmarkedPolicyIds.includes(policy.No));
   }, [bookmarkedPolicyIds]);
 
   // 필터링 및 정렬 로직을 useMemo로 최적화
@@ -65,7 +65,7 @@ export default function RecPoliciesPage() {
     // 검색어 필터링
     if (searchQuery.trim()) {
       filtered = filtered.filter(policy => {
-        const searchField = policy[searchType as 'title' | 'summary'] || '';
+        const searchField = policy[searchType as 'plcyNm' | 'summary'] || '';
         return searchField.toLowerCase().includes(searchQuery.toLowerCase());
       });
     }
@@ -178,7 +178,7 @@ export default function RecPoliciesPage() {
         ) : !hasResults ? (
           <div className={styles.noResults}>
             <h3>검색 결과가 없습니다.</h3>
-            <p>검색어: "{searchQuery}"</p>
+            <p>검색어: {searchQuery}</p>
             <button onClick={handleClearSearch} className={styles.clearButton}>
               찜한 정책 전체 보기
             </button>

@@ -4,7 +4,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 1234
-
   jpa:
     hibernate:
       ddl-auto: update # 운영은 validate 또는 none 권장
@@ -12,15 +11,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-
 logging:
   level:
     org.springframework: INFO
-
 jwt:
   secret: my-very-strong-jwt-secret-key
   access-token-validity-ms: 900000 # 15분

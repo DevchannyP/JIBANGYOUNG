@@ -1,4 +1,3 @@
-//app/policy/totalPolicies/components/Pagination.tsx ([1][2][3] ... [다음])
 "use client";
 
 import styles from '../../total_policy.module.css';
@@ -18,12 +17,31 @@ export default function Pagination({
   onNext,
   onPageChange
 }: PaginationProps) {
+  const pagesPerGroup = 10;
+  const currentGroup = Math.floor((currentPage - 1) / pagesPerGroup);
+  const startPage = currentGroup * pagesPerGroup + 1;
+  const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
+  
+  const handlePrevGroup = () => {
+    const newPage = Math.max(1, startPage - pagesPerGroup);
+    onPageChange(newPage);
+  };
+
+  const handleNextGroup = () => {
+    const newPage = Math.min(endPage + 1, totalPages);
+    onPageChange(newPage);
+  };
+
   return (
     <div className={styles.pagination}>
-      <button className={styles.pageButton} onClick={onPrev} disabled={currentPage === 1}>
+      <button 
+        className={styles.pageButton} 
+        onClick={handlePrevGroup} 
+        disabled={currentPage <= 1}
+      >
         ◄
       </button>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+      {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
         <button
           key={page}
           className={`${styles.pageButton} ${currentPage === page ? styles.activePage : ''}`}
@@ -32,7 +50,11 @@ export default function Pagination({
           {page}
         </button>
       ))}
-      <button className={styles.pageButton} onClick={onNext} disabled={currentPage === totalPages}>
+      <button 
+        className={styles.pageButton} 
+        onClick={handleNextGroup} 
+        disabled={currentPage >= totalPages}
+      >
         ►
       </button>
     </div>
