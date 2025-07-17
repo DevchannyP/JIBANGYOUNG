@@ -2,6 +2,7 @@ package com.jibangyoung.global.security;
 
 import com.jibangyoung.domain.auth.repository.UserRepository;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,8 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -18,7 +21,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String jwtSecret;
+    private String jwtSecret; // 반드시 Base64 인코딩된 문자열!
 
     @Value("${jwt.access-token-validity-ms}")
     private long accessTokenValidityInMilliseconds;
@@ -27,6 +30,12 @@ public class JwtTokenProvider {
     private long refreshTokenValidityInMilliseconds;
 
     private final CustomUserDetailsService userDetailsService;
+
+    // ✅ 시그니처에 사용할 Key 반환 (Base64 → Key)
+    private Key getSigningKey(String base64Secret) {
+        byte[] keyBytes = Base64.getDecoder().decode(base64Secret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     // 액세스 토큰 생성
     public String createAccessToken(Authentication authentication) {
@@ -38,7 +47,7 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512) // ✅ 변경!
                 .compact();
     }
 
@@ -51,7 +60,7 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(getSigningKey(jwtSecret), SignatureAlgorithm.HS512) // ✅ 변경!
                 .compact();
     }
 
@@ -86,10 +95,10 @@ public class JwtTokenProvider {
         );
     }
 
-    // 클레임 파싱(내부전용)
+    // ✅ 클레임 파싱(내부전용) - 반드시 같은 Key로!
     private Claims parseClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(getSigningKey(jwtSecret)) // ✅ 변경!
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -98,4 +107,3 @@ public class JwtTokenProvider {
         return accessTokenValidityInMilliseconds;
     }
 }
-

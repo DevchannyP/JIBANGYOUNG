@@ -8,8 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "../LoginPage.module.css";
 
 export default function LoginForm() {
-  const setUser = useAuthStore((state) => state.setUser);
-  // ✅ 변수명 일관성: username으로 통일
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -39,22 +38,19 @@ export default function LoginForm() {
     mutationFn: () => loginWithEmail(username.trim(), password),
     retry: false,
     onSuccess: (res) => {
-      setUser({
-        id: res.user.id,
-        username: res.user.username,
-        email: res.user.email,
-        nickname: res.user.nickname || "",
-        phone: res.user.phone || "",
-        profileImageUrl: res.user.profileImageUrl || "",
-        birthDate: res.user.birthDate || "",
-        gender: res.user.gender || "",
-        region: res.user.region || "",
-        role: res.user.role,
-        status: res.user.status,
-        lastLoginAt: res.user.lastLoginAt || "",
-        createdAt: res.user.createdAt || "",
-        updatedAt: res.user.updatedAt || "",
-      });
+      // ✅✅✅ 이 부분이 중요! 반드시 res.data.data에서 파싱!
+      const envelope = res; // loginWithEmail에서 이미 data.data를 반환하도록 되어있으면 그냥 res 사용
+      // 아래처럼 받도록 loginWithEmail 구현 필요!
+      // const envelope = res?.data ?? {};
+
+      const { user, accessToken, refreshToken } = envelope ?? {};
+
+      if (!user || !accessToken || !refreshToken) {
+        setError("로그인 응답이 올바르지 않습니다.");
+        return;
+      }
+
+      setAuth(user, { accessToken, refreshToken });
       router.push("/dashboard");
     },
     onError: (err: any) => {

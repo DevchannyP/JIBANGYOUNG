@@ -1,15 +1,9 @@
-// frontend/libs/api/auth.api.ts
 import axios from "axios";
 
-// -------------------------------
-// ✅ Enum Types (서버와 정확히 일치시켜야 함)
-// -------------------------------
+// Enum Types
 export type UserRole = "USER" | "ADMIN" | "MENTOR";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
 
-// -------------------------------
-// ✅ DTO Interfaces
-// -------------------------------
 export interface UserDto {
   id: number;
   username: string;
@@ -19,19 +13,25 @@ export interface UserDto {
   role: UserRole;
   status: UserStatus;
   profileImageUrl?: string;
-  birthDate?: string; // yyyy-MM-dd
+  birthDate?: string;
   gender?: string;
   region?: string;
-  lastLoginAt?: string; // yyyy-MM-dd'T'HH:mm:ss
+  lastLoginAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface LoginResponse {
   user: UserDto;
-  accessToken?: string;
-  refreshToken?: string;
+  accessToken: string;
+  refreshToken: string;
   [key: string]: any;
+}
+
+export interface ApiEnvelope<T> {
+  success: boolean;
+  data: T;
+  message?: string;
 }
 
 export interface ApiError {
@@ -39,20 +39,14 @@ export interface ApiError {
   message: string;
 }
 
-// -------------------------------
-// ✅ Axios Instance
-// -------------------------------
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // ex: http://localhost:8080
-  withCredentials: true, // CORS 쿠키 전송 필수
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// -------------------------------
-// ✅ 공통 에러 핸들러
-// -------------------------------
 function handleApiError(error: unknown): never {
   if (axios.isAxiosError(error)) {
     const res = error.response;
@@ -69,29 +63,31 @@ function handleApiError(error: unknown): never {
         throw new Error(apiError.message || "로그인 실패");
     }
   }
-
   throw new Error("네트워크 연결 실패 (서버 응답 없음)");
 }
 
-// -------------------------------
-// ✅ 로그인 API 함수
-// -------------------------------
 export async function loginWithEmail(
   username: string,
   password: string
 ): Promise<LoginResponse> {
   try {
-    const response = await api.post<LoginResponse>("/api/auth/login", {
-      username,
-      password,
-    });
+    // ApiEnvelope<LoginResponse> 구조로 받는다!
+    const response = await api.post<ApiEnvelope<LoginResponse>>(
+      "/api/auth/login",
+      {
+        username,
+        password,
+      }
+    );
 
-    const data = response.data;
-    if (!data?.user?.id) {
-      throw new Error("유저 정보가 올바르지 않습니다.");
+    // ⭐⭐⭐ 이 줄이 중요! 반드시 data.data에서 꺼내라!
+    const envelope = response.data;
+
+    if (!envelope.success || !envelope.data?.user?.id) {
+      throw new Error(envelope.message || "로그인 응답이 올바르지 않습니다.");
     }
 
-    return data;
+    return envelope.data;
   } catch (error) {
     handleApiError(error);
   }
