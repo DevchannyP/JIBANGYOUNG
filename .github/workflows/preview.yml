@@ -3,6 +3,7 @@ name: 🔍 Preview Deployment (PR)
 on:
   pull_request:
     types: [opened, synchronize]
+    branches: [main] # 👉 main 브랜치 대상 PR에만 실행
 
 jobs:
   preview:
