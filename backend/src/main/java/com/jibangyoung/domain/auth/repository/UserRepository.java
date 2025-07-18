@@ -17,13 +17,9 @@ import com.jibangyoung.domain.auth.entity.UserStatus;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
-
     Optional<User> findByEmail(String email);
-
     Optional<User> findByUsernameAndStatus(String username, UserStatus status);
-
     boolean existsByUsername(String username);
-
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.status = :status AND u.lastLoginAt < :date")

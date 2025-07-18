@@ -1,33 +1,31 @@
-// store/authStore.ts
-import type { LoginTokenResponse } from "@/types/api/auth";
+import type {
+  UserDto,
+  UserRole,
+  UserStatus,
+  LoginResponse,
+} from "@/libs/api/auth/auth.api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  nickname?: string;
-  phone?: string;
-  profileImageUrl?: string;
-  birthDate?: string;
-  gender?: string;
-  region?: string;
-  role: "USER" | "ADMIN" | "MENTOR";
-  status: "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
-  lastLoginAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+export type { LoginResponse, UserDto, UserRole, UserStatus };
+
+type Tokens = Omit<LoginResponse, "user">; // user 제외 나머지 모두
 
 export interface AuthState {
-  user: User | null;
+  user: UserDto | null;
   accessToken: string | null;
   refreshToken: string | null;
-  setUser: (user: User | null) => void;
-  setAuth: (user: User, tokens: LoginTokenResponse) => void;
+  tokenType: string | null;
+  expiresIn: number | null;
+  issuedAt: string | null;
+  expiresAt: string | null;
+  setUser: (user: UserDto | null) => void;
+  setAuth: (user: UserDto, tokens: Tokens) => void;
   logout: () => void;
 }
+
+// SSR/CSR-safe localStorage 핸들러
+const storage = typeof window !== "undefined" ? window.localStorage : undefined;
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -35,33 +33,54 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       refreshToken: null,
+      tokenType: null,
+      expiresIn: null,
+      issuedAt: null,
+      expiresAt: null,
       setUser: (user) => set({ user }),
       setAuth: (user, tokens) => {
         set({
           user,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
+          tokenType: tokens.tokenType,
+          expiresIn: tokens.expiresIn,
+          issuedAt: tokens.issuedAt,
+          expiresAt: tokens.expiresAt,
         });
-        if (typeof window !== "undefined") {
-          localStorage.setItem("accessToken", tokens.accessToken);
-          localStorage.setItem("refreshToken", tokens.refreshToken);
+        if (storage) {
+          storage.setItem("accessToken", tokens.accessToken);
+          storage.setItem("refreshToken", tokens.refreshToken);
         }
       },
       logout: () => {
-        set({ user: null, accessToken: null, refreshToken: null });
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          tokenType: null,
+          expiresIn: null,
+          issuedAt: null,
+          expiresAt: null,
+        });
+        if (storage) {
+          storage.removeItem("accessToken");
+          storage.removeItem("refreshToken");
         }
       },
     }),
     {
-      name: "auth-store",
+      name: "auth-store-v2",
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
+        tokenType: state.tokenType,
+        expiresIn: state.expiresIn,
+        issuedAt: state.issuedAt,
+        expiresAt: state.expiresAt,
       }),
+      version: 2,
     }
   )
 );

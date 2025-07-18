@@ -1,13 +1,14 @@
+// app/(auth)/login/components/LoginForm.tsx
 "use client";
 
-import { loginWithEmail } from "@/libs/api/auth.api";
+import { loginWithEmail } from "@/libs/api/auth/auth.api";
 import { useAuthStore } from "@/store/authStore";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../LoginPage.module.css";
 
-export default function LoginForm() {
+function LoginForm() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,34 +30,44 @@ export default function LoginForm() {
   }, []);
 
   const sanitize = (val: string) => val.replace(/[<>'"`;]/g, "");
-
   const isIdValid = username.trim().length >= 4 && !username.match(/[<>'"`;]/g);
   const isPwValid = password.length >= 4 && !password.match(/[<>'"`;]/g);
   const isFormValid = isIdValid && isPwValid;
 
   const loginMutation = useMutation({
     mutationFn: () => loginWithEmail(username.trim(), password),
-    retry: false,
+    retry: 0,
     onSuccess: (res) => {
-      // ✅✅✅ 이 부분이 중요! 반드시 res.data.data에서 파싱!
-      const envelope = res; // loginWithEmail에서 이미 data.data를 반환하도록 되어있으면 그냥 res 사용
-      // 아래처럼 받도록 loginWithEmail 구현 필요!
-      // const envelope = res?.data ?? {};
-
-      const { user, accessToken, refreshToken } = envelope ?? {};
-
+      const {
+        user,
+        accessToken,
+        refreshToken,
+        tokenType,
+        expiresIn,
+        issuedAt,
+        expiresAt,
+      } = res || {};
       if (!user || !accessToken || !refreshToken) {
         setError("로그인 응답이 올바르지 않습니다.");
         return;
       }
-
-      setAuth(user, { accessToken, refreshToken });
+      setAuth(user, {
+        accessToken,
+        refreshToken,
+        tokenType,
+        expiresIn,
+        issuedAt,
+        expiresAt,
+      });
       router.push("/dashboard");
     },
     onError: (err: any) => {
-      setError("로그인에 실패하였습니다. 입력 정보를 다시 확인해주세요.");
+      setError(
+        err?.message ||
+          "로그인에 실패하였습니다. 입력 정보를 다시 확인해주세요."
+      );
       if (process.env.NODE_ENV === "development") {
-        console.error("로그인 실패:", err?.response?.status, err?.message);
+        console.error("로그인 실패:", err);
       }
     },
   });
@@ -80,6 +91,7 @@ export default function LoginForm() {
       className={styles.formContainer}
       autoComplete="off"
       aria-label="로그인 입력 폼"
+      aria-busy={isPending}
       onSubmit={handleSubmit}
       style={{ gap: 0 }}
     >
@@ -90,6 +102,7 @@ export default function LoginForm() {
         onChange={(e) => setUsername(sanitize(e.target.value))}
         placeholder="아이디를 입력하세요"
         autoComplete="username"
+        autoCapitalize="off"
         aria-label="아이디"
         required
         className={styles.inputField}
@@ -97,16 +110,17 @@ export default function LoginForm() {
         maxLength={50}
         disabled={isPending}
         style={{ marginBottom: "14px" }}
+        spellCheck={false}
       />
-
       <div style={{ position: "relative", marginBottom: "18px" }}>
         <input
           type={showPw ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(sanitize(e.target.value))}
           placeholder="비밀번호를 입력하세요"
-          autoComplete="off"
+          autoComplete="current-password"
           aria-label="비밀번호"
+          autoCapitalize="off"
           required
           className={styles.inputField}
           minLength={4}
@@ -132,13 +146,11 @@ export default function LoginForm() {
           {showPw ? "숨김" : "보기"}
         </button>
       </div>
-
       {error && (
         <div className={styles.errorMsg} role="alert">
           {error}
         </div>
       )}
-
       <button
         type="submit"
         disabled={isPending || !isFormValid}
@@ -151,3 +163,5 @@ export default function LoginForm() {
     </form>
   );
 }
+
+export default React.memo(LoginForm);

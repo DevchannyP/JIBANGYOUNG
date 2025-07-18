@@ -1,4 +1,4 @@
-import RegisterForm from "./components/RegisterForm";
+import RegisterPageClient from "./RegisterPageClient";
 export default function RegisterPage() {
-  return <RegisterForm />;
+  return <RegisterPageClient />;
 }

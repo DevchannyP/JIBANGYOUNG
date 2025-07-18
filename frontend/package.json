@@ -20,7 +20,9 @@
     "axios": "^1.6.8",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.10",
+    "framer-motion": "^12.1.6",
     "jwt-decode": "^4.0.0",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.323.0",
     "next": "^15.3.4",
     "next-seo": "^6.0.0",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.81.5",
     "@testing-library/react": "^15.0.0",
+    "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.41",
     "@types/react-dom": "^18.2.17",

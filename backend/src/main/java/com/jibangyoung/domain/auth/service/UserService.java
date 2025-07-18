@@ -1,19 +1,20 @@
 package com.jibangyoung.domain.auth.service;
 
-import com.jibangyoung.domain.auth.dto.*;
-import com.jibangyoung.domain.auth.entity.User;
-import com.jibangyoung.domain.auth.entity.UserStatus;
-import com.jibangyoung.domain.auth.repository.UserRepository;
-import com.jibangyoung.global.exception.BusinessException;
-import com.jibangyoung.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.jibangyoung.domain.auth.dto.PasswordUpdateRequestDto;
+import com.jibangyoung.domain.auth.dto.SignupRequestDto;
+import com.jibangyoung.domain.auth.dto.UserDto;
+import com.jibangyoung.domain.auth.entity.User;
+import com.jibangyoung.domain.auth.entity.UserRole;
+import com.jibangyoung.domain.auth.repository.UserRepository;
+import com.jibangyoung.global.exception.BusinessException;
+import com.jibangyoung.global.exception.ErrorCode;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +37,12 @@ public class UserService {
             signupRequest.getProfileImageUrl(),
             signupRequest.getBirthDate(),
             signupRequest.getGender(),
-            signupRequest.getRegion()
+            signupRequest.getRegion(),
+            UserRole.USER // 반드시 USER로!
         );
         return userRepository.save(user);
     }
 
-    // 비밀번호 변경
     public void updateUserPassword(Long userId, PasswordUpdateRequestDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -56,13 +57,11 @@ public class UserService {
         log.info("사용자 {} 비밀번호 변경 완료", user.getUsername());
     }
 
-    // 마지막 로그인 갱신
     public void updateLastLogin(User user) {
         user.updateLastLogin();
         userRepository.save(user); // dirty checking으로 자동 반영 가능
     }
 
-    // 프로필 업데이트
     public UserDto updateUserProfile(Long userId, String nickname, String phone, String profileImageUrl) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -70,7 +69,6 @@ public class UserService {
         return UserDto.from(user);
     }
 
-    // 탈퇴/비활성화/활성화
     public void deactivateUser(Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -83,7 +81,6 @@ public class UserService {
         user.activate();
     }
 
-    // 조회 API
     @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)
@@ -91,7 +88,6 @@ public class UserService {
         return UserDto.from(user);
     }
 
-    // 중복 체크
     public boolean isUsernameAvailable(String username) {
         return !userRepository.existsByUsername(username);
     }
@@ -100,4 +96,3 @@ public class UserService {
         return !userRepository.existsByEmail(email);
     }
 }
-

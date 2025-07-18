@@ -34,6 +34,7 @@ backend/build/               # backend 빌드 산출물
 .idea/
 .vscode/
 *.swp
+# application.yml
 
 # -----------------------
 # 🌐 환경 변수 파일

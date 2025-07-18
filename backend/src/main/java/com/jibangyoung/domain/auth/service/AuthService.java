@@ -4,13 +4,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jibangyoung.domain.auth.dto.LoginRequestDto;
-import com.jibangyoung.domain.auth.dto.LoginResponseDto;
-import com.jibangyoung.domain.auth.dto.SignupRequestDto;
-import com.jibangyoung.domain.auth.dto.UserDto;
+import com.jibangyoung.domain.auth.dto.*;
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.entity.UserStatus;
 import com.jibangyoung.domain.auth.repository.UserRepository;
@@ -30,35 +28,41 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final TokenService tokenService;
+    private final VerificationService verificationService;
+    private final PasswordEncoder passwordEncoder;
 
-    // ✅ RefreshToken 관련 Repository는 이 클래스에 직접 의존하지 않음
-    // 모든 토큰 저장/조회/폐기 로직은 TokenService 내부에서 처리!
-    // (SOLID: 단일책임원칙, 유지보수/테스트/확장에 유리)
-
+    // ======================
+    // 1. 회원가입
+    // ======================
     public UserDto signup(SignupRequestDto signupRequest) {
         log.info("[SIGNUP] 요청 - username={}, email={}", signupRequest.getUsername(), signupRequest.getEmail());
         validateSignupRequest(signupRequest);
 
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            log.warn("[SIGNUP] 실패 - 중복 username: {}", signupRequest.getUsername());
+        if (userRepository.existsByUsername(signupRequest.getUsername()))
             throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        }
-
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            log.warn("[SIGNUP] 실패 - 중복 email: {}", signupRequest.getEmail());
+        if (userRepository.existsByEmail(signupRequest.getEmail()))
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
 
-        try {
-            User user = userService.createUser(signupRequest);
-            log.info("[SIGNUP] 성공 - username: {}", user.getUsername());
-            return UserDto.from(user);
-        } catch (Exception e) {
-            log.error("[SIGNUP] 내부 오류 - {}", e.getMessage(), e);
-            throw e;
-        }
+        // TODO: 이메일 인증(verify) 필요 시 아래에서 검증
+
+        User user = User.createUser(
+                signupRequest.getUsername(),
+                signupRequest.getEmail(),
+                passwordEncoder.encode(signupRequest.getPassword()),
+                signupRequest.getNickname(),
+                signupRequest.getPhone(),
+                signupRequest.getProfileImageUrl(),
+                signupRequest.getBirthDate(),
+                signupRequest.getGender(),
+                signupRequest.getRegion()
+        );
+        userRepository.save(user);
+        return UserDto.from(user);
     }
 
+    // ======================
+    // 2. 로그인 (JWT 반환)
+    // ======================
     public LoginResponseDto login(LoginRequestDto loginRequest) {
         log.info("[LOGIN] 요청 - username={}", loginRequest.getUsername());
         try {
@@ -75,10 +79,8 @@ public class AuthService {
                         return new BusinessException(ErrorCode.USER_NOT_FOUND);
                     });
 
-            // 마지막 로그인 시간 업데이트
-            userService.updateLastLogin(user);
+            userService.updateLastLogin(user); // 마지막 로그인 갱신
 
-            // ✅ 토큰 생성/저장/관리 책임은 tokenService에 위임!
             LoginResponseDto loginResponse = tokenService.generateTokens(authentication, user);
 
             log.info("[LOGIN] 성공 - username: {}", user.getUsername());
@@ -93,10 +95,12 @@ public class AuthService {
         }
     }
 
+    // ======================
+    // 3. 리프레시 토큰 → 액세스 토큰 재발급
+    // ======================
     public LoginResponseDto refreshToken(String refreshToken) {
         log.info("[REFRESH] 토큰 재발급 요청");
         try {
-            // ✅ 리프레시토큰 검증/교체 책임도 tokenService가 전담
             LoginResponseDto dto = tokenService.refreshAccessToken(refreshToken);
             log.info("[REFRESH] 토큰 재발급 성공");
             return dto;
@@ -106,6 +110,9 @@ public class AuthService {
         }
     }
 
+    // ======================
+    // 4. 로그아웃 (토큰 폐기)
+    // ======================
     public void logout(String refreshToken) {
         log.info("[LOGOUT] 로그아웃 요청 - refreshToken: {}", refreshToken);
         try {
@@ -128,10 +135,41 @@ public class AuthService {
         }
     }
 
+    // ======================
+    // 5. 아이디/이메일 중복확인
+    // ======================
+    public CheckUsernameResponse checkUsername(String username) {
+        boolean exists = userRepository.existsByUsername(username);
+        return CheckUsernameResponse.builder()
+            .data(!exists)
+            .message(exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다.")
+            .build();
+    }
+
+    public CheckEmailResponse checkEmail(String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        return CheckEmailResponse.builder()
+            .data(!exists)
+            .message(exists ? "이미 등록된 이메일입니다." : "사용 가능한 이메일입니다.")
+            .build();
+    }
+
+    // ======================
+    // 6. 이메일 인증 (Redis 활용)
+    // ======================
+    public void sendVerificationCode(String email) {
+        verificationService.sendCode(email); // Redis에 코드 저장 + 이메일 발송
+    }
+
+    public boolean verifyCode(String email, String code) {
+        return verificationService.verifyCode(email, code); // Redis에서 검증
+    }
+
+    // ======================
+    // 유틸
+    // ======================
     private void validateSignupRequest(SignupRequestDto signupRequest) {
-        if (!signupRequest.isPasswordMatching()) {
-            log.warn("[SIGNUP] 비밀번호 불일치 - username: {}", signupRequest.getUsername());
+        if (!signupRequest.isPasswordMatching())
             throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
-        }
     }
 }

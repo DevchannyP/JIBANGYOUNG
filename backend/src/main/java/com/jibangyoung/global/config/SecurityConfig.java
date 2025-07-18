@@ -30,52 +30,70 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    // ✅ 패스워드 인코더 (BCrypt 방식)
+    
+    // ✅ PasswordEncoder 등록
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ 인증 매니저 등록 (Spring Security 6.x 방식)
+    // ✅ AuthenticationManager 등록 (Spring Security 6.x 스타일)
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        builder.userDetailsService(customUserDetailsService)
+               .passwordEncoder(passwordEncoder());
         return builder.build();
     }
 
-    // ✅ CORS 정책 설정 (Spring Security용)
+    // ✅ CORS 정책 명확하게 분리
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 프론트 도메인
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 프론트 도메인 명시
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With")); // 명시적 설정
-        config.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie")); // 응답 헤더 노출 허용
-        config.setAllowCredentials(true); // 쿠키/세션 허용
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        config.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // 모든 요청 경로에 CORS 적용
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
-    // ✅ 보안 필터 체인 설정
+    // ✅ 핵심: Security Filter Chain 최신 문법 적용
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 적용
-            .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 방식)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 무상태 세션
+            // CORS 정책 적용
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // CSRF 비활성화 (JWT stateless 특성)
+            .csrf(csrf -> csrf.disable())
+            // 세션 사용 안 함 (JWT 방식)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 엔드포인트별 인가정책 (PERMIT ALL → 실제 운영시에는 일부 API만 허용!)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Preflight 허용
-                .requestMatchers("/api/auth/**").permitAll() // 로그인/회원가입 등
-                .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/admin/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/community/**").permitAll()
+                .requestMatchers("/api/dashboard/**").permitAll()
+                .requestMatchers("/api/mentor/**").permitAll()
+                .requestMatchers("/api/mypage/**").permitAll()
+                .requestMatchers("/api/policy/**").permitAll()
+                .requestMatchers("/api/recommendation/**").permitAll()
+                .requestMatchers("/api/report/**").permitAll()
+                .requestMatchers("/api/search/**").permitAll()
+                .requestMatchers("/api/survey/**").permitAll()
+                .anyRequest().authenticated()
             )
+            // 인증 실패 핸들러 (JWT 토큰 문제시 401)
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증 실패 처리
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 적용
+            // 🔥 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
