@@ -236,3 +236,44 @@
     transform: scale(1);
   }
 }
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+.checkboxInput {
+  accent-color: #ffdf39;
+  width: 16px;
+  height: 16px;
+}
+.tagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.tag {
+  background: #fff2c3;
+  color: #3a3c3f;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.85em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tagClose {
+  background: transparent;
+  border: none;
+  color: #444;
+  font-weight: bold;
+  cursor: pointer;
+}

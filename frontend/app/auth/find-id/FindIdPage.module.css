@@ -1,0 +1,204 @@
+.inputRow {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  align-items: center;
+  width: 100%; /* 인풋+버튼 한줄일 때 꽉차게 */
+}
+.inputField {
+  height: 48px;
+  background: #f8f8f8;
+  border: 1.5px solid #ececec;
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #3a3c3f;
+  padding: 0 18px;
+  font-family: inherit;
+  font-weight: 400;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border 0.2s;
+}
+.inputField:focus {
+  border: 1.5px solid #ffdf39;
+}
+.codeButton,
+.findIdButton,
+.loginButton,
+.signupButton {
+  height: 48px;
+  background: #ffdf39;
+  border: none;
+  border-radius: 12px;
+  color: #3a3c3f;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.04);
+  letter-spacing: -0.5px;
+  min-width: 112px;
+  width: 100%;  /* 버튼도 input과 같은 폭 */
+}
+.codeButton:disabled,
+.findIdButton:disabled,
+.loginButton:disabled,
+.signupButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+.codeButton:hover:not(:disabled),
+.findIdButton:hover:not(:disabled),
+.loginButton:hover:not(:disabled),
+.signupButton:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+.codeButton:focus-visible,
+.findIdButton:focus-visible,
+.loginButton:focus-visible,
+.signupButton:focus-visible {
+  outline: 2.5px solid #3884e3;
+  outline-offset: 2px;
+}
+
+/* 인증코드 한줄 PC (input+button 연결) */
+.inputRow .inputField {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+  flex: 1;
+  margin-bottom: 0;
+}
+.inputRow .codeButton {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  min-width: 112px;
+  width: 112px;
+  height: 48px;
+}
+
+/* 반응형: 모바일(500px 이하)에서는 inputRow → 세로 쌓기 */
+@media (max-width: 500px) {
+  .inputRow {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .inputRow .inputField,
+  .inputRow .codeButton {
+    border-radius: 12px !important;
+    border-right: 1.5px solid #ececec;
+    width: 100% !important;
+    min-width: 0;
+  }
+  .codeButton { width: 100%; }
+}
+
+/* LoginPage.module.css 안에 포함될 수 있음. 없는 항목만 추가 */
+
+.resultContainer {
+  padding: 32px 24px 40px 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.04);
+  margin: 40px auto 24px auto;
+  max-width: 400px;
+  width: 100%;
+  border: 1.5px solid #ffe140;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.successIcon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+.resultTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #147833;
+}
+.resultCard {
+  background: #faf8f2;
+  border-radius: 10px;
+  padding: 20px 18px 15px 18px;
+  margin-bottom: 24px;
+  width: 100%;
+}
+.resultRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.resultLabel {
+  background: #ffe140;
+  color: #333;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.resultValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #222;
+}
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+.retryButton {
+  background: #ececec;
+  color: #444;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 22px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.retryButton:hover,
+.retryButton:focus {
+  background: #f8e86e;
+}
+.loginButton {
+  background: #ffdf39;
+  color: #222;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 22px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-decoration: none;
+  display: block;
+}
+.loginButton:hover,
+.loginButton:focus {
+  background: #ffd400;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(20, 20, 20, 0.38);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

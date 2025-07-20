@@ -74,7 +74,7 @@ function handleApiError(error: unknown): never {
 // ⭐️ API 함수들
 // --------------------
 
-// ✅ 아이디 중복확인 (boolean + message 구조로 반환)
+// ✅ 아이디 중복확인
 export async function checkUsername(
   username: string
 ): Promise<{ available: boolean; message: string }> {
@@ -83,7 +83,6 @@ export async function checkUsername(
       `/api/auth/check-username`,
       { params: { username } }
     );
-    // 백엔드: { success, data: { data: boolean, message: string }, message }
     return {
       available: res.data.data?.data ?? false,
       message: res.data.data?.message || res.data.message || "",
@@ -111,13 +110,21 @@ export async function checkEmail(
   }
 }
 
-// ✅ 이메일 인증코드 발송
+// ✅ 이메일 인증코드 발송 (이름만 달라도 실제 동일 기능, 둘 중 하나만 써도 됨)
 export async function sendCode(email: string): Promise<{ message: string }> {
   try {
     const res = await api.post<ApiEnvelope<void>>(`/api/auth/send-code`, {
       email,
     });
     return { message: res.data.message || "인증코드가 발송되었습니다." };
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+export async function sendCodeByEmail(email: string): Promise<{ message: string }> {
+  try {
+    const res = await api.post<ApiEnvelope<void>>(`/api/auth/send-code`, { email });
+    return { message: res.data.message || "이메일로 인증코드가 발송되었습니다." };
   } catch (error) {
     handleApiError(error);
   }
@@ -173,7 +180,7 @@ export async function signup(payload: SignupRequest): Promise<UserDto> {
   }
 }
 
-// ✅ 로그인 (기존 코드 유지)
+// ✅ 로그인
 export async function loginWithEmail(
   username: string,
   password: string
@@ -207,3 +214,59 @@ export async function loginWithEmail(
     handleApiError(error);
   }
 }
+
+
+// ✅ [아이디 찾기 전용] 인증코드 발송
+export async function sendFindIdCode(email: string): Promise<{ message: string }> {
+  try {
+    const res = await api.post<ApiEnvelope<void>>(`/api/auth/find-id/send-code`, { email });
+    return { message: res.data.message || "아이디 찾기 인증코드가 발송되었습니다." };
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// ✅ [아이디 찾기 전용] 인증코드 검증
+export async function verifyFindIdCode(
+  email: string,
+  code: string
+): Promise<{ valid: boolean; message: string }> {
+  try {
+    const res = await api.post<ApiEnvelope<boolean>>(`/api/auth/find-id/verify-code`, {
+      email,
+      code,
+    });
+    return {
+      valid: res.data.data ?? false,
+      message: res.data.message || (res.data.data ? "인증 성공!" : "인증코드가 올바르지 않습니다."),
+    };
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// ✅ [아이디 찾기 전용] 이메일+코드로 아이디 조회
+export async function findIdByEmailAndCode(
+  email: string,
+  code: string
+): Promise<{ username: string }> {
+  try {
+    const response = await api.post<ApiEnvelope<{ username: string }>>(
+      "/api/auth/find-id",
+      { email, code }
+    );
+    const envelope = response.data;
+
+    if (!envelope.success) {
+      throw new Error(envelope.message || "아이디 찾기에 실패했습니다.");
+    }
+    if (!envelope.data?.username) {
+      throw new Error("일치하는 아이디가 없습니다.");
+    }
+    return envelope.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+

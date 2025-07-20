@@ -14,6 +14,8 @@ import com.jibangyoung.domain.auth.dto.CheckEmailResponse;
 import com.jibangyoung.domain.auth.dto.CheckUsernameResponse;
 import com.jibangyoung.domain.auth.dto.EmailSendRequest;
 import com.jibangyoung.domain.auth.dto.EmailVerifyRequest;
+import com.jibangyoung.domain.auth.dto.FindIdRequest;
+import com.jibangyoung.domain.auth.dto.FindIdResponse;
 import com.jibangyoung.domain.auth.dto.LoginRequestDto;
 import com.jibangyoung.domain.auth.dto.LoginResponseDto;
 import com.jibangyoung.domain.auth.dto.SignupRequestDto;
@@ -102,4 +104,31 @@ public class AuthController {
         String msg = valid ? "인증 성공!" : "인증코드가 올바르지 않습니다.";
         return ResponseEntity.ok(ApiResponse.success(valid, msg));
     }
+
+  
+    // ✅ [아이디 찾기] 인증코드 발송
+    @PostMapping("/find-id/send-code")
+    public ResponseEntity<ApiResponse<Void>> sendFindIdCode(@RequestBody @Valid EmailSendRequest req) {
+        authService.sendCodeForFindId(req.getEmail());
+        return ResponseEntity.ok(ApiResponse.success(null, "아이디 찾기 인증코드 발송 완료"));
+    }
+
+    // ✅ [아이디 찾기] 인증코드 검증
+    @PostMapping("/find-id/verify-code")
+    public ResponseEntity<ApiResponse<Boolean>> verifyFindIdCode(@RequestBody @Valid EmailVerifyRequest req) {
+        boolean valid = authService.verifyFindIdCode(req.getEmail(), req.getCode());
+        return ResponseEntity.ok(ApiResponse.success(valid, valid ? "인증 성공" : "인증 실패"));
+    }
+
+    // ✅ [아이디 찾기] 이메일+코드로 아이디 반환
+    @PostMapping("/find-id")
+    public ResponseEntity<ApiResponse<FindIdResponse>> findId(@RequestBody @Valid FindIdRequest req) {
+        String username = authService.findIdByEmailAndCode(req.getEmail(), req.getCode());
+        return ResponseEntity.ok(ApiResponse.success(new FindIdResponse(username), "아이디 조회 성공"));
+    }
+
+    
+
+
+    
 }

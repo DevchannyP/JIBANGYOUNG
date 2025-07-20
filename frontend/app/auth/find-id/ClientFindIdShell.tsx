@@ -1,19 +1,17 @@
-// app/(auth)/login/ClientLoginShell.tsx
+// app/auth/find-id/ClientFindIdShell.tsx
 "use client";
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import LoginForm from "./components/LoginForm"; // ⭐️ static import (즉시 노출)
-import SocialLoginButtons from "../common/SocialLoginButtons"; // ⭐️ static import (즉시 노출)
-import styles from "./LoginPage.module.css";
+import styles from "../login/LoginPage.module.css";
+import FindIdSection from "./components/FindIdSection";
 import Link from "next/link";
+import SocialLoginButtons from "../common/SocialLoginButtons";
 
-// 마스코트만 dynamic import + Suspense
-const AuthMascots = dynamic(() => import("../common/AuthMascots"), {
-  ssr: false,
-});
+// CSR 컴포넌트만 dynamic
+const AuthMascots = dynamic(() => import("../common/AuthMascots"), { ssr: false });
 
-export default function ClientLoginShell() {
+export default function ClientFindIdShell() {
   return (
     <div className={styles.bgWrap}>
       <div className={styles.mascotFixed}>
@@ -47,21 +45,19 @@ export default function ClientLoginShell() {
           <div className={styles.curveSection}></div>
           <div className={styles.loginSection}>
             <div className={styles.formContainer}>
-              {/* 로그인 폼 즉시 노출 */}
-              <LoginForm />
+              <FindIdSection />
               <div className={styles.linkRow}>
-                <Link href="/auth/find-id" className={styles.linkSm}>
-                  아이디 찾기
+                <Link href="/auth/login" className={styles.linkSm}>
+                  로그인 하기
                 </Link>
                 <Link href="/auth/find-password" className={styles.linkSm}>
-                  비밀번호 재설정 하기
+                  비밀번호 찾기
                 </Link>
               </div>
               <div className={styles.dividerOr}>OR</div>
-              {/* 소셜 버튼 즉시 노출 */}
               <SocialLoginButtons />
               <div className={styles.bottomText}>
-                계정이 없으신가요?{" "}
+                계정이 필요하신가요?{" "}
                 <Link href="/auth/register" className={styles.linkSm}>
                   회원가입
                 </Link>

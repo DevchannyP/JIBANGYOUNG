@@ -1,5 +1,8 @@
 package com.jibangyoung.domain.auth.service;
 
+import java.time.LocalDateTime;
+import java.util.Random;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,8 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jibangyoung.domain.auth.dto.*;
+import com.jibangyoung.domain.auth.entity.EmailVerification;
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.entity.UserStatus;
+import com.jibangyoung.domain.auth.exception.AuthException;
+import com.jibangyoung.domain.auth.repository.EmailVerificationRepository;
 import com.jibangyoung.domain.auth.repository.UserRepository;
 import com.jibangyoung.global.exception.BusinessException;
 import com.jibangyoung.global.exception.ErrorCode;
@@ -30,6 +36,9 @@ public class AuthService {
     private final TokenService tokenService;
     private final VerificationService verificationService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationRepository emailVerificationRepository;
+    private final EmailService emailService;
+    
 
     // ======================
     // 1. 회원가입
@@ -172,4 +181,95 @@ public class AuthService {
         if (!signupRequest.isPasswordMatching())
             throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
     }
+
+
+    
+    /**
+     * [아이디 찾기] 인증코드 발송 (DB 기반, 5분 TTL)
+     * - 기존 인증 내역 모두 삭제 후 새로 발송 (재사용 방지)
+     * - EmailVerification DB에 저장, 이메일로 코드 발송
+     */
+    @Transactional
+    public void sendCodeForFindId(String email) {
+        // 기존 인증 내역 삭제 (중복 방지)
+        emailVerificationRepository.deleteByEmail(email);
+
+        // 6자리 랜덤 코드 생성 (0~999999, 앞자리 0 포함)
+        String code = String.format("%06d", new Random().nextInt(1_000_000));
+
+        // 인증 정보 저장 (verified = false)
+        EmailVerification verification = EmailVerification.builder()
+            .email(email)
+            .code(code)
+            .verified(false)
+            .build();
+        emailVerificationRepository.save(verification);
+
+        // 이메일 전송 (비동기 발송 추천)
+        emailService.sendAuthCodeMail(email, code);
+    }
+
+    /**
+     * [아이디 찾기] 인증코드 검증 (5분 유효/미사용 시만)
+     * - 유효성/만료/사용 여부 모두 체크
+     * @return 성공 true, 실패 false (불일치만 false, 만료/사용됨은 예외)
+     */
+    @Transactional
+    public boolean verifyFindIdCode(String email, String code) {
+        EmailVerification verification = emailVerificationRepository
+            .findTopByEmailOrderByCreatedAtDesc(email)
+            .orElseThrow(() -> new AuthException("인증코드가 존재하지 않습니다. 다시 요청하세요."));
+
+        // 5분 내 코드만 유효
+        if (verification.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+            throw new AuthException("인증코드가 만료되었습니다. 다시 요청하세요.");
+        }
+        // 코드 일치 체크 (불일치만 false)
+        if (!verification.getCode().equals(code)) {
+            return false;
+        }
+        // 이미 사용된 코드 방지
+        if (Boolean.TRUE.equals(verification.getVerified())) {
+            throw new AuthException("이미 사용된 인증코드입니다. 다시 요청하세요.");
+        }
+
+        verification.setVerified(true); // 사용 처리(1회용)
+        emailVerificationRepository.save(verification); // DB 반영 (중요!)
+        return true;
+    }
+
+    /**
+     * [아이디 찾기] 이메일+인증코드로 아이디 반환
+     * - 인증 코드 5분/1회 사용 제한
+     * - verified=true(인증됨)만 아이디 조회 허용
+     */
+    @Transactional(readOnly = true)
+    public String findIdByEmailAndCode(String email, String code) {
+        EmailVerification verification = emailVerificationRepository
+            .findTopByEmailOrderByCreatedAtDesc(email)
+            .orElseThrow(() -> new AuthException("인증코드가 발송되지 않았거나 만료되었습니다."));
+
+        // 5분 유효성 검사
+        if (verification.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+            throw new AuthException("인증코드가 만료되었습니다. (5분 이내 코드만 유효)");
+        }
+        // 코드 일치
+        if (!verification.getCode().equals(code)) {
+            throw new AuthException("인증코드가 일치하지 않습니다.");
+        }
+        // 인증 성공(verified=true)만 통과
+        if (!Boolean.TRUE.equals(verification.getVerified())) {
+            throw new AuthException("이메일 인증을 먼저 완료해주세요.");
+        }
+
+        // 해당 이메일로 활성 상태 유저 조회
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new AuthException("해당 이메일로 등록된 계정이 없습니다."));
+        if (!user.isActive()) {
+            throw new AuthException("탈퇴/정지/비활성 계정입니다.");
+        }
+        return user.getUsername();
+    }
 }
+
+

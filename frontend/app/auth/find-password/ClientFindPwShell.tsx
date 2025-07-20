@@ -1,19 +1,21 @@
-// app/(auth)/login/ClientLoginShell.tsx
+// app/auth/find-password/ClientFindPwShell.tsx
 "use client";
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import LoginForm from "./components/LoginForm"; // ⭐️ static import (즉시 노출)
-import SocialLoginButtons from "../common/SocialLoginButtons"; // ⭐️ static import (즉시 노출)
-import styles from "./LoginPage.module.css";
+import styles from "./FindPasswordPage.module.css";
+import FindPwSection from "./components/FindPwSection";
 import Link from "next/link";
 
-// 마스코트만 dynamic import + Suspense
+// ✅ AuthMascots는 dynamic import 유지 (CSR + lazy load)
 const AuthMascots = dynamic(() => import("../common/AuthMascots"), {
   ssr: false,
 });
 
-export default function ClientLoginShell() {
+// ✅ SocialLoginButtons는 static import로 즉시 렌더링 (같은 방식으로 통일)
+import SocialLoginButtons from "../common/SocialLoginButtons";
+
+export default function ClientFindPwShell() {
   return (
     <div className={styles.bgWrap}>
       <div className={styles.mascotFixed}>
@@ -47,21 +49,20 @@ export default function ClientLoginShell() {
           <div className={styles.curveSection}></div>
           <div className={styles.loginSection}>
             <div className={styles.formContainer}>
-              {/* 로그인 폼 즉시 노출 */}
-              <LoginForm />
+              <FindPwSection />
               <div className={styles.linkRow}>
+                <Link href="/auth/login" className={styles.linkSm}>
+                  로그인 하기
+                </Link>
                 <Link href="/auth/find-id" className={styles.linkSm}>
                   아이디 찾기
                 </Link>
-                <Link href="/auth/find-password" className={styles.linkSm}>
-                  비밀번호 재설정 하기
-                </Link>
               </div>
               <div className={styles.dividerOr}>OR</div>
-              {/* 소셜 버튼 즉시 노출 */}
+              {/* ✅ 즉시 노출: static import */}
               <SocialLoginButtons />
               <div className={styles.bottomText}>
-                계정이 없으신가요?{" "}
+                계정이 필요하신가요?{" "}
                 <Link href="/auth/register" className={styles.linkSm}>
                   회원가입
                 </Link>

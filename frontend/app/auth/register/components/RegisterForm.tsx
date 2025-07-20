@@ -13,8 +13,9 @@ import {
 } from "../../../../libs/hooks/useAuth";
 import styles from "../RegisterPage.module.css";
 
-// --- 비밀번호 규칙 안내 컴포넌트(내부) ---
-function PasswordRules({ password }: { password: string }) {
+// --- 비밀번호 규칙 안내 ---
+function PasswordRules({ password, visible }: { password: string; visible: boolean }) {
+  if (!visible) return null;
   const rules = [
     { check: password.length >= 8, text: "8자 이상" },
     { check: /[A-Z]/.test(password), text: "대문자 포함" },
@@ -37,10 +38,12 @@ function PasswordRules({ password }: { password: string }) {
   );
 }
 
-// --- 기타 상수 ---
 type MessageState = { type: "success" | "error" | "info"; text: string };
 
-const REGION_OPTIONS = ["서울", "경기도", "전라남도", "부산", "대전"];
+const REGION_OPTIONS = [
+  "서울", "경기도", "전라남도", "부산", "대전", "강원도", "제주도", "전주시", "포항", "서귀포시"
+];
+const MAX_REGION_SELECT = 3;
 const GENDER_OPTIONS = [
   { value: "", label: "성별 선택" },
   { value: "M", label: "남성" },
@@ -48,18 +51,14 @@ const GENDER_OPTIONS = [
   { value: "O", label: "기타/선택안함" },
 ];
 
-// --- 비밀번호 규칙 함수 ---
-function checkPasswordRules(password: string) {
+function isPasswordValid(password: string) {
   return [
     password.length >= 8,
     /[A-Z]/.test(password),
     /[a-z]/.test(password),
     /[0-9]/.test(password),
     /[!@#$%^&*]/.test(password),
-  ];
-}
-function isPasswordValid(password: string) {
-  return checkPasswordRules(password).every(Boolean);
+  ].every(Boolean);
 }
 
 export default function RegisterForm() {
@@ -72,13 +71,14 @@ export default function RegisterForm() {
     code: "",
     nickname: "",
     phone: "",
-    region: "",
+    regionMulti: [] as string[],
     profileImageUrl: "",
     gender: "",
     birthDate: "",
   });
+  const [regionQuery, setRegionQuery] = useState("");
 
-  // 상태 관리
+  // --- UI State ---
   const [usernameMsg, setUsernameMsg] = useState<MessageState | null>(null);
   const [emailMsg, setEmailMsg] = useState<MessageState | null>(null);
   const [codeMsg, setCodeMsg] = useState<MessageState | null>(null);
@@ -89,6 +89,9 @@ export default function RegisterForm() {
   const [codeSent, setCodeSent] = useState(false);
   const [codeChecked, setCodeChecked] = useState(false);
   const [showNext, setShowNext] = useState(false);
+
+  // 비밀번호 규칙 안내 포커스 제어
+  const [pwRuleVisible, setPwRuleVisible] = useState(false);
 
   const userInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -101,7 +104,7 @@ export default function RegisterForm() {
   const verifyCodeMut = useVerifyCode();
   const signupMut = useSignup();
 
-  // 아이디 중복확인
+  // --- Debounced Username ---
   const debouncedCheckUsername = useCallback(
     debounce(async (username: string) => {
       if (!username || username.length < 3) {
@@ -113,16 +116,10 @@ export default function RegisterForm() {
       try {
         const res = await checkUsernameMut.mutateAsync(username);
         if (res.available) {
-          setUsernameMsg({
-            type: "success",
-            text: "사용 가능한 아이디입니다.",
-          });
+          setUsernameMsg({ type: "success", text: "사용 가능한 아이디입니다." });
           setIsUsernameValid(true);
         } else {
-          setUsernameMsg({
-            type: "error",
-            text: "이미 사용중인 아이디입니다.",
-          });
+          setUsernameMsg({ type: "error", text: "이미 사용중인 아이디입니다." });
           setIsUsernameValid(false);
         }
       } catch (e: any) {
@@ -139,7 +136,7 @@ export default function RegisterForm() {
     return () => debouncedCheckUsername.cancel();
   }, [form.username]);
 
-  // 이메일 중복확인
+  // --- Debounced Email ---
   const debouncedCheckEmail = useCallback(
     debounce(async (email: string) => {
       if (!email || !email.includes("@")) {
@@ -176,7 +173,7 @@ export default function RegisterForm() {
     return () => debouncedCheckEmail.cancel();
   }, [form.email]);
 
-  // 코드발송
+  // --- 인증코드 발송 ---
   const handleSendCode = useCallback(async () => {
     if (!form.email || !isEmailValid) {
       setEmailMsg({ type: "error", text: "유효한 이메일을 입력하세요." });
@@ -187,7 +184,7 @@ export default function RegisterForm() {
       const res = await sendCodeMut.mutateAsync(form.email);
       setCodeInputVisible(true);
       setCodeSent(true);
-      setShowNext(true); // ⭐ 추가필드 노출
+      setShowNext(true);
       setCodeMsg({
         type: "success",
         text: res.message || "인증코드가 발송되었습니다.",
@@ -198,7 +195,7 @@ export default function RegisterForm() {
     }
   }, [form.email, isEmailValid]);
 
-  // 코드확인
+  // --- 인증코드 확인 ---
   const handleVerifyCode = useCallback(async () => {
     if (!form.email || !form.code) {
       setCodeMsg({ type: "error", text: "인증코드를 입력하세요." });
@@ -220,17 +217,14 @@ export default function RegisterForm() {
     }
   }, [form.email, form.code]);
 
-  // 비밀번호 실시간 체크 (규칙)
+  // --- 비밀번호 실시간 체크 ---
   useEffect(() => {
     if (!form.password && !form.passwordConfirm) {
       setPwMsg(null);
       return;
     }
     if (!isPasswordValid(form.password)) {
-      setPwMsg({
-        type: "error",
-        text: "비밀번호 규칙을 모두 만족해야 합니다.",
-      });
+      setPwMsg({ type: "error", text: "비밀번호 규칙을 모두 만족해야 합니다." });
       return;
     }
     if (form.password !== form.passwordConfirm) {
@@ -240,7 +234,17 @@ export default function RegisterForm() {
     setPwMsg({ type: "success", text: "비밀번호 일치" });
   }, [form.password, form.passwordConfirm]);
 
-  // 폼 제출
+  // --- 지역 실시간 필터링 ---
+  const filteredRegionOptions = REGION_OPTIONS.filter(
+    (region) =>
+      region
+        .toLowerCase()
+        .replace(/ /g, "")
+        .includes(regionQuery.trim().toLowerCase().replace(/ /g, "")) &&
+      !form.regionMulti.includes(region)
+  );
+
+  // --- 폼 제출 ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (
@@ -254,7 +258,7 @@ export default function RegisterForm() {
       !form.phone.trim() ||
       !form.birthDate ||
       !form.gender ||
-      !form.region
+      form.regionMulti.length === 0
     ) {
       alert("모든 정보를 정확히 입력하세요.");
       return;
@@ -265,7 +269,7 @@ export default function RegisterForm() {
       passwordConfirm: form.passwordConfirm,
       email: form.email,
       nickname: form.nickname,
-      region: form.region,
+      region: form.regionMulti.join(","),
       phone: form.phone,
       profileImageUrl: form.profileImageUrl,
       birthDate: form.birthDate,
@@ -280,7 +284,7 @@ export default function RegisterForm() {
     }
   };
 
-  // 메시지 렌더
+  // --- 메시지 렌더 ---
   const renderMsg = (msg: MessageState | null) =>
     msg ? (
       <div
@@ -288,8 +292,8 @@ export default function RegisterForm() {
           msg.type === "success"
             ? styles.successMsg
             : msg.type === "error"
-              ? styles.errorMsg
-              : styles.infoMsg
+            ? styles.errorMsg
+            : styles.infoMsg
         }
         style={{ marginTop: "4px", fontSize: "0.95em" }}
         aria-live="polite"
@@ -307,96 +311,91 @@ export default function RegisterForm() {
           autoComplete="off"
           onSubmit={handleSubmit}
         >
-          {/* 1단계: 아이디, 이메일, 코드발송, 비밀번호 */}
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-          >
-            {/* 아이디 */}
-            <div className={styles.formRow}>
-              <input
-                ref={userInputRef}
-                name="username"
-                value={form.username}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, username: e.target.value }))
-                }
-                className={`${styles.inputField} ${isUsernameValid ? styles.inputSuccess : ""} ${usernameMsg?.type === "error" ? styles.inputError : ""}`}
-                placeholder="아이디 입력"
-                autoComplete="username"
-                inputMode="text"
-                disabled={signupMut.isPending}
-                aria-invalid={usernameMsg?.type === "error"}
-                aria-label="아이디"
-                required
-              />
-              {isUsernameValid && (
-                <span
-                  aria-label="확인됨"
-                  style={{
-                    marginLeft: 8,
-                    color: "#20c37b",
-                    fontSize: "1.3em",
-                    fontWeight: 700,
-                  }}
-                >
-                  ✔
-                </span>
-              )}
-            </div>
-            {renderMsg(usernameMsg)}
-
-            {/* 이메일 */}
-            <div className={styles.formRow}>
-              <input
-                ref={emailInputRef}
-                name="email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, email: e.target.value }))
-                }
-                className={`${styles.inputField} ${isEmailValid ? styles.inputSuccess : ""} ${emailMsg?.type === "error" ? styles.inputError : ""}`}
-                placeholder="이메일 주소 입력"
-                autoComplete="email"
-                inputMode="email"
-                disabled={signupMut.isPending}
-                aria-invalid={emailMsg?.type === "error"}
-                aria-label="이메일"
-                required
-              />
-              {isEmailValid && (
-                <span
-                  aria-label="확인됨"
-                  style={{
-                    marginLeft: 8,
-                    color: "#20c37b",
-                    fontSize: "1.3em",
-                    fontWeight: 700,
-                  }}
-                >
-                  ✔
-                </span>
-              )}
-            </div>
-            {renderMsg(emailMsg)}
-
-            {/* 코드발송 버튼 */}
-            <div className={styles.formRow}>
-              <button
-                type="button"
-                className={styles.sideButton}
-                onClick={handleSendCode}
-                disabled={
-                  sendCodeMut.isPending || !isEmailValid || signupMut.isPending
-                }
-                style={{ width: "100%", fontWeight: 600, letterSpacing: "1px" }}
+          {/* 아이디 */}
+          <div className={styles.formRow}>
+            <input
+              ref={userInputRef}
+              name="username"
+              value={form.username}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, username: e.target.value }))
+              }
+              className={`${styles.inputField} ${isUsernameValid ? styles.inputSuccess : ""} ${usernameMsg?.type === "error" ? styles.inputError : ""}`}
+              placeholder="아이디 입력"
+              autoComplete="username"
+              inputMode="text"
+              disabled={signupMut.isPending}
+              aria-invalid={usernameMsg?.type === "error"}
+              aria-label="아이디"
+              required
+            />
+            {isUsernameValid && (
+              <span
+                aria-label="확인됨"
+                style={{
+                  marginLeft: 8,
+                  color: "#20c37b",
+                  fontSize: "1.3em",
+                  fontWeight: 700,
+                }}
               >
-                {codeSent
-                  ? "인증코드 재발송"
-                  : sendCodeMut.isPending
-                    ? "발송중..."
-                    : "코드발송"}
-              </button>
-            </div>
+                ✔
+              </span>
+            )}
+          </div>
+          {renderMsg(usernameMsg)}
+
+          {/* 이메일 */}
+          <div className={styles.formRow}>
+            <input
+              ref={emailInputRef}
+              name="email"
+              value={form.email}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, email: e.target.value }))
+              }
+              className={`${styles.inputField} ${isEmailValid ? styles.inputSuccess : ""} ${emailMsg?.type === "error" ? styles.inputError : ""}`}
+              placeholder="이메일 주소 입력"
+              autoComplete="email"
+              inputMode="email"
+              disabled={signupMut.isPending}
+              aria-invalid={emailMsg?.type === "error"}
+              aria-label="이메일"
+              required
+            />
+            {isEmailValid && (
+              <span
+                aria-label="확인됨"
+                style={{
+                  marginLeft: 8,
+                  color: "#20c37b",
+                  fontSize: "1.3em",
+                  fontWeight: 700,
+                }}
+              >
+                ✔
+              </span>
+            )}
+          </div>
+          {renderMsg(emailMsg)}
+
+          {/* 코드발송 버튼 */}
+          <div className={styles.formRow}>
+            <button
+              type="button"
+              className={styles.sideButton}
+              onClick={handleSendCode}
+              disabled={
+                sendCodeMut.isPending || !isEmailValid || signupMut.isPending
+              }
+              style={{ width: "100%", fontWeight: 600, letterSpacing: "1px" }}
+            >
+              {codeSent
+                ? "인증코드 재발송"
+                : sendCodeMut.isPending
+                ? "발송중..."
+                : "코드발송"}
+            </button>
           </div>
 
           {/* 인증코드 입력/확인 */}
@@ -447,15 +446,15 @@ export default function RegisterForm() {
                   {codeChecked
                     ? "확인완료"
                     : verifyCodeMut.isPending
-                      ? "확인중..."
-                      : "코드확인"}
+                    ? "확인중..."
+                    : "코드확인"}
                 </button>
               </motion.div>
             )}
           </AnimatePresence>
           {renderMsg(codeMsg)}
 
-          {/* 비밀번호 입력 */}
+          {/* 비밀번호 */}
           <div className={styles.formRow}>
             <input
               name="password"
@@ -468,19 +467,22 @@ export default function RegisterForm() {
                 isPasswordValid(form.password)
                   ? styles.inputSuccess
                   : form.password
-                    ? styles.inputError
-                    : ""
+                  ? styles.inputError
+                  : ""
               }`}
               placeholder="비밀번호"
               autoComplete="new-password"
               disabled={signupMut.isPending}
               required
               aria-label="비밀번호"
+              onFocus={() => setPwRuleVisible(true)}
+              onBlur={() => setPwRuleVisible(false)}
             />
           </div>
-          {/* === 비밀번호 규칙 안내 바로 아래에 출력 === */}
-          <PasswordRules password={form.password} />
+          {/* 비밀번호 규칙 안내 (포커스 때만) */}
+          <PasswordRules password={form.password} visible={pwRuleVisible} />
 
+          {/* 비밀번호 확인 */}
           <div className={styles.formRow}>
             <input
               name="passwordConfirm"
@@ -499,26 +501,27 @@ export default function RegisterForm() {
           </div>
           {renderMsg(pwMsg)}
 
-          {/* 2단계: 코드발송 후 모든 추가필드 슬라이드 등장 */}
-          <AnimatePresence>
-            {showNext && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 32 }}
-                transition={{ type: "spring", stiffness: 250, damping: 30 }}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  marginTop: "20px",
-                  background: "#fffbea",
-                  borderRadius: "14px",
-                  padding: "20px 14px 16px 14px",
-                  boxShadow: "0 3px 12px 0 rgba(255,225,64,0.09)",
-                }}
-              >
+          {/* 2단계: 코드발송 후 추가필드 */}
+<AnimatePresence>
+  {showNext && (
+    <motion.div
+      key="step2"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 32 }}
+      transition={{ type: "spring", stiffness: 250, damping: 30 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "18px", // innerForm gap과 통일
+        margin: 0,
+        padding: 0,
+        background: "none",
+        borderRadius: 0,
+        boxShadow: "none",
+      }}
+    >
+                {/* 닉네임 */}
                 <div className={styles.formRow}>
                   <input
                     name="nickname"
@@ -534,6 +537,7 @@ export default function RegisterForm() {
                     aria-label="닉네임"
                   />
                 </div>
+                {/* 이하 동일 */}
                 <div className={styles.formRow}>
                   <input
                     name="phone"
@@ -586,25 +590,110 @@ export default function RegisterForm() {
                     max={new Date().toISOString().split("T")[0]}
                   />
                 </div>
-                <div className={styles.formRow}>
-                  <select
-                    name="region"
-                    value={form.region}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, region: e.target.value }))
-                    }
+                {/* 지역 검색 & 선택 */}
+                <div className={styles.formRow} style={{ flexDirection: "column", alignItems: "start" }}>
+                  <div style={{ fontSize: "0.95em", marginBottom: 4, fontWeight: 600 }}>
+                    지역명 검색 (최대 {MAX_REGION_SELECT}개)
+                  </div>
+                  <input
+                    type="text"
+                    value={regionQuery}
+                    onChange={(e) => setRegionQuery(e.target.value)}
                     className={styles.inputField}
-                    disabled={signupMut.isPending}
-                    required
-                    aria-label="지역"
-                  >
-                    <option value="">지역 선택</option>
-                    {REGION_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
+                    placeholder="예: 서울, 부산 등 입력"
+                    disabled={signupMut.isPending || form.regionMulti.length >= MAX_REGION_SELECT}
+                    aria-label="지역명 검색"
+                    style={{ marginBottom: 7, minWidth: 180, width: "100%" }}
+                  />
+                  {/* 검색창에 입력 있을 때만 체크박스 노출 */}
+                  {regionQuery.trim() && (
+                    <div className={styles.checkboxGroup} style={{ marginBottom: 5 }}>
+                      {filteredRegionOptions.length === 0 ? (
+                        <div style={{ color: "#b0a689", fontSize: "0.97em" }}>
+                          검색 결과 없음
+                        </div>
+                      ) : (
+                        filteredRegionOptions.map((region) => {
+                          const isChecked = form.regionMulti.includes(region);
+                          const isDisabled = !isChecked && form.regionMulti.length >= MAX_REGION_SELECT;
+                          return (
+                            <label key={region} className={styles.checkboxLabel} style={{ opacity: isDisabled ? 0.5 : 1 }}>
+                              <input
+                                type="checkbox"
+                                value={region}
+                                checked={isChecked}
+                                disabled={isDisabled || signupMut.isPending}
+                                onChange={(e) => {
+                                  setForm((prev) => {
+                                    const selected = prev.regionMulti;
+                                    const next = e.target.checked
+                                      ? [...selected, region]
+                                      : selected.filter((r) => r !== region);
+                                    return { ...prev, regionMulti: next };
+                                  });
+                                }}
+                                className={styles.checkboxInput}
+                                style={{ display: "none" }}
+                              />
+                              <span
+                                className="custom-checkbox"
+                                style={{
+                                  display: "inline-block",
+                                  width: 16,
+                                  height: 16,
+                                  border: "1.5px solid #ffe140",
+                                  borderRadius: 4,
+                                  background: isChecked ? "#ffe140" : "#fff",
+                                  marginRight: 6,
+                                  verticalAlign: "middle",
+                                  transition: "background 0.15s"
+                                }}
+                              >
+                                {isChecked && (
+                                  <span style={{
+                                    display: "block",
+                                    width: 10,
+                                    height: 10,
+                                    margin: "2.5px auto",
+                                    borderRadius: 2,
+                                    background: "#20c37b"
+                                  }} />
+                                )}
+                              </span>
+                              {region}
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
+                  {/* 선택된 지역 태그 */}
+                  <div className={styles.tagWrap}>
+                    {form.regionMulti.map((r) => (
+                      <span key={r} className={styles.tag}>
+                        {r}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm((prev) => ({
+                              ...prev,
+                              regionMulti: prev.regionMulti.filter((item) => item !== r),
+                            }))
+                          }
+                          className={styles.tagClose}
+                          aria-label={`${r} 제거`}
+                          tabIndex={0}
+                        >
+                          ×
+                        </button>
+                      </span>
                     ))}
-                  </select>
+                  </div>
+                  {form.regionMulti.length >= MAX_REGION_SELECT && (
+                    <div style={{ color: "#d89105", fontSize: "0.94em", marginTop: 3 }}>
+                      최대 {MAX_REGION_SELECT}개까지 선택할 수 있습니다.
+                    </div>
+                  )}
                 </div>
                 <div className={styles.formRow}>
                   <input

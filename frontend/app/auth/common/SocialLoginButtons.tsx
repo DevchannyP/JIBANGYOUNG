@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import styles from "../LoginPage.module.css";
+import styles from "../login/LoginPage.module.css";
 
 const SOCIALS = [
   {

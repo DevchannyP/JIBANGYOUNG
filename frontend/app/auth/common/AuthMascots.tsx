@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../LoginPage.module.css";
+import styles from "../login/LoginPage.module.css";
 
 export default function AuthMascots() {
   return (
