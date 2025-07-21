@@ -1,35 +1,33 @@
 package com.jibangyoung.domain.policy.controller;
 
-import com.jibangyoung.domain.policy.dto.PolicyResponseDto;
+import com.jibangyoung.domain.policy.dto.PolicyCardDto;
 import com.jibangyoung.domain.policy.service.PolicyService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/policyApi")
+@RequestMapping("/api/policy")
 public class PolicyController {
     
-    private final PolicyService policyService;
+    @Autowired
+    private PolicyService policyService;
 
     public PolicyController(PolicyService policyService) {
         this.policyService = policyService;
     }
-    
-    @GetMapping
-    public List<PolicyResponseDto> getAllPolicies() {
-        System.out.println("=== API 호출됨 ===");
-    try {
-        List<PolicyResponseDto> result = policyService.getNoPlcyNm();
-        System.out.println("조회된 데이터 개수: " + result.size());
-        return result;
-    } catch (Exception e) {
-        System.err.println("오류 발생: " + e.getMessage());
-        e.printStackTrace();
-        throw e;
+
+    // 클라이언트에서 /api/policies/cards 요청 시 정책 카드 DTO 리스트 반환
+    @GetMapping("/policy.c")
+    public List<PolicyCardDto> getPolicyCards() {
+        return policyService.getActivePolicyCards();
     }
-}
+
+    
 }

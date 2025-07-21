@@ -1,9 +1,9 @@
 package com.jibangyoung.domain.policy;
 
-import com.jibangyoung.domain.policy.dto.PolicyResponseDto;
-import com.jibangyoung.domain.policy.entity.PolicyView;
-import com.jibangyoung.domain.policy.service.PolicyService;
+import com.jibangyoung.domain.policy.dto.PolicyCardDto;
+import com.jibangyoung.domain.policy.entity.Policy;
 import com.jibangyoung.domain.policy.repository.PolicyRepository;
+import com.jibangyoung.domain.policy.service.PolicyService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,20 +12,33 @@ import java.util.List;
 
 @Component
 public class SimplePolicyTest {
-    private final PolicyService policyService;
 
     @Autowired
-    public SimplePolicyTest(PolicyService policyService, PolicyRepository policyRepository) {
-        this.policyService = policyService;
-    }
+    private PolicyService policyService;
+
+    @Autowired
+    private PolicyRepository policyRepository;
 
     @PostConstruct
     public void testTop10Policies() {
-        // PolicyResponseDto 테스트
-        System.out.println("Testing PolicyResponseDto:");
-        List<PolicyResponseDto> policies = policyService.getNoPlcyNm();
-        for (PolicyResponseDto policy : policies) {
-            System.out.println("NO: " + policy.getNo() + ", plcyNm: " + policy.getPlcyNm());
+        // Repository에서 직접 조회
+        System.out.println("=== Repository에서 직접 조회 ===");
+        List<Policy> repoPolicies = policyRepository.findDistinctByPlcyNm().stream()
+                .limit(10)
+                .toList();
+        for (Policy policy : repoPolicies) {
+            System.out.println("NO: " + policy.getNO() +
+                    ", plcyNm: " + policy.getPlcy_nm() +
+                    ", aplyYmd: " + policy.getAply_ymd());
         }
+        //service에서 조회
+         System.out.println("=== Service에서 조회 테스트 ===");
+        List<PolicyCardDto> servicePolicies = policyService.getActivePolicyCards();
+        System.out.println("총 개수:"+servicePolicies.size());
+        // for (PolicyCardDto policy : servicePolicies) {
+        //     System.out.println("NO: " + policy.getNO() +
+        //             ", plcyNm: " + policy.getPlcy_nm() +
+        //             ", aplyYmd: " + policy.getDeadline());
+        // }
     }
 }

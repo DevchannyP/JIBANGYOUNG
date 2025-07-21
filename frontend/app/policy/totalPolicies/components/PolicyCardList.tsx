@@ -1,21 +1,13 @@
-// app/policy/totalPolicies/components/PolicyCardList.tsx (3열 카드 그리드)
+// app/policy/totalPolicies/components/PolicyCardList.tsx
 "use client";
 
 import PolicyCard from './PolicyCard';
 import styles from '../../total_policy.module.css';
-
-export interface Policy {
-  No: number;
-  plcyNm: string;
-  // summary: string;
-  // support: string;
-  // deadline: string;
-  // category: string;
-}
+import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
 
 interface PolicyCardListProps {
-  policies: Policy[];
-  onCardClick: (No: number) => void;
+  policies: PolicyCardType[];
+  onCardClick: (NO: number) => void;
   bookmarkedPolicyIds?: number[];
   onBookmarkToggle?: (policyId: number) => void;
 }
@@ -26,14 +18,17 @@ export default function PolicyCardList({
   bookmarkedPolicyIds = [], 
   onBookmarkToggle 
 }: PolicyCardListProps) {
+
+  console.log("PolicyCardList에 받은 policies:", policies);
+
   return (
     <div className={styles.list}>
-      {policies.map((policy) => (
+      {policies.map((policy, index) => (
         <PolicyCard 
-          key={policy.No} 
+          key={policy.NO}
           policy={policy}
-          onClick={() => onCardClick(policy.No)}
-          isBookmarked={bookmarkedPolicyIds.includes(policy.No)}
+          onClick={() => onCardClick(policy.NO)}
+          isBookmarked={bookmarkedPolicyIds.includes(policy.NO)}
           onBookmarkToggle={onBookmarkToggle}
         />
       ))}

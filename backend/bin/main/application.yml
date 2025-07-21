@@ -6,7 +6,7 @@ spring:
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: update # 운영은 validate 또는 none 권장
+      ddl-auto: validate # 운영은 validate 또는 none 권장
     show-sql: true
     properties:
       hibernate:

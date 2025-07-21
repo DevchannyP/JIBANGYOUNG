@@ -74,9 +74,8 @@ export default function PolicyFilterBar({
           onChange={(e) => setSortBy(e.target.value)} 
           className={styles.select}
         >
-          <option value="date_desc">최신순</option>
-          <option value="date_asc">오래된순</option>
-          <option value="support_desc">지원금 높은순</option>
+          <option value="d_day_desc">마감빠른순</option>
+          <option value="favorite_asc">인기순</option>
         </select>
       </div>
       
@@ -89,7 +88,7 @@ export default function PolicyFilterBar({
           className={styles.select}
         >
           <option value="title">제목</option>
-          <option value="summary">요약</option>
+          <option value="keyword">키워드</option>
         </select>
       </div>
       
