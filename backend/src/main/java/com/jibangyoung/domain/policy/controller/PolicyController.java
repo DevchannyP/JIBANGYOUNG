@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,6 +29,12 @@ public class PolicyController {
     public List<PolicyCardDto> getPolicyCards() {
         return policyService.getActivePolicyCards();
     }
+
+    //Region 필터링 엔드포인트
+    @GetMapping("/region.api")
+    public List<PolicyCardDto> getPoliciesByRegion(@RequestParam(name= "region_code", required= false, defaultValue = "99999" ) int regionCode) {
+        return policyService.getPoliciesByRegion(regionCode);
+    }    
 
     
 }

@@ -9,25 +9,38 @@ import PolicyCounter from './components/PolicyCounter';
 import styles from '../total_policy.module.css';
 import { PolicyCard } from "@/types/api/policy.c";
 import { fetchAllPolicies } from "@/libs/api/policy/policy.c";
+import { fetchPoliciesByRegion } from "@/libs/api/policy/region.api"; // 추가
 
 export default function PolicyPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchType, setSearchType] = useState('title');
-  const [region, setRegion] = useState('전국');
+  const [region, setRegion] = useState<number>(99999); // 99999 : 전국
   const [sortBy, setSortBy] = useState('date_desc');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
   const [policies, setPolicies] = useState<PolicyCard[]>([]);
 
-useEffect(() => {
-  fetchAllPolicies()
-    .then(data => {
-      console.log('받은 정책 데이터:', data);  // 여기에 데이터가 찍히나요?
-      setPolicies(data);
-    })
-    .catch(err => console.error('API 호출 에러:', err));
-}, []);
+  // regionCode 변경 시마다 데이터 새로 fetch
+  useEffect(() => {
+    if (region === 99999) {
+      // 전국
+      fetchAllPolicies()
+        .then(data => {
+          console.log('전체 정책 데이터:', data);
+          setPolicies(data);
+        })
+        .catch(err => console.error('전체 정책 API 호출 에러:', err));
+    } else {
+      // 지역별 조회
+      fetchPoliciesByRegion(region)
+        .then(data => {
+          console.log(`지역 ${region} 데이터:`, data);
+          setPolicies(data);
+        })
+        .catch(err => console.error('지역별 정책 API 호출 에러:', err));
+    }
+  }, [region]);
 
   const itemsPerPage = 12;
 
@@ -54,7 +67,7 @@ useEffect(() => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategories, sortBy]);
+  }, [searchQuery, selectedCategories, sortBy, region]);
 
   const totalFiltered = filteredAndSortedPolicies.length;
   const totalPages = Math.ceil(totalFiltered / itemsPerPage);

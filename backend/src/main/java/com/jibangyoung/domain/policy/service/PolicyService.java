@@ -1,15 +1,16 @@
 package com.jibangyoung.domain.policy.service;
 
 import com.jibangyoung.domain.policy.dto.PolicyCardDto;
+import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.PolicyRepository;
+import com.jibangyoung.domain.policy.repository.RegionRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,5 +66,35 @@ private LocalDate extractDeadline(String aply_ymd, DateTimeFormatter formatter) 
     } catch (Exception e) {
         return LocalDate.parse("2099-12-31", formatter); // 파싱 실패 시 상시 마감일
     }
+}
+// 지역코드와 정책 지역코드를 매핑
+public List<PolicyCardDto> getPoliciesByRegion(Integer regionCode) {
+    
+    return policyRepository.findAll().stream()
+            .filter(policy -> {
+                try {
+                    return Integer.parseInt(policy.getZip_cd()) == regionCode;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            })
+            .map(p -> {
+                LocalDate deadline = extractDeadline(p.getAply_ymd(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                if (deadline == null) return null;
+
+                long d_day = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), deadline);
+                if (d_day < 0) return null;
+
+                return new PolicyCardDto(
+                        p.getNO(),
+                        p.getPlcy_nm(),
+                        p.getAply_ymd(),
+                        p.getPlcy_kywd_nm(),
+                        deadline,
+                        d_day
+                );
+            })
+            .filter(dto -> dto != null)
+            .collect(Collectors.toList());
 }
 }

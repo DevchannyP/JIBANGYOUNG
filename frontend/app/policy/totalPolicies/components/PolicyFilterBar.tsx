@@ -7,8 +7,8 @@ import styles from '../../total_policy.module.css';
 interface PolicyFilterBarProps {
   searchType: string;
   setSearchType: (type: string) => void;
-  region: string;
-  setRegion: (region: string) => void;
+  region: number;
+  setRegion: (region: number) => void;
   sortBy: string;
   setSortBy: (sort: string) => void;
   onSearch: (query: string) => void;
@@ -56,13 +56,13 @@ export default function PolicyFilterBar({
         <select 
           id="region" 
           value={region} 
-          onChange={(e) => setRegion(e.target.value)} 
+          onChange={(e) => setRegion(Number(e.target.value))} 
           className={styles.select}
         >
-          <option value="전국">전국</option>
-          <option value="서울">서울</option>
-          <option value="부산">부산</option>
-          <option value="제주">제주</option>
+          <option value={99999}>전국</option>
+          <option value={11000}>서울</option>
+          <option value={26000}>부산</option>
+          <option value={50000}>제주</option>
         </select>
       </div>
       
