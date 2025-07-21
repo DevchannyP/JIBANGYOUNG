@@ -3,13 +3,13 @@
 import { loginWithEmail } from "@/libs/api/auth.api";
 import { useAuthStore } from "@/store/authStore";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import styles from "../LoginPage.module.css";
 
 export default function LoginForm() {
-  const setUser = useAuthStore((state) => state.setUser);
-  const [userid, setUserid] = useState("");
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
@@ -17,33 +17,50 @@ export default function LoginForm() {
   const router = useRouter();
 
   useEffect(() => {
+    if (showPw) {
+      const timer = setTimeout(() => setShowPw(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPw]);
+
+  useEffect(() => {
     inputRef.current?.focus();
     return () => setError("");
   }, []);
 
+  const sanitize = (val: string) => val.replace(/[<>'"`;]/g, "");
+
+  const isIdValid = username.trim().length >= 4 && !username.match(/[<>'"`;]/g);
+  const isPwValid = password.length >= 4 && !password.match(/[<>'"`;]/g);
+  const isFormValid = isIdValid && isPwValid;
+
   const loginMutation = useMutation({
-    mutationFn: () => loginWithEmail(userid.trim(), password),
+    mutationFn: () => loginWithEmail(username.trim(), password),
     retry: false,
     onSuccess: (res) => {
-      setUser({ ...res.user, nickname: res.user.nickname ?? "" });
-      router.push("/dashboard"); // ✅ CSR 방식 리다이렉션
-    },
-    onError: (err: any) => {
-      if (err?.response?.status === 401) {
-        setError("아이디 또는 비밀번호가 올바르지 않습니다.");
-      } else {
-        setError("일시적인 오류입니다. 잠시 후 다시 시도해주세요.");
+      // ✅✅✅ 이 부분이 중요! 반드시 res.data.data에서 파싱!
+      const envelope = res; // loginWithEmail에서 이미 data.data를 반환하도록 되어있으면 그냥 res 사용
+      // 아래처럼 받도록 loginWithEmail 구현 필요!
+      // const envelope = res?.data ?? {};
+
+      const { user, accessToken, refreshToken } = envelope ?? {};
+
+      if (!user || !accessToken || !refreshToken) {
+        setError("로그인 응답이 올바르지 않습니다.");
+        return;
       }
 
+      setAuth(user, { accessToken, refreshToken });
+      router.push("/dashboard");
+    },
+    onError: (err: any) => {
+      setError("로그인에 실패하였습니다. 입력 정보를 다시 확인해주세요.");
       if (process.env.NODE_ENV === "development") {
-        console.error("로그인 실패:", err);
+        console.error("로그인 실패:", err?.response?.status, err?.message);
       }
     },
   });
 
-  const isIdValid = userid.trim().length >= 4;
-  const isPwValid = password.length >= 4;
-  const isFormValid = isIdValid && isPwValid;
   const isPending = loginMutation.status === "pending";
 
   const handleLogin = () => {
@@ -61,7 +78,7 @@ export default function LoginForm() {
   return (
     <form
       className={styles.formContainer}
-      autoComplete="on"
+      autoComplete="off"
       aria-label="로그인 입력 폼"
       onSubmit={handleSubmit}
       style={{ gap: 0 }}
@@ -69,8 +86,8 @@ export default function LoginForm() {
       <input
         ref={inputRef}
         type="text"
-        value={userid}
-        onChange={(e) => setUserid(e.target.value)}
+        value={username}
+        onChange={(e) => setUsername(sanitize(e.target.value))}
         placeholder="아이디를 입력하세요"
         autoComplete="username"
         aria-label="아이디"
@@ -86,9 +103,9 @@ export default function LoginForm() {
         <input
           type={showPw ? "text" : "password"}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(sanitize(e.target.value))}
           placeholder="비밀번호를 입력하세요"
-          autoComplete="current-password"
+          autoComplete="off"
           aria-label="비밀번호"
           required
           className={styles.inputField}

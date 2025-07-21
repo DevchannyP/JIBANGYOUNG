@@ -36,11 +36,10 @@ public class AuthController {
 
         return ResponseEntity.ok(ApiResponse.success(user, "회원가입이 완료되었습니다."));
     }
-
+// 진행중
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto loginRequest) {
         log.info("로그인 요청: {}", loginRequest.getUsername());
-
         LoginResponseDto loginResponse = authService.login(loginRequest);
 
         return ResponseEntity.ok(ApiResponse.success(loginResponse, "로그인이 완료되었습니다."));

@@ -1,17 +1,24 @@
 package com.jibangyoung.domain.auth.entity;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
@@ -61,9 +68,10 @@ public class User {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-@com.fasterxml.jackson.annotation.JsonIgnore
-private List<RefreshToken> refreshTokens = new ArrayList<>();
+    // 🚫❌ Redis로 토큰 저장 → 아래 부분 완전히 삭제!!
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @com.fasterxml.jackson.annotation.JsonIgnore
+    // private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -75,8 +83,8 @@ private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     // 정적 팩토리 메서드 (Builder 아님)
     public static User createUser(String username, String email, String password,
-                                  String nickname, String phone, String profileImageUrl,
-                                  LocalDate birthDate, String gender, String region) {
+    String nickname, String phone, String profileImageUrl,
+    LocalDate birthDate, String gender, String region) {
         User user = new User();
         user.username = username;
         user.email = email;
@@ -111,4 +119,3 @@ private List<RefreshToken> refreshTokens = new ArrayList<>();
     public boolean isAdmin() { return this.role == UserRole.ADMIN; }
     public boolean isMentor() { return this.role == UserRole.MENTOR; }
 }
-

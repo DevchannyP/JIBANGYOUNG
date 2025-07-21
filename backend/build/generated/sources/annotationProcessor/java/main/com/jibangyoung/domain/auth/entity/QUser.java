@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -39,8 +38,6 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath phone = createString("phone");
 
     public final StringPath profileImageUrl = createString("profileImageUrl");
-
-    public final ListPath<RefreshToken, QRefreshToken> refreshTokens = this.<RefreshToken, QRefreshToken>createList("refreshTokens", RefreshToken.class, QRefreshToken.class, PathInits.DIRECT2);
 
     public final StringPath region = createString("region");
 

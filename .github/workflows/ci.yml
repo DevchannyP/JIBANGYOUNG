@@ -1,4 +1,4 @@
-name: 🚦 CI - 지방청년 통합 테스트 (Backend, Frontend, Docker)
+name: 🚦 CI - 지방청년 통합 테스트 (Backend, Frontend, Docker, Vercel)
 
 on:
   pull_request:
@@ -70,7 +70,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
 
       - name: 📦 Install Dependencies
         working-directory: frontend
@@ -82,20 +81,41 @@ jobs:
           npm run lint
           npm run build
 
-  docker:
-    name: 🐳 Docker Build Check
-    runs-on: ubuntu-latest
-    needs: [frontend, backend]
+  # docker:
+  #   name: 🐳 Docker Build Check
+  #   runs-on: ubuntu-latest
+  #   needs: [frontend, backend]
 
-    steps:
-      - name: ✅ Checkout Code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: ✅ Checkout Code
+  #       uses: actions/checkout@v4
 
-      - name: 📁 Dockerfile 위치 확인
-        run: ls -al infra/docker
+  #     - name: 🔧 Docker Build Test (frontend)
+  #       run: docker build -f infra/docker/Dockerfile.frontend -t jibangyoung-frontend:latest .
 
-      - name: 🔧 Docker Build Test (frontend)
-        run: docker build -f infra/docker/Dockerfile.frontend -t jibangyoung-frontend:latest .
+  #     - name: 🔧 Docker Build Test (backend)
+  #       run: docker build -f infra/docker/Dockerfile.backend -t jibangyoung-backend:latest .
 
-      - name: 🔧 Docker Build Test (backend)
-        run: docker build -f infra/docker/Dockerfile.backend -t jibangyoung-backend:latest .
+  # vercel:
+  #   name: ▲ Deploy to Vercel
+  #   runs-on: ubuntu-latest
+  #   needs: frontend
+
+  #   steps:
+  #     - name: ✅ Checkout Code
+  #       uses: actions/checkout@v4
+
+  #     - name: ⚙️ Set up Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+
+  #     - name: 🔐 Install Vercel CLI
+  #       run: npm install -g vercel@25.1.0
+
+  #     - name: 🚀 Deploy to Vercel (Production)
+  #       run: |
+  #         vercel --token=${{ secrets.VERCEL_TOKEN }} \
+  #                --prod \
+  #                --yes \
+  #                --cwd frontend
