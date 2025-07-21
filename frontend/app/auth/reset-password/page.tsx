@@ -1,8 +1,8 @@
 import ClientResetPwShell from "./ClientResetPwShell";
 
-// ✅ 최소한의 타입 명시로 TS 에러 해결
+// ✅ searchParams는 선택적이 아니어야 Next.js PageProps 조건을 만족함
 interface ResetPasswordPageProps {
-  searchParams?: { token?: string };
+  searchParams: { token?: string };
 }
 
 export default function ResetPasswordPage({
