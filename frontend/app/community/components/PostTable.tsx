@@ -37,7 +37,7 @@ const PostsTable: React.FC<PostsTableProps> = ({ posts }) => {
             {/* <td>{post.author}</td>
             <td>{post.date}</td>
             <td>{post.views}</td> */}
-            <td>👍{post.likes}</td>
+            <td>👍{post.likes} 👁️{post.views}</td>
           </tr>
         ))}
       </tbody>

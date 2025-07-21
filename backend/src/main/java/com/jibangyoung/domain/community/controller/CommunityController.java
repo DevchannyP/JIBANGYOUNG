@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jibangyoung.domain.community.dto.PostListDto;
 import com.jibangyoung.domain.community.service.CommunityService;
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
 public class CommunityController {
 
-    CommunityService communityService;
+    private final CommunityService communityService;
 
-     @GetMapping("/top-liked-week")
-     public List<PostListDto> topLikeToday() {
-         return communityService.getRecentTop10(null);
-     }
+    @GetMapping("/top-liked-week")
+    public List<PostListDto> topLikeWeek() {
+        return communityService.getCachedWeekTop10();
+    }
+    @GetMapping("/top-liked-today")
+    public List<PostListDto> topLikeToday() {
+        return communityService.getCachedTodayTop10();
+    }
 }

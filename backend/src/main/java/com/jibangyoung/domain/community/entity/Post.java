@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Post {
 
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

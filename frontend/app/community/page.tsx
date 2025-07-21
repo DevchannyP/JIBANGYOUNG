@@ -1,9 +1,11 @@
 // app/community/page.tsx
 import styles from "./Community.module.css";
-import DailyPopularPosts from "./components/DailyPopularPosts";
 import PostsTable from "./components/PostTable";
 import RegionBoardNavigation from "./components/RegionBoardNavigation";
+import TodayPopularPosts from "./components/TodayPopularPosts";
 import WeeklyPopularPosts from "./components/WeeklyPopularPosts";
+
+
 const posts = [
   {
     id: 10,
@@ -111,7 +113,7 @@ export default function CommunityPage() {
               <WeeklyPopularPosts />
             </div>
             <div>
-              <DailyPopularPosts />
+              <TodayPopularPosts />
             </div>
           </section>
         </div>
