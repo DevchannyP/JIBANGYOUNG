@@ -1,12 +1,14 @@
+// ✅ app/auth/reset-password/page.tsx
 import ClientResetPwShell from "./ClientResetPwShell";
 
-// ✅ searchParams는 선택적이 아니어야 Next.js PageProps 조건을 만족함
-interface ResetPasswordPageProps {
-  searchParams: { token?: string };
+interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function ResetPasswordPage({
-  searchParams,
-}: ResetPasswordPageProps) {
-  return <ClientResetPwShell token={searchParams?.token || ""} />;
+export default function ResetPasswordPage({ searchParams }: PageProps) {
+  const token = Array.isArray(searchParams.token)
+    ? searchParams.token[0]
+    : (searchParams.token ?? "");
+
+  return <ClientResetPwShell token={token} />;
 }
