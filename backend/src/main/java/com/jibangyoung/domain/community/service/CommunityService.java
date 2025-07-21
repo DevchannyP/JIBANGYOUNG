@@ -16,14 +16,14 @@ import lombok.RequiredArgsConstructor;
 public class CommunityService {
     private final PostRepository postRepository;
 
-    // public List<PostListDto> getRecentTop10(LocalDateTime since) {
-    //     return postRepository.findTop10ByCreatedAtAfterOrderByLikeDesc(since).stream()
-    //             .map(post -> new PostListDto(
-    //                     post.getTitle(),
-    //                     post.getLikes(),
-    //                     post.getViews(),
-    //                     post.getCreatedAt(),
-    //                     post.getRegionId()))
-    //             .collect(Collectors.toList());
-    // }
+    public List<PostListDto> getRecentTop10(LocalDateTime since) {
+        return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
+                .map(post -> new PostListDto(
+                        post.getTitle(),
+                        post.getLikes(),
+                        post.getViews(),
+                        post.getCreatedAt(),
+                        post.getRegionId()))
+                .collect(Collectors.toList());
+    }
 }

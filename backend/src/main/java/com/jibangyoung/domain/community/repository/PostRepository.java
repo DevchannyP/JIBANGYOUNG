@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.jibangyoung.domain.community.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    // List<Post> findTop10ByCreatedAtAfterOrderByLikeDesc(LocalDateTime after);
+    List<Post> findTop10ByCreatedAtAfterOrderByLikesDesc(LocalDateTime after);
 }
