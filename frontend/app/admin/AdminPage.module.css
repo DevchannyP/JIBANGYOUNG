@@ -1,0 +1,264 @@
+.adminSidebar {
+  width: 100%;
+  max-width: 300px;
+  background-color: #353535;
+  color: #fff;
+}
+
+.adminNav {
+  display: flex;
+  gap: 0;
+  flex-direction: column;
+}
+
+.navLink {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80px;
+  transition: background-color 0.2s ease;
+  color: #fff;
+  font-size: 18px;
+  text-decoration: none !important;
+  border-bottom: 1px solid #fff;
+}
+
+.navLinkActive,
+.navLink:hover {
+  background-color: #6177f6;
+  color: #fff;
+}
+
+/* 레이아웃 css */
+.adminContent {
+  display: flex;
+  max-width: 100%;
+  min-height: 1080px;
+  background-color: #fff;
+}
+
+/* 리스트 */
+.mainContent {
+  flex: 1;
+  width: 1100px;
+  padding: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.userTable th,
+.userTable td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.roleSelect {
+  padding: 4px 8px;
+}
+
+.saveButton {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background-color: #4338ca;
+}
+
+/* 검색 */
+.searchArea {
+  margin-bottom: 16px;
+}
+
+.searchInput {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.searchButton {
+  padding: 8px 16px;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.noResult {
+  margin-top: 20px;
+  color: #999;
+  text-align: center;
+}
+
+/* 저장 버튼 */
+.saveButton {
+  padding: 8px 16px;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background: #555;
+}
+
+/* 다운로드 버튼 */
+.downloadButton {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.downloadButton:hover {
+  background: #f0f0f0;
+}
+
+/* 모달팝업 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 24px;
+  width: 400px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.modalClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modalTitle {
+  margin-bottom: 16px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.modalBody {
+  margin-bottom: 24px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.primaryButton {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dangerButton {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.defaultButton {
+  background: #f1f1f1;
+  color: #333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 지역버튼 */
+.regionTabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.regionButton {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.activeRegion {
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+}
+
+/* 게시글 관리 */
+.region-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.region-table th,
+.region-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.outline-btn {
+  border: 1px solid #999;
+  background: none;
+  padding: 5px 10px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}

@@ -67,14 +67,18 @@ public class SecurityConfig {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
+            // 세션 사용 안 함 (JWT 방식)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 엔드포인트별 인가정책 (PERMIT ALL → 실제 운영시에는 일부 API만 허용!)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll()    // ✅ 모든 API 인증 없이 허용!
             )
+            // 인증 실패 핸들러 (JWT 토큰 문제시 401)
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
+            // 🔥 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
