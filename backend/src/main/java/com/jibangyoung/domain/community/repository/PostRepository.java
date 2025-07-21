@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.jibangyoung.domain.community.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
+
+    // 최근 {after} 동안 생성된 게시글 중 좋아요 Top10 조회
     List<Post> findTop10ByCreatedAtAfterOrderByLikesDesc(LocalDateTime after);
 }

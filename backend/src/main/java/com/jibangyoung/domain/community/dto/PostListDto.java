@@ -12,10 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PostListDto {
+    private Long id;
     private String title;
     private int likes;
     private int views;
     private LocalDateTime createdAt;
-    // private Long userId;
+    private Long userId;
     private Long regionId;
 }
