@@ -10,10 +10,12 @@ import styles from "../LoginPage.module.css";
 
 function LoginForm() {
   const setAuth = useAuthStore((state) => state.setAuth);
+  const accessToken = useAuthStore((state) => state.accessToken);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
+  const [isLoggingInNow, setIsLoggingInNow] = useState(false); // ⭐️ 로그인 성공시 true
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -29,6 +31,7 @@ function LoginForm() {
     return () => setError("");
   }, []);
 
+  // 특수문자 방지
   const sanitize = (val: string) => val.replace(/[<>'"`;]/g, "");
   const isIdValid = username.trim().length >= 4 && !username.match(/[<>'"`;]/g);
   const isPwValid = password.length >= 4 && !password.match(/[<>'"`;]/g);
@@ -59,6 +62,7 @@ function LoginForm() {
         issuedAt,
         expiresAt,
       });
+      setIsLoggingInNow(true); // ⭐️ 로그인 성공 직후 true로
       router.push("/dashboard");
     },
     onError: (err: any) => {
@@ -86,6 +90,51 @@ function LoginForm() {
     handleLogin();
   };
 
+  // ⭐️ 로그인 성공시 아무것도 렌더하지 않음 (페이지 전환 대기)
+  if (isLoggingInNow) return null;
+
+  // ⭐️ accessToken만 있는 경우(=로그인된 상태, but 직접 로그인한게 아님)
+  if (accessToken) {
+    return (
+      <div
+        className={styles.formContainer}
+        style={{
+          textAlign: "center",
+          padding: "48px 28px",
+          borderRadius: 16,
+          background: "#fffef7",
+          boxShadow: "0 2px 12px 0 #ffe14022",
+          fontWeight: 600,
+          fontSize: "1.08rem",
+        }}
+        aria-live="polite"
+        tabIndex={0}
+      >
+        <div
+          style={{
+            color: "#388e3c",
+            marginBottom: 18,
+            fontSize: "1.18rem",
+            fontWeight: 700,
+            letterSpacing: "-1px",
+          }}
+        >
+          이미 로그인 중입니다.
+        </div>
+        <button
+          type="button"
+          onClick={() => router.push("/dashboard")}
+          className={styles.loginButton}
+          tabIndex={0}
+          aria-label="대시보드로 이동"
+        >
+          대시보드로 이동
+        </button>
+      </div>
+    );
+  }
+
+  // 👇 로그인 폼
   return (
     <form
       className={styles.formContainer}

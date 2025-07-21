@@ -1,8 +1,10 @@
-// app/components/layout/Header.tsx
 "use client";
 
+import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { logout as logoutApi } from "../../libs/api/auth/auth.api";
 
 const dropdownItems = [
   { label: "로그인", path: "/auth/login" },
@@ -27,6 +29,25 @@ const dropdownItems = [
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // ✅ Zustand persist store에서 accessToken/user 가져오기
+  const { user, accessToken, refreshToken, logout } = useAuthStore();
+  const router = useRouter();
+
+  // ✅ accessToken, user 둘 중 하나만 있어도 로그인으로 간주 (최소 보안 기준은 둘 다)
+  const isLoggedIn = !!accessToken && !!user;
+
+  // ✅ 로그아웃 핸들러
+  const handleLogout = async () => {
+    try {
+      if (refreshToken) await logoutApi(refreshToken);
+    } catch (err: any) {
+      // 서버 실패 무시하고 클라이언트 상태 정리
+    } finally {
+      logout();
+      router.push("/auth/login");
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -86,9 +107,16 @@ export default function Header() {
           </div>
         </nav>
 
-        <Link href="/auth/login" className="btn-primary">
-          로그인
-        </Link>
+        {/* ✅ 로그인 여부에 따라 버튼 분기 */}
+        {!isLoggedIn ? (
+          <Link href="/auth/login" className="btn-primary">
+            로그인
+          </Link>
+        ) : (
+          <button className="btn-primary" onClick={handleLogout}>
+            로그아웃
+          </button>
+        )}
       </div>
     </header>
   );

@@ -42,8 +42,9 @@ export interface ApiError {
   message: string;
 }
 
+// ✅ axios 인스턴스 (Spring Boot API 주소만 사용)
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "/api",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // ex) http://localhost:8080
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
@@ -63,6 +64,14 @@ function handleApiError(error: unknown): never {
         throw new Error("이미 사용 중인 아이디입니다.");
       case "EMAIL_ALREADY_EXISTS":
         throw new Error("이미 등록된 이메일입니다.");
+      case "EMAIL_SEND_FAILED":
+        throw new Error("메일 발송에 실패했습니다.");
+      case "TOKEN_INVALID":
+        throw new Error("유효하지 않은 토큰입니다.");
+      case "TOKEN_EXPIRED":
+        throw new Error("토큰이 만료되었습니다. 다시 시도해주세요.");
+      case "PASSWORD_MISMATCH":
+        throw new Error("비밀번호가 일치하지 않습니다.");
       default:
         throw new Error(apiError.message || "요청에 실패했습니다.");
     }
@@ -71,10 +80,68 @@ function handleApiError(error: unknown): never {
 }
 
 // --------------------
-// ⭐️ API 함수들
+// ⭐️ 비밀번호 재설정 (Spring Boot 컨트롤러와 1:1)
 // --------------------
 
-// ✅ 아이디 중복확인
+// 1. [비밀번호 찾기] 비밀번호 재설정 메일 발송 (POST /api/auth/send-reset-pw)
+export async function sendResetPwEmail(email: string): Promise<void> {
+  try {
+    const res = await api.post<ApiEnvelope<void>>("/api/auth/send-reset-pw", {
+      email,
+    });
+    if (!res.data.success) {
+      throw new Error(res.data.message || "메일 발송에 실패했습니다.");
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// 2. [비밀번호 찾기] 재설정 토큰 유효성 검증 (POST /api/auth/verify-reset-token)
+export async function verifyResetPwToken(token: string): Promise<void> {
+  try {
+    const res = await api.post<ApiEnvelope<void>>(
+      "/api/auth/verify-reset-token",
+      { token }
+    );
+    if (!res.data.success) {
+      throw new Error(res.data.message || "토큰 인증 실패");
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// 3. [비밀번호 찾기] 비밀번호 변경 실행 (POST /api/auth/reset-password)
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string; // ✅ 반드시 newPassword!
+  newPasswordConfirm: string; // ✅ 반드시 newPasswordConfirm!
+}
+export async function resetPassword({
+  token,
+  newPassword,
+  newPasswordConfirm,
+}: ResetPasswordPayload): Promise<void> {
+  try {
+    const res = await api.post<ApiEnvelope<void>>("/api/auth/reset-password", {
+      token,
+      newPassword,
+      newPasswordConfirm,
+    });
+    if (!res.data.success) {
+      throw new Error(res.data.message || "비밀번호 변경 실패");
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// --------------------
+// ⭐️ 기존 인증/회원가입/아이디 찾기 등
+// --------------------
+
+// 아이디 중복확인
 export async function checkUsername(
   username: string
 ): Promise<{ available: boolean; message: string }> {
@@ -92,7 +159,7 @@ export async function checkUsername(
   }
 }
 
-// ✅ 이메일 중복확인
+// 이메일 중복확인
 export async function checkEmail(
   email: string
 ): Promise<{ available: boolean; message: string }> {
@@ -110,7 +177,7 @@ export async function checkEmail(
   }
 }
 
-// ✅ 이메일 인증코드 발송 (이름만 달라도 실제 동일 기능, 둘 중 하나만 써도 됨)
+// 이메일 인증코드 발송
 export async function sendCode(email: string): Promise<{ message: string }> {
   try {
     const res = await api.post<ApiEnvelope<void>>(`/api/auth/send-code`, {
@@ -121,16 +188,22 @@ export async function sendCode(email: string): Promise<{ message: string }> {
     handleApiError(error);
   }
 }
-export async function sendCodeByEmail(email: string): Promise<{ message: string }> {
+export async function sendCodeByEmail(
+  email: string
+): Promise<{ message: string }> {
   try {
-    const res = await api.post<ApiEnvelope<void>>(`/api/auth/send-code`, { email });
-    return { message: res.data.message || "이메일로 인증코드가 발송되었습니다." };
+    const res = await api.post<ApiEnvelope<void>>(`/api/auth/send-code`, {
+      email,
+    });
+    return {
+      message: res.data.message || "이메일로 인증코드가 발송되었습니다.",
+    };
   } catch (error) {
     handleApiError(error);
   }
 }
 
-// ✅ 이메일 인증코드 검증
+// 이메일 인증코드 검증
 export async function verifyCode(
   email: string,
   code: string
@@ -151,7 +224,7 @@ export async function verifyCode(
   }
 }
 
-// ✅ 회원가입
+// 회원가입
 export interface SignupRequest {
   username: string;
   email: string;
@@ -180,7 +253,17 @@ export async function signup(payload: SignupRequest): Promise<UserDto> {
   }
 }
 
-// ✅ 로그인
+// 로그아웃
+export async function logout(refreshToken: string): Promise<void> {
+  const res = await api.post<ApiEnvelope<void>>(
+    "/api/auth/logout",
+    {},
+    { headers: { "Refresh-Token": refreshToken } }
+  );
+  if (!res.data.success) throw new Error(res.data.message || "로그아웃 실패");
+}
+
+// 로그인
 export async function loginWithEmail(
   username: string,
   password: string
@@ -188,10 +271,7 @@ export async function loginWithEmail(
   try {
     const response = await api.post<ApiEnvelope<LoginResponse>>(
       "/api/auth/login",
-      {
-        username,
-        password,
-      }
+      { username, password }
     );
     const envelope = response.data;
 
@@ -215,37 +295,45 @@ export async function loginWithEmail(
   }
 }
 
-
-// ✅ [아이디 찾기 전용] 인증코드 발송
-export async function sendFindIdCode(email: string): Promise<{ message: string }> {
+// [아이디 찾기 전용] 인증코드 발송
+export async function sendFindIdCode(
+  email: string
+): Promise<{ message: string }> {
   try {
-    const res = await api.post<ApiEnvelope<void>>(`/api/auth/find-id/send-code`, { email });
-    return { message: res.data.message || "아이디 찾기 인증코드가 발송되었습니다." };
-  } catch (error) {
-    handleApiError(error);
-  }
-}
-
-// ✅ [아이디 찾기 전용] 인증코드 검증
-export async function verifyFindIdCode(
-  email: string,
-  code: string
-): Promise<{ valid: boolean; message: string }> {
-  try {
-    const res = await api.post<ApiEnvelope<boolean>>(`/api/auth/find-id/verify-code`, {
-      email,
-      code,
-    });
+    const res = await api.post<ApiEnvelope<void>>(
+      `/api/auth/find-id/send-code`,
+      { email }
+    );
     return {
-      valid: res.data.data ?? false,
-      message: res.data.message || (res.data.data ? "인증 성공!" : "인증코드가 올바르지 않습니다."),
+      message: res.data.message || "아이디 찾기 인증코드가 발송되었습니다.",
     };
   } catch (error) {
     handleApiError(error);
   }
 }
 
-// ✅ [아이디 찾기 전용] 이메일+코드로 아이디 조회
+// [아이디 찾기 전용] 인증코드 검증
+export async function verifyFindIdCode(
+  email: string,
+  code: string
+): Promise<{ valid: boolean; message: string }> {
+  try {
+    const res = await api.post<ApiEnvelope<boolean>>(
+      `/api/auth/find-id/verify-code`,
+      { email, code }
+    );
+    return {
+      valid: res.data.data ?? false,
+      message:
+        res.data.message ||
+        (res.data.data ? "인증 성공!" : "인증코드가 올바르지 않습니다."),
+    };
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
+// [아이디 찾기 전용] 이메일+코드로 아이디 조회
 export async function findIdByEmailAndCode(
   email: string,
   code: string
@@ -268,5 +356,3 @@ export async function findIdByEmailAndCode(
     handleApiError(error);
   }
 }
-
-

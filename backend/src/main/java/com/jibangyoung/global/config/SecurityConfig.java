@@ -50,8 +50,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // 프론트 도메인 명시
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://jibangyoung.kr")); // 운영 도메인 필요시 추가
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
         config.setAllowCredentials(true);
@@ -61,38 +61,20 @@ public class SecurityConfig {
         return source;
     }
 
-    // ✅ 핵심: Security Filter Chain 최신 문법 적용
+    // ✅ 모든 API 인증 없이 허용 (개발단계)
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // CORS 정책 적용
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // CSRF 비활성화 (JWT stateless 특성)
             .csrf(csrf -> csrf.disable())
-            // 세션 사용 안 함 (JWT 방식)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 엔드포인트별 인가정책 (PERMIT ALL → 실제 운영시에는 일부 API만 허용!)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/admin/**").permitAll()
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/community/**").permitAll()
-                .requestMatchers("/api/dashboard/**").permitAll()
-                .requestMatchers("/api/mentor/**").permitAll()
-                .requestMatchers("/api/mypage/**").permitAll()
-                .requestMatchers("/api/policy/**").permitAll()
-                .requestMatchers("/api/recommendation/**").permitAll()
-                .requestMatchers("/api/report/**").permitAll()
-                .requestMatchers("/api/search/**").permitAll()
-                .requestMatchers("/api/survey/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()    // ✅ 모든 API 인증 없이 허용!
             )
-            // 인증 실패 핸들러 (JWT 토큰 문제시 401)
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
-            // 🔥 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

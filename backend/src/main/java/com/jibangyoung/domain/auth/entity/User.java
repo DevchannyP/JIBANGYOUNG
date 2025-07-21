@@ -111,4 +111,9 @@ public class User {
             || this.role == UserRole.MENTOR_B
             || this.role == UserRole.MENTOR_C;
     }
+
+
+    public void changePassword(String encodedPassword) {
+    this.password = encodedPassword;
+}
 }

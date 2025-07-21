@@ -1,44 +1,26 @@
-// app/auth/find-password/ClientFindPwShell.tsx
 "use client";
 
+import SocialLoginButtons from "@/app/auth/common/SocialLoginButtons";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import styles from "./FindPasswordPage.module.css";
-import FindPwSection from "./components/FindPwSection";
 import Link from "next/link";
+import { Suspense } from "react";
+import FindPwSection from "./components/FindPwSection";
+import styles from "./FindPasswordPage.module.css";
 
-// ✅ AuthMascots는 dynamic import 유지 (CSR + lazy load)
-const AuthMascots = dynamic(() => import("../common/AuthMascots"), {
+// 마스코트 이미지는 CSR lazy-load, 초기 렌더/유지비 최적화
+const AuthMascots = dynamic(() => import("@/app/auth/common/AuthMascots"), {
   ssr: false,
 });
-
-// ✅ SocialLoginButtons는 static import로 즉시 렌더링 (같은 방식으로 통일)
-import SocialLoginButtons from "../common/SocialLoginButtons";
 
 export default function ClientFindPwShell() {
   return (
     <div className={styles.bgWrap}>
-      <div className={styles.mascotFixed}>
+      <div className={styles.mascotFixed} aria-hidden>
         <Suspense
           fallback={
             <div
-              style={{
-                height: 180,
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 100,
-                  height: 32,
-                  background: "#ffe14022",
-                  borderRadius: 8,
-                }}
-              />
-            </div>
+              style={{ height: 180, background: "#ffe14022", borderRadius: 8 }}
+            />
           }
         >
           <AuthMascots />
@@ -46,20 +28,24 @@ export default function ClientFindPwShell() {
       </div>
       <main className={styles.main}>
         <section className={styles.whiteSection}>
-          <div className={styles.curveSection}></div>
+          <div className={styles.curveSection} />
           <div className={styles.loginSection}>
             <div className={styles.formContainer}>
               <FindPwSection />
-              <div className={styles.linkRow}>
+              <nav
+                className={styles.linkRow}
+                aria-label="비밀번호/계정 복구 바로가기"
+              >
                 <Link href="/auth/login" className={styles.linkSm}>
                   로그인 하기
                 </Link>
                 <Link href="/auth/find-id" className={styles.linkSm}>
                   아이디 찾기
                 </Link>
+              </nav>
+              <div className={styles.dividerOr} aria-hidden>
+                OR
               </div>
-              <div className={styles.dividerOr}>OR</div>
-              {/* ✅ 즉시 노출: static import */}
               <SocialLoginButtons />
               <div className={styles.bottomText}>
                 계정이 필요하신가요?{" "}

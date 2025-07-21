@@ -7,7 +7,6 @@ export default function FindPwSection() {
   const [result, setResult] = useState<{ email: string } | null>(null);
   const [error, setError] = useState<string>("");
 
-  // CSR 상태 전환 함수
   const handleSuccess = (email: string) => {
     setResult({ email });
     setError("");
