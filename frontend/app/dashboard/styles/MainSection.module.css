@@ -317,3 +317,209 @@
   font-size: 18px;
   margin-left: 4px;
 }
+
+.sectionRoot {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.bgTop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 360px; /* 노란 배경 높이 */
+  background: #ffe140;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 중앙 컨텐츠: 위에서 노란 배경 높이만큼 "걸쳐" 겹치게! */
+.mainContent {
+  position: relative;
+  z-index: 1;
+  max-width: 1157px;
+  margin: 0 auto;
+  padding-top: 80px; /* 노란 배경 위로 살짝 걸치게! (디자인 시안 기준 조절) */
+  /* 핵심! 배경 높이만큼 마이너스 마진(= overlap) */
+  margin-top: 140px; /* (bgTop.height - 원하는 겹침값) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 아래는 추가 여백 */
+  padding-bottom: 36px;
+}
+
+.heroSection {
+  width: 100%;
+  height: 178px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 178px;
+  justify-content: center;
+}
+.logoTextImg {
+  width: 470px;
+  height: 132px;
+  object-fit: contain;
+}
+.logoBear {
+  width: 90px;
+  height: 90px;
+}
+
+.cardRowWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 38px;
+  margin-top: 0;
+  z-index: 2;
+  position: relative;
+}
+.leftCol {
+  width: 256px;
+  display: flex;
+  flex-direction: column;
+}
+.centerCol {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 384px;
+  min-width: 384px;
+}
+.rankCardWrapper {
+  border-radius: 16px;
+  padding: 30px 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: transparent;
+}
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 314px;
+  min-width: 314px;
+  align-items: flex-end;
+}
+
+/* 이하 카드, 서브카드, 랭킹 등은 동일 (생략 가능) */
+.sectionRoot {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* 노란색 영역: 헤더 아래에 딱 붙고, absolute로 위에 깔아둔다 */
+.bgTop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 370px; /* 시안에 맞게 350~400px 조정 */
+  background: #ffe140;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 핵심! 카드 그리드 전체를 노란 배경 위에 "걸쳐" 오버랩시킨다 */
+.innerWrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1157px;
+  margin: 0 auto;
+  /* 핵심: 노란 배경 높이의 절반 정도만큼 "음수 마진"으로 위로 빼서 걸치게 */
+  margin-top: 180px; /* bgTop.height의 절반~60% (디자인 맞춰 미세조정) */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 48px;
+}
+
+/* 로고 및 카드 그리드 부분은 기존과 동일 */
+.heroSection {
+  width: 100%;
+  height: 178px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 178px;
+  justify-content: center;
+}
+.logoTextImg {
+  width: 470px;
+  height: 132px;
+  object-fit: contain;
+}
+.logoBear {
+  width: 90px;
+  height: 90px;
+}
+.cardRowWrap {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 38px;
+  margin-top: 0;
+  z-index: 2;
+  position: relative;
+}
+.leftCol {
+  width: 256px;
+  display: flex;
+  flex-direction: column;
+}
+.centerCol {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 384px;
+  min-width: 384px;
+}
+.rankCardWrapper {
+  border-radius: 16px;
+  padding: 30px 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: transparent;
+}
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 314px;
+  min-width: 314px;
+  align-items: flex-end;
+}
+
+/* ... (이하 카드 스타일, subRow, 기타는 기존과 동일하게 유지) */
