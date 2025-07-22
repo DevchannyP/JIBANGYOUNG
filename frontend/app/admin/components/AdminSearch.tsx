@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../AdminPage.module.css";
 
 interface SearchBarProps {
@@ -13,11 +13,19 @@ export function SearchBar({
   placeholder = "검색어를 입력하세요",
 }: SearchBarProps) {
   const [keyword, setKeyword] = useState("");
+  const [debouncedKeyword, setDebouncedKeyword] = useState(keyword);
 
-  const handleClick = () => onSearch(keyword);
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") onSearch(keyword);
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(keyword);
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timer);
+  }, [keyword]);
+
+  useEffect(() => {
+    onSearch(debouncedKeyword);
+  }, [debouncedKeyword]);
 
   return (
     <div className={styles.searchArea}>
@@ -25,13 +33,9 @@ export function SearchBar({
         type="text"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className={styles.searchInput}
       />
-      <button onClick={handleClick} className={styles.searchButton}>
-        검색
-      </button>
     </div>
   );
 }

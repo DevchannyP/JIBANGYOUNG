@@ -1,6 +1,7 @@
 // libs/api/admin.api.ts
 
 import { AdminUser } from "@/types/api/adminUser";
+import { AdminUserRole } from "@/types/api/adminUserRole";
 
 export interface ApiError {
   code?: string;
@@ -42,4 +43,28 @@ export async function fetchAllUsers(): Promise<AdminUser[]> {
   }
 
   return response.json();
+}
+
+// 유저 권한 변경 API
+export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
+  const response = await safeFetch("http://localhost:8080/api/admin/users/roles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "유저 권한 변경 실패" };
+
+    try {
+      apiError = await response.json();
+    } catch {
+      // JSON 파싱 불가
+    }
+
+    throw new Error(apiError.message || "유저 권한 변경 실패");
+  }
 }

@@ -176,40 +176,45 @@ export default function ReportPage() {
   const [selectedType, setSelectedType] = useState("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
 
+  // 통합 필터
   const filterData = (regionCode: number, keyword: string, type: string) => {
-    let filtered = reports;
+    const trimmed = keyword.trim().toLowerCase();
 
-    if (regionCode !== 0) {
-      filtered = filtered.filter((r) => r.regionCode === regionCode);
-    }
+    let filtered = reports.filter((r) => {
+      const matchRegion = regionCode === 0 || r.regionCode === regionCode;
 
-    if (keyword.trim() !== "") {
-      filtered = filtered.filter((r) =>
-        r.title.toLowerCase().includes(keyword.toLowerCase())
-      );
-    }
+      const matchKeyword =
+        trimmed === "" ||
+        r.title.toLowerCase().includes(trimmed) ||
+        r.date.toLowerCase().includes(trimmed); 
 
-    if (type !== "전체") {
-      filtered = filtered.filter((r) => r.type === type);
-      if (type === "게시글") {
-        filtered = [...filtered].sort((a, b) => a.no - b.no);
-      }
+        const matchType = type === "전체" || r.type === type;
+
+        return matchRegion && matchKeyword && matchType;
+    });
+
+    // 게시글 타입일 때 정렬
+    if (type === "게시글") {
+      filtered = [...filtered].sort((a, b) => a.no - b.no);
     }
 
     setSearchResult(filtered);
   };
 
+  // 지역 선택
   const handleRegionChange = (region: string, code: number) => {
     setSelectedRegion(region);
     setSelectedRegionCode(code);
     filterData(code, searchKeyword, selectedType);
   };
 
+  // 타입 선택
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
     filterData(selectedRegionCode, searchKeyword, type);
   };
 
+  // 키워드 검색
   const handleSearch = (keyword: string) => {
     setSearchKeyword(keyword);
     filterData(selectedRegionCode, keyword, selectedType);

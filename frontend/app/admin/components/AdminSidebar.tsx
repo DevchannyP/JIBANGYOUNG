@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import styles from "../AdminPage.module.css";
 
 const menu = [
+  { name: "멘토 공지사항", href: "/mentors/notices" },
   { name: "사용자 관리", href: "/admin/users" },
   { name: "멘토 신청 목록", href: "/admin/mentors" },
   { name: "신고 목록", href: "/admin/reports" },

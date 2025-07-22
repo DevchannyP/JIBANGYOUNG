@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "../../AdminPage.module.css";
 import { Pagination } from "../../components/Pagination";
 import { AdminUser } from "@/types/api/adminUser";
+import { updateUserRoles } from "@/libs/api/admin/admin.api";
 
 interface AdminUserListProps {
   users: AdminUser[];
@@ -21,19 +22,44 @@ export function AdminUserList({
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [editedRoles, setEditedRoles] = useState<{ [key: number]: string }>({});
+  const [isChanged, setIsChanged] = useState(false); // ✅ 저장 버튼 상태
 
   const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
 
-  // 권한 변경 (함수형 업데이트: 최신상태 보장)
+  // 권한 변경
   const handleRoleChange = (id: number, newRole: string) => {
+    console.log(`변경된 유저 ID: ${id}, 새로운 권한: ${newRole}`);
+    
     setEditedRoles((prev) => ({
       ...prev,
       [id]: newRole,
     }));
+    setIsChanged(true); //  변경 시 저장 버튼 활성화
   };
 
-  // 권한 변경(저장)
-  const handleSave = () => {
+  // 권한 저장
+const handleSave = async () => {
+  // 변경된 유저 중 실제로 role이 다른 경우만 필터링
+  const changedUsers = allUsers.filter((user) => {
+    const changedRole = editedRoles[user.id];
+    return changedRole && changedRole !== user.role;
+  });
+
+  if (changedUsers.length === 0) {
+    alert("변경된 권한이 없습니다.");
+    return; //  API 호출 X
+  }
+
+  // 서버에 보낼 payload
+  const payload = changedUsers.map((user) => ({
+    id: user.id,
+    role: editedRoles[user.id],
+  }));
+
+  try {
+    await updateUserRoles(payload);
+
+    // 프론트 상태 업데이트
     const updatedUsers = allUsers.map((user) => {
       if (editedRoles[user.id]) {
         return { ...user, role: editedRoles[user.id] };
@@ -44,23 +70,18 @@ export function AdminUserList({
     setUsers(updatedUsers);
     setSearchResult(updatedUsers);
 
-    const changedUsers = allUsers.filter((user) => editedRoles[user.id]);
+    // 변경된 사람 이름 alert 출력
+    const changedNames = changedUsers.map((user) => user.nickname).join(", ");
+    alert(`${changedNames} 님의 권한이 변경되었습니다.`);
 
-    if (changedUsers.length > 0) {
-      const messages = changedUsers
-        .map(
-          (user) =>
-            `${user.username}님이 ${editedRoles[user.id]}로 저장되었습니다.`
-        )
-        .join("\n");
-
-      alert(messages);
-    } else {
-      alert("변경사항이 없습니다.");
-    }
-
+    // 상태 초기화
     setEditedRoles({});
-  };
+    setIsChanged(false);
+  } catch (e: any) {
+    alert(e.message || "저장 중 오류가 발생했습니다.");
+  }
+};
+
 
   const paginatedData = users.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -76,19 +97,21 @@ export function AdminUserList({
       <table className={styles.userTable}>
         <thead>
           <tr>
+            <th>NO</th>
             <th>ID</th>
-            <th>이름</th>
+            <th>닉네임</th>
+            <th>성별</th>
             <th>이메일</th>
             <th>전화번호</th>
             <th>생년월일</th>
-            <th>비밀번호</th>
+            <th>지역</th>
             <th>권한</th>
           </tr>
         </thead>
         <tbody>
           {paginatedData.length === 0 ? (
             <tr>
-              <td colSpan={7} style={{ textAlign: "center", padding: "20px" }}>
+              <td colSpan={9} style={{ textAlign: "center", padding: "20px" }}>
                 일치하는 정보가 없습니다.
               </td>
             </tr>
@@ -97,10 +120,12 @@ export function AdminUserList({
               <tr key={user.id}>
                 <td>{user.id}</td>
                 <td>{user.username}</td>
+                <td>{user.nickname}</td>
+                <td>{user.gender}</td>
                 <td>{user.email}</td>
                 <td>{user.phone}</td>
-                <td>{user.birthDate}</td>
-                <td>{user.password}</td>
+                <td>{user.birth_date}</td>
+                <td>{user.region}</td>
                 <td>
                   <select
                     value={
@@ -125,7 +150,11 @@ export function AdminUserList({
       </table>
 
       <div style={{ textAlign: "right", marginTop: "10px" }}>
-        <button onClick={handleSave} className={styles.saveButton}>
+        <button
+          onClick={handleSave}
+          className={styles.saveButton}
+          disabled={!isChanged}
+        >
           저장하기
         </button>
       </div>

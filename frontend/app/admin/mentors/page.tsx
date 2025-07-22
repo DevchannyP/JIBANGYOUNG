@@ -140,6 +140,9 @@ export default function MentorApplyPage() {
         (app) =>
           app.name.includes(keyword) ||
           app.email.includes(keyword) ||
+          app.reason.includes(keyword) ||
+          app.date.includes(keyword) ||
+          app.status.includes(keyword) ||
           app.region.includes(keyword)
       );
     }

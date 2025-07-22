@@ -3,7 +3,9 @@ export interface AdminUser {
   username: string;
   email: string;
   phone: string;
-  birthDate: string;
+  birth_date: string;
   role: string;
-  password: string;
+  nickname: string;
+  gender: string;
+  region: string;
 }

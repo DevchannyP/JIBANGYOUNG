@@ -40,7 +40,7 @@ const initialPosts: Post[] = [
   {
     no: 3,
     title: "멘토님에게 문의 어떻게 하나요?",
-    writer: "홍길동",
+    writer: "노진구",
     date: "2025-07-05",
     url: "/post/3",
     region: "경기도",
@@ -49,7 +49,7 @@ const initialPosts: Post[] = [
   {
     no: 4,
     title: "경기도 청년 복지 정책 정리",
-    writer: "홍길동",
+    writer: "이슬기",
     date: "2025-07-06",
     url: "/post/4",
     region: "충청남도",
@@ -58,8 +58,8 @@ const initialPosts: Post[] = [
   {
     no: 5,
     title: "충청북도 전입신고 방법 공유",
-    writer: "홍길동",
-    date: "2025-07-07",
+    writer: "오푸리",
+    date: "2025-06-07",
     url: "/post/5",
     region: "전라북도",
     regionCode: 1005,
@@ -67,8 +67,8 @@ const initialPosts: Post[] = [
   {
     no: 6,
     title: "전라남도 관광지 추천 부탁드려요",
-    writer: "홍길동",
-    date: "2025-07-08",
+    writer: "이다재",
+    date: "2025-05-08",
     url: "/post/6",
     region: "전라남도",
     regionCode: 1006,
@@ -76,8 +76,8 @@ const initialPosts: Post[] = [
   {
     no: 7,
     title: "경상북도 문화재 질문 있습니다",
-    writer: "홍길동",
-    date: "2025-07-09",
+    writer: "가시로",
+    date: "2025-04-09",
     url: "/post/7",
     region: "경상북도",
     regionCode: 1007,
@@ -85,8 +85,8 @@ const initialPosts: Post[] = [
   {
     no: 8,
     title: "강원도 취업 지원 정책 소개",
-    writer: "홍길동",
-    date: "2025-07-10",
+    writer: "임도로",
+    date: "2025-02-25",
     url: "/post/8",
     region: "경상남도",
     regionCode: 1008,
@@ -94,8 +94,8 @@ const initialPosts: Post[] = [
   {
     no: 9,
     title: "제주도 렌트카 예약 방법 알려주세요",
-    writer: "홍길동",
-    date: "2025-07-11",
+    writer: "다리고",
+    date: "2025-01-18",
     url: "/post/9",
     region: "강원도",
     regionCode: 1009,
@@ -103,7 +103,7 @@ const initialPosts: Post[] = [
   {
     no: 10,
     title: "세종시 생활 정보 공유해요",
-    writer: "홍길동",
+    writer: "오라니",
     date: "2025-07-12",
     url: "/post/10",
     region: "제주도",
@@ -112,7 +112,7 @@ const initialPosts: Post[] = [
   {
     no: 11,
     title: "전국 공공임대주택 신청 방법",
-    writer: "홍길동",
+    writer: "오라니",
     date: "2025-07-13",
     url: "/post/11",
     region: "세종",
@@ -126,27 +126,32 @@ export default function PostPage() {
   const [selectedRegionCode, setSelectedRegionCode] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
 
+  // 공통 필터 함수
   const filterData = (regionCode: number, keyword: string) => {
-    let filtered = posts;
+    const trimmed = keyword.trim().toLowerCase();
 
-    if (regionCode !== 0) {
-      filtered = filtered.filter((p) => p.regionCode === regionCode);
-    }
+    const filtered = posts.filter((p) => {
+      const matchRegion = regionCode === 0 || p.regionCode === regionCode;
 
-    if (keyword.trim() !== "") {
-      filtered = filtered.filter((p) =>
-        p.title.toLowerCase().includes(keyword.toLowerCase())
-      );
-    }
+      const matchKeyword =
+        trimmed === "" ||
+        p.title.toLowerCase().includes(trimmed) ||
+        p.writer.toLowerCase().includes(trimmed) ||
+        p.date.toLowerCase().includes(trimmed);
+
+      return matchRegion && matchKeyword;
+    });
 
     setSearchResult(filtered);
   };
 
+  // 지역 변경 핸들러
   const handleRegionChange = (region: string, code: number) => {
     setSelectedRegionCode(code);
     filterData(code, searchKeyword);
   };
 
+  // 검색어 입력 핸들러
   const handleSearch = (keyword: string) => {
     setSearchKeyword(keyword);
     filterData(selectedRegionCode, keyword);

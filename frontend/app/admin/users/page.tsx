@@ -5,7 +5,7 @@ import styles from "../AdminPage.module.css";
 import { SearchBar } from "../components/AdminSearch";
 import AdminSidebar from "../components/AdminSidebar";
 import { AdminUserList } from "./components/AdminUserList";
-import { fetchAllUsers } from "./../../../libs/api/admin.api";
+import { fetchAllUsers } from "../../../libs/api/admin/admin.api";
 import { AdminUser } from "@/types/api/adminUser";
 
 export default function UserPage() {
@@ -34,8 +34,11 @@ export default function UserPage() {
     const result = users.filter(
       (user) =>
         user.username.includes(keyword) ||
+        user.nickname.includes(keyword) ||
         user.email.includes(keyword) ||
-        user.phone.includes(keyword)
+        user.phone.includes(keyword) ||
+        user.birth_date.includes(keyword) ||
+        user.region.includes(keyword)
     );
 
     setSearchResult(result);

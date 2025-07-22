@@ -114,6 +114,10 @@ public class User {
 
 
     public void changePassword(String encodedPassword) {
-    this.password = encodedPassword;
-}
+        this.password = encodedPassword;
+    }
+
+    public void changeRole(UserRole newRole) {
+    this.role = newRole;
+    }
 }
