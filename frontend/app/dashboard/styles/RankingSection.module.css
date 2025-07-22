@@ -1,0 +1,77 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--gap-md);
+  background-color: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--color-shadow);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: var(--gap-md);
+}
+
+.arrowBtn {
+  font-size: 1.2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-btn);
+  transition: background 0.2s;
+}
+
+.arrowBtn:hover {
+  background: var(--color-point);
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--color-text-main);
+}
+
+.sliderWrap {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: var(--gap-md);
+  padding: 1rem 0;
+  width: 100%;
+}
+
+.regionTab {
+  min-width: 220px;
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 1rem;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  box-shadow: var(--color-shadow);
+}
+
+.tabTitle {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  color: var(--color-text-main);
+  text-align: center;
+}
+
+.regionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}

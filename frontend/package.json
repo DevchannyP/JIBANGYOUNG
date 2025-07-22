@@ -12,11 +12,11 @@
     "test": "jest",
     "test:unit": "jest --passWithNoTests",
     "test:e2e": "cypress run",
-    "cy:open": "cypress open",
-    "prepare": "husky install"
+    "cy:open": "cypress open"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.81.5",
+    "@radix-ui/react-dialog": "^1.0.6",
     "axios": "^1.6.8",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.10",
@@ -31,7 +31,10 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.3",
     "zod": "^3.22.4",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "react-joyride": "^2.6.1",
+    "react-loading-skeleton": "^3.3.1",
+    "locomotive-scroll": "^4.1.4"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.81.5",

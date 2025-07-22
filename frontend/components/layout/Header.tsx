@@ -10,7 +10,7 @@ const dropdownItems = [
   { label: "로그인", path: "/auth/login" },
   { label: "아이디 찾기", path: "/auth/find-id" },
   { label: "비밀번호 찾기", path: "/auth/find-password" },
-  { label: "회원가입", path: "register" },
+  { label: "회원가입", path: "/auth/register" }, // 오타 수정: 앞에 '/' 누락
   { label: "대시보드", path: "/dashboard" },
   { label: "설문 응답", path: "/survey" },
   { label: "추천 결과", path: "/recommendation" },
@@ -30,19 +30,15 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ✅ Zustand persist store에서 accessToken/user 가져오기
   const { user, accessToken, refreshToken, logout } = useAuthStore();
   const router = useRouter();
 
-  // ✅ accessToken, user 둘 중 하나만 있어도 로그인으로 간주 (최소 보안 기준은 둘 다)
   const isLoggedIn = !!accessToken && !!user;
 
-  // ✅ 로그아웃 핸들러
   const handleLogout = async () => {
     try {
       if (refreshToken) await logoutApi(refreshToken);
-    } catch (err: any) {
-      // 서버 실패 무시하고 클라이언트 상태 정리
+    } catch {
     } finally {
       logout();
       router.push("/auth/login");
@@ -58,18 +54,13 @@ export default function Header() {
         setIsOpen(false);
       }
     };
-
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setIsOpen(false);
-      }
+      if (e.key === "Escape") setIsOpen(false);
     };
-
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", handleEsc);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEsc);
@@ -77,28 +68,38 @@ export default function Header() {
   }, [isOpen]);
 
   return (
-    <header>
-      <div className="container header-container">
-        <Link href="/" className="logo">
+    <header className="header-root">
+      <div className="header-inner">
+        <Link href="/" className="header-logo" draggable={false}>
           지방청년
         </Link>
-
-        <nav>
-          <Link href="/community">커뮤니티</Link>
-          <Link href="/recommendation">추천정책</Link>
-
+        <nav className="header-nav" aria-label="주요 메뉴">
+          <Link href="/community" className="header-nav-link">
+            커뮤니티
+          </Link>
+          <Link href="/recommendation" className="header-nav-link">
+            추천정책
+          </Link>
           <div className="dropdown" ref={dropdownRef}>
             <button
               type="button"
-              className="dropdown-button"
+              className="dropdown-btn"
+              aria-haspopup="menu"
+              aria-expanded={isOpen}
               onClick={() => setIsOpen((prev) => !prev)}
             >
               전체정책 ▼
             </button>
             {isOpen && (
-              <div className="dropdown-menu">
+              <div className="dropdown-menu" role="menu">
                 {dropdownItems.map((item) => (
-                  <Link key={item.path} href={item.path}>
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className="header-nav-link"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     {item.label}
                   </Link>
                 ))}
@@ -106,8 +107,6 @@ export default function Header() {
             )}
           </div>
         </nav>
-
-        {/* ✅ 로그인 여부에 따라 버튼 분기 */}
         {!isLoggedIn ? (
           <Link href="/auth/login" className="btn-primary">
             로그인

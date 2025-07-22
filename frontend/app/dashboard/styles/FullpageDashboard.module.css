@@ -1,0 +1,35 @@
+.fullpageRoot {
+  /* scoped CSS 변수 선언 */
+  --color-point: #ffe140;
+  --color-bg: #fffef9;
+  --color-card: #fff;
+  --color-text-main: #181818;
+  --color-border: #eee;
+  --color-shadow: 0 4px 28px #ffe14022;
+  --color-outline: 3px solid #ffe140;
+  --radius-card: 15px;
+  --radius-btn: 999px;
+  --gap-xl: 42px;
+  --gap-md: 22px;
+
+  height: 100vh;
+  width: 100vw;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: var(--color-point);
+}
+
+.snapSection {
+  height: 100vh;
+  width: 100vw;
+  scroll-snap-align: start;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  /* 이 안에서도 변수를 쓰려면 .fullpageRoot 내부여야 적용됨 */
+  background-color: var(--color-card);
+  color: var(--color-text-main);
+}

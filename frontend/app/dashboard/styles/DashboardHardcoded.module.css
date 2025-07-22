@@ -1,0 +1,266 @@
+.bg {
+  background: #ffe140;
+  min-height: 100vh;
+  width: 100vw;
+}
+.row {
+  display: flex;
+  gap: 24px;
+  max-width: 1370px;
+  margin: -44px auto 0 auto;
+  align-items: flex-start;
+  justify-content: center;
+}
+.leftCol {
+  flex: 0 0 242px;
+}
+.centerCol {
+  flex: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.rightCol {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cardBox {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px 19px 26px 23px;
+  box-shadow: 0 2px 14px #ffe1401a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 36px;
+  transition: box-shadow 0.14s;
+}
+.cardBox:focus,
+.cardBox:hover {
+  box-shadow: 0 3px 24px #ffe14048;
+  outline: 2px solid #ffe140bb;
+}
+.cardTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cardTitle {
+  font-size: 1.16rem;
+  font-weight: 700;
+}
+.heart {
+  color: #f8c700;
+  font-size: 1.2em;
+  margin-left: 2px;
+}
+.cardDesc {
+  color: #444;
+  font-size: 0.98rem;
+  line-height: 1.44;
+}
+
+.gridRow {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px 17px 13px 19px;
+  min-width: 182px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  box-shadow: 0 1.5px 8px #ffe1401a;
+  transition: box-shadow 0.12s;
+}
+.box:hover,
+.box:focus {
+  box-shadow: 0 3px 20px #ffe14044;
+}
+.boxTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.boxIcon {
+  font-size: 1.13rem;
+}
+.boxTitle {
+  font-weight: 700;
+  font-size: 1.01rem;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 5px;
+}
+.tab,
+.selectedTab {
+  background: #f8f7f1;
+  border-radius: 999px;
+  padding: 2px 11px;
+  font-size: 0.97em;
+  font-weight: 600;
+  color: #767676;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.13s,
+    color 0.13s;
+}
+.selectedTab {
+  background: #ffe140;
+  color: #222;
+  border: 1.2px solid #ffe140;
+  pointer-events: none;
+}
+.tab:focus,
+.selectedTab:focus {
+  outline: 2px solid #ffe140bb;
+}
+.popularList {
+  margin: 7px 0 0 5px;
+  padding: 0;
+  list-style: decimal inside;
+  color: #353535;
+  font-size: 0.98rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardGrid {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.policyCard {
+  background: #fff;
+  border-radius: 11px;
+  box-shadow: 0 1.5px 8px #ffe1401a;
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 13px 12px;
+  min-width: 237px;
+  max-width: 270px;
+  cursor: pointer;
+  transition: box-shadow 0.13s;
+}
+.policyCard:focus,
+.policyCard:hover {
+  box-shadow: 0 3px 20px #ffe14030;
+  outline: 2px solid #ffe140bb;
+}
+.policyImg {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #f6f3dc 60%, #ffe05b 100%);
+  border-radius: 8px;
+  margin-right: 5px;
+}
+.policyTitle {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: #232323;
+}
+.policyDesc {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 2px;
+}
+.rankingCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 17px 13px 9px 16px;
+  min-height: 130px;
+  box-shadow: 0 2px 10px #ffe14010;
+  margin-top: 38px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.14s;
+}
+.rankingCard:focus,
+.rankingCard:hover {
+  box-shadow: 0 3px 20px #ffe14045;
+  outline: 2px solid #ffe140bb;
+}
+.policyImgLarge {
+  width: 92px;
+  height: 72px;
+  background: linear-gradient(135deg, #f6f3dc 60%, #ffe05b 100%);
+  border-radius: 13px;
+  margin-bottom: 13px;
+}
+.rankingTitle {
+  font-weight: 600;
+  font-size: 1.03rem;
+  color: #292929;
+  margin-top: 4px;
+}
+.rankingBox {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 14px #ffe1401a;
+  padding: 19px 16px 13px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.rankingHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.rankingTopTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #222;
+}
+.rankingTopIcon {
+  font-size: 1.23rem;
+}
+.rankingList {
+  list-style: decimal inside;
+  margin: 0;
+  padding: 0 0 0 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4.5px;
+  color: #313131;
+  font-size: 0.97rem;
+}
+.rankingList li b {
+  color: #222;
+  font-weight: 700;
+}
+.yellowDot {
+  background: #ffe140;
+  display: inline-block;
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: 4px;
+  margin-bottom: 1px;
+}
+.scrollMark {
+  text-align: center;
+  color: #888;
+  margin: 22px auto 0 auto;
+  font-size: 1.07rem;
+  letter-spacing: 0.5px;
+}
+.scrollMark span {
+  font-size: 1.28em;
+  color: #ccc;
+}

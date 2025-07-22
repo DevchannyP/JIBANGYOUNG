@@ -1,0 +1,172 @@
+.mainSection {
+  position: relative;
+  width: 100vw;
+  height: 960px;
+  overflow: visible;
+  background: #fff;
+}
+.bgTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 380px;
+  background: #ffe447;
+  z-index: 0;
+}
+.logoRow {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 54px;
+  padding-left: 56px;
+  gap: 32px;
+  z-index: 2;
+  position: relative;
+}
+.logoText {
+  font-size: 4.6rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #222;
+  line-height: 1;
+}
+.logoCharacter {
+  height: 72px;
+  width: 72px;
+  margin-top: 10px;
+}
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 260px 340px 1fr 260px;
+  grid-template-rows: 210px 1fr;
+  gap: 20px 20px;
+  padding: 48px 42px 0 42px;
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+.policyCard,
+.rankingCard,
+.popularCard,
+.bigCard,
+.top10Card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 3px 16px #0001;
+  padding: 26px 24px;
+  font-size: 1.13rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.policyCard {
+  grid-row: 1 / span 2;
+  grid-column: 1 / 2;
+  border-left: 6px solid #f6c92b;
+}
+.rankingCard {
+  grid-row: 1 / 2;
+  grid-column: 2 / 4;
+  background: #f6f7fa;
+}
+.popularCard {
+  grid-row: 2 / 3;
+  grid-column: 2 / 4;
+  background: #fffefb;
+}
+.bigCard {
+  grid-row: 1 / 2;
+  grid-column: 4 / 5;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bigCardImage {
+  width: 98px;
+  height: 98px;
+  background: #eee;
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+.bigCardTitle {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #18181b;
+  margin-top: 8px;
+}
+.top10Card {
+  grid-row: 2 / 3;
+  grid-column: 4 / 5;
+  background: #f6f7fa;
+  min-height: 210px;
+}
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  font-size: 1.11rem;
+  font-weight: 700;
+  gap: 7px;
+}
+.cardDesc {
+  color: #444;
+  line-height: 1.48;
+  font-weight: 400;
+}
+.rankingTabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tab,
+.tabActive {
+  background: #fff;
+  border-radius: 13px;
+  padding: 2.5px 17px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #444;
+  border: 1.5px solid #eee;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.tabActive {
+  background: #ffd700;
+  color: #333;
+  border: 2px solid #f6c92b;
+}
+.cardTabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.todayList,
+.top10List {
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+  color: #444;
+  font-size: 1.03rem;
+  font-weight: 500;
+}
+.scrollMark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  text-align: center;
+  color: #888;
+  font-size: 1.03rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  z-index: 2;
+}
+.arrow {
+  font-size: 1.7em;
+  color: #444;
+  vertical-align: middle;
+}
