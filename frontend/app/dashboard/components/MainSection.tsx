@@ -10,11 +10,13 @@ import Top10Card from "./Top10Card";
 export default function MainSection() {
   return (
     <section className={styles.sectionRoot}>
-      {/* 노란 배경을 absolute로 */}
+      {/* 상단 노란 배경 (absolute, 아래로 370px 정도) */}
       <div className={styles.bgTop} />
-      {/* 내부 컨텐츠만 .innerWrap로 고정폭 중앙 */}
+
+      {/* 중앙 콘텐츠: margin-top: -100px 등으로 노란 영역과 걸쳐지게 */}
       <div className={styles.innerWrap}>
         <MainLogoHeader />
+
         <div className={styles.cardRowWrap}>
           <div className={styles.leftCol}>
             <PolicyCard />
@@ -33,6 +35,7 @@ export default function MainSection() {
             <Top10Card />
           </div>
         </div>
+
         <div className={styles.scrollMark}>
           SCROLL <span className={styles.arrow}>⌄</span>
         </div>
