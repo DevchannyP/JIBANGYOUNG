@@ -1,0 +1,330 @@
+.fullpageScrollContainer {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  width: 100vw;
+  background: linear-gradient(120deg, #ffe447 0% 44%, #fff 44% 100%);
+  position: relative;
+}
+.fullpageSection {
+  height: 960px;
+  min-height: 960px;
+  max-height: 960px;
+  width: 100vw;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+  outline: none;
+  background: transparent;
+}
+.mainSection {
+  /* 섹션1만 별도 패딩, z-index 조절 */
+  z-index: 2;
+}
+.bgTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 400px;
+  background: #ffe447;
+  z-index: 0;
+}
+.logoRow {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 54px;
+  padding-left: 56px;
+  gap: 32px;
+  z-index: 2;
+  position: relative;
+}
+.logoText {
+  font-size: 4.7rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #222;
+  line-height: 1;
+}
+.logoCharacter {
+  height: 70px;
+  width: 70px;
+  margin-top: 10px;
+}
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 260px 340px 1fr 260px;
+  grid-template-rows: 210px 1fr;
+  gap: 20px 20px;
+  padding: 52px 42px 0 42px;
+  margin-top: 18px;
+  position: relative;
+  z-index: 2;
+}
+.policyCard,
+.rankingCard,
+.popularCard,
+.bigCard,
+.top10Card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 3px 16px #0001;
+  padding: 26px 24px;
+  font-size: 1.13rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.policyCard {
+  grid-row: 1 / span 2;
+  grid-column: 1 / 2;
+  border-left: 6px solid #f6c92b;
+}
+.rankingCard {
+  grid-row: 1 / 2;
+  grid-column: 2 / 4;
+  background: #f6f7fa;
+}
+.popularCard {
+  grid-row: 2 / 3;
+  grid-column: 2 / 4;
+  background: #fffefb;
+}
+.bigCard {
+  grid-row: 1 / 2;
+  grid-column: 4 / 5;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bigCardImage {
+  width: 98px;
+  height: 98px;
+  background: #eee;
+  border-radius: 16px;
+  margin-bottom: 12px;
+}
+.bigCardTitle {
+  font-size: 1.04rem;
+  font-weight: 600;
+  color: #18181b;
+  margin-top: 8px;
+}
+.top10Card {
+  grid-row: 2 / 3;
+  grid-column: 4 / 5;
+  background: #f6f7fa;
+  min-height: 210px;
+}
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  font-size: 1.13rem;
+  font-weight: 700;
+  gap: 7px;
+}
+.cardDesc {
+  color: #444;
+  line-height: 1.48;
+  font-weight: 400;
+}
+.rankingTabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tab,
+.tabActive {
+  background: #fff;
+  border-radius: 13px;
+  padding: 2.5px 17px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #444;
+  border: 1.5px solid #eee;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.tabActive {
+  background: #ffd700;
+  color: #333;
+  border: 2px solid #f6c92b;
+}
+.cardTabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.todayList,
+.top10List {
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+  color: #444;
+  font-size: 1.03rem;
+  font-weight: 500;
+}
+.scrollMark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  text-align: center;
+  color: #888;
+  font-size: 1.03rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  z-index: 2;
+}
+.arrow {
+  font-size: 1.7em;
+  color: #444;
+  vertical-align: middle;
+}
+
+.dotNav {
+  position: fixed;
+  top: 50%;
+  right: 54px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.dot {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #dbeafe;
+  border: 2.5px solid #3b82f6;
+  box-shadow: 0 0 10px 2px #60a5fa44;
+  opacity: 0.33;
+  pointer-events: auto;
+  transition:
+    opacity 0.25s,
+    box-shadow 0.23s,
+    border-color 0.18s;
+  outline: none;
+  cursor: pointer;
+}
+.dotActive {
+  opacity: 1;
+  border-color: #2563eb;
+  box-shadow:
+    0 0 0 4px #2563eb38,
+    0 2px 8px 0 #4f46e53d;
+  background: linear-gradient(140deg, #2563eb 55%, #6366f1 100%);
+}
+.dot:focus-visible {
+  box-shadow:
+    0 0 0 4px #6366f1bb,
+    0 2px 8px 0 #2563eb55;
+}
+.dot:hover:not(.dotActive) {
+  opacity: 0.7;
+  border-color: #60a5fa;
+}
+.scrollGuide {
+  position: fixed;
+  bottom: 62px;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  text-align: center;
+  color: #3730a3;
+  font-size: 1.15rem;
+  z-index: 120;
+  pointer-events: none;
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s both;
+  font-weight: 500;
+  text-shadow: 0 2px 10px #dbeafe90;
+}
+
+.fullpageScrollContainer {
+  width: 100vw;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: #faf9f7;
+}
+.fullpageSection {
+  width: 100vw;
+  min-height: 100vh;
+  outline: none;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  position: relative;
+  background: transparent;
+  scroll-snap-align: start;
+}
+.mainSection {
+  background: transparent;
+}
+.dotNav {
+  position: fixed;
+  top: 48%;
+  right: 22px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  pointer-events: auto;
+}
+.dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ddd;
+  border: none;
+  outline: none;
+  opacity: 0.5;
+  transition:
+    background 0.2s,
+    opacity 0.2s,
+    transform 0.15s;
+  cursor: pointer;
+}
+.dotActive {
+  background: #ffe140;
+  opacity: 1;
+  box-shadow: 0 2px 7px #f9c50044;
+  transform: scale(1.22);
+}
+.scrollGuide {
+  position: fixed;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 9px 22px;
+  background: #222;
+  color: #ffe140;
+  font-size: 1.04rem;
+  border-radius: 14px;
+  font-weight: 700;
+  opacity: 0.95;
+  box-shadow: 0 3px 16px #0002;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 900px) {
+  .dotNav {
+    right: 10px;
+  }
+  .scrollGuide {
+    font-size: 0.93rem;
+    padding: 7px 14px;
+  }
+}
