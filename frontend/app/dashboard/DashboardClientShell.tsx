@@ -1,27 +1,23 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, RefObject, useCallback } from "react";
 import styles from "./styles/DashboardClientShell.module.css";
 
-// ===== 메인 페이지 첫 섹션 컴포넌트화 =====
-const MainSection = dynamic(() => import("./components/MainSection"), {
+// 동적 import + 섹션별 스켈레톤(UX/서버비용↓)
+const MainSection = dynamic(() => import("./MainSection/MainSection"), {
   ssr: false,
-  loading: () => <div style={{ height: 480, background: "#FFE140" }} />,
+  loading: () => <div className={styles.sectionSkeleton} style={{ background: "#FFE140" }} />,
 });
 const CommunitySection = dynamic(
-  () => import("./components/CommunitySection"),
-  { ssr: false, loading: () => <div style={{ height: 120 }} /> }
+  () => import("./CommunitySection/CommunitySection"),
+  { ssr: false, loading: () => <div className={styles.sectionSkeleton} style={{ background: "#fff" }} /> }
 );
-const RegionRankingSection = dynamic(
-  () => import("./components/RegionRankingSection"),
-  { ssr: false, loading: () => <div style={{ height: 120 }} /> }
+const RegionRankingMainSection = dynamic(
+  () => import("./RegionRankingMainSection/RegionRankingMainSection"),
+  { ssr: false, loading: () => <div className={styles.sectionSkeleton} style={{ background: "#ffe140" }} /> }
 );
-const RegionTabSlider = dynamic(() => import("./components/RegionTabSlider"), {
-  ssr: false,
-  loading: () => <div style={{ height: 120 }} />,
-});
 
 const SECTIONS = [
   { name: "메인", label: "메인" },
@@ -29,111 +25,149 @@ const SECTIONS = [
   { name: "랭킹", label: "지역 랭킹" },
 ];
 
-export default function DashboardClientShell() {
-  const sectionRefs = [useRef(null), useRef(null), useRef(null)];
+function useSectionInView(refs: RefObject<HTMLElement>[], hydrated: boolean) {
   const [current, setCurrent] = useState(0);
-
-  // 인덱스 추적(스크롤 감지)
   useEffect(() => {
-    const handleScroll = () => {
-      const midY = window.innerHeight / 2;
-      let newIndex = 0;
-      sectionRefs.forEach((ref, idx) => {
-        if (ref.current) {
-          const rect = ref.current.getBoundingClientRect();
-          if (rect.top < midY) newIndex = idx;
-        }
-      });
-      setCurrent(newIndex);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (!hydrated) return;
+    const observer = new window.IntersectionObserver(
+      (entries) => {
+        const visibleIdx = entries
+          .filter((e) => e.isIntersecting)
+          .map((e) => refs.findIndex((ref) => ref.current === e.target));
+        if (visibleIdx.length) setCurrent(Math.min(...visibleIdx));
+      },
+      {
+        root: null,
+        rootMargin: "-40% 0px -40% 0px",
+        threshold: 0.3,
+      }
+    );
+    refs.forEach((ref) => {
+      if (ref.current) observer.observe(ref.current);
+    });
+    return () => observer.disconnect();
+  }, [hydrated, refs.map((r) => r.current).join()]);
 
-  // 키보드 네비 지원
+  return [current, setCurrent] as const;
+}
+
+export default function DashboardClientShell() {
+  const [hydrated, setHydrated] = useState(false);
+  const sectionRefs = [
+    useRef<HTMLElement>(null),
+    useRef<HTMLElement>(null),
+    useRef<HTMLElement>(null),
+  ];
+  const [current, setCurrent] = useSectionInView(sectionRefs, hydrated);
+  const [showGuide, setShowGuide] = useState(true);
+
+  useEffect(() => { setHydrated(true); }, []);
+
+  const scrollToSection = useCallback((idx: number) => {
+    setCurrent(idx);
+    sectionRefs[idx].current?.scrollIntoView({ behavior: "smooth" });
+    sectionRefs[idx].current?.focus({ preventScroll: true });
+  }, [sectionRefs]);
+
   useEffect(() => {
+    if (!hydrated) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (["ArrowDown", "ArrowRight"].includes(e.key)) {
-        setCurrent((prev) => Math.min(SECTIONS.length - 1, prev + 1));
-      } else if (["ArrowUp", "ArrowLeft"].includes(e.key)) {
-        setCurrent((prev) => Math.max(0, prev - 1));
+      if (["ArrowDown", "ArrowRight", "PageDown"].includes(e.key)) {
+        e.preventDefault();
+        scrollToSection(Math.min(SECTIONS.length - 1, current + 1));
+      } else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(e.key)) {
+        e.preventDefault();
+        scrollToSection(Math.max(0, current - 1));
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-  useEffect(() => {
-    sectionRefs[current].current?.scrollIntoView({ behavior: "smooth" });
-  }, [current]);
+  }, [current, hydrated, scrollToSection]);
 
-  // 안내문구 애니메이션
-  const [showGuide, setShowGuide] = useState(true);
   useEffect(() => {
-    const timer = setTimeout(() => setShowGuide(false), 2100);
+    const timer = setTimeout(() => setShowGuide(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
+  if (!hydrated) {
+    return (
+      <div className={styles.fullpageScrollContainer}>
+        <div className={styles.skeletonLoader}>메인 페이지로 진입중...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.fullpageScrollContainer}>
-      {/* dot navigation */}
+    <div className={styles.fullpageScrollContainer} aria-live="polite">
+      {/* dot nav */}
       <nav className={styles.dotNav} aria-label="페이지 네비게이션">
         {SECTIONS.map((section, idx) => (
           <button
             key={section.name}
             className={`${styles.dot} ${idx === current ? styles.dotActive : ""}`}
             aria-label={`${section.label}로 이동`}
-            onClick={() => setCurrent(idx)}
+            onClick={() => scrollToSection(idx)}
             tabIndex={0}
+            type="button"
+            aria-current={idx === current}
           />
         ))}
       </nav>
-      {showGuide && (
-        <div className={styles.scrollGuide}>
-          <span>아래로 스크롤하거나 좌우키로 넘겨보세요!</span>
-        </div>
-      )}
+      {/* 안내문구 */}
+      <AnimatePresence>
+        {showGuide && (
+          <motion.div
+            className={styles.scrollGuide}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -18 }}
+            transition={{ duration: 0.5 }}
+          >
+            <span>아래로 스크롤/좌우키/PageUp,Down으로 넘겨보세요!</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ====== [SECTION 1] 메인 ====== */}
+      {/* 1. 메인 */}
       <section
         ref={sectionRefs[0]}
         className={`${styles.fullpageSection} ${styles.mainSection}`}
         tabIndex={-1}
         aria-label="메인"
+        role="region"
       >
         <MainSection />
       </section>
-
-      {/* ====== [SECTION 2] 커뮤니티 ====== */}
+      {/* 2. 커뮤니티 */}
       <section
         ref={sectionRefs[1]}
         className={styles.fullpageSection}
         tabIndex={-1}
         aria-label="HOT 커뮤니티"
+        role="region"
       >
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.75, ease: [0.23, 1, 0.32, 1] }}
         >
           <CommunitySection />
         </motion.div>
       </section>
-
-      {/* ====== [SECTION 3] 지역랭킹 ====== */}
+      {/* 3. 지역랭킹 (마지막, snap scroll 유지, footer 없음) */}
       <section
         ref={sectionRefs[2]}
-        className={styles.fullpageSection}
+        className={`${styles.fullpageSection} ${styles.lastSectionWithFooter}`}
         tabIndex={-1}
         aria-label="지역 랭킹"
+        role="region"
       >
         <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0, y: 38 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.85, ease: [0.23, 1, 0.32, 1] }}
         >
-          <RegionRankingSection />
-          <RegionTabSlider />
+          <RegionRankingMainSection />
         </motion.div>
       </section>
     </div>

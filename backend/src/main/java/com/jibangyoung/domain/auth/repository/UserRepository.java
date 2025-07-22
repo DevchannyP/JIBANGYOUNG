@@ -29,6 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countUsersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
 
+    
 //     // === [비밀번호 해시코드로 변경 코드] ===
 // @Modifying(clearAutomatically = true, flushAutomatically = true)
 // @Query("update User u set u.password = :encoded where u.id = :id")

@@ -1,9 +1,8 @@
-// app/layout.tsx
 import type { Metadata } from "next";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import "../styles/globals.css";
-import Providers from "./providers"; // ✅ 추가
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "지방청년 플랫폼",

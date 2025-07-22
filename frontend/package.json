@@ -15,13 +15,14 @@
     "cy:open": "cypress open"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.81.5",
     "@radix-ui/react-dialog": "^1.0.6",
+    "@tanstack/react-query": "^5.81.5",
     "axios": "^1.6.8",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.10",
     "framer-motion": "^12.1.6",
     "jwt-decode": "^4.0.0",
+    "locomotive-scroll": "^4.1.4",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.323.0",
     "next": "^15.3.4",
@@ -29,28 +30,27 @@
     "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.51.3",
-    "zod": "^3.22.4",
-    "zustand": "^5.0.6",
+    "react-hook-form": "^7.51.5",
     "react-joyride": "^2.6.1",
     "react-loading-skeleton": "^3.3.1",
-    "locomotive-scroll": "^4.1.4"
+    "zod": "^3.22.4",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.81.5",
     "@testing-library/react": "^15.0.0",
-    "@types/lodash.debounce": "^4.0.7",
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.41",
-    "@types/react-dom": "^18.2.17",
-    "cypress": "^13.1.0",
+    "@types/lodash.debounce": "^4.0.8",
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.46",
+    "@types/react-dom": "^18.2.19",
+    "cypress": "^13.5.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^15.0.0",
-    "husky": "^9.0.0",
-    "jest": "^30.0.0",
-    "lint-staged": "^15.2.0",
-    "prettier": "^3.2.4",
-    "typescript": "^5.8.3"
+    "eslint-config-next": "^15.3.0",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
