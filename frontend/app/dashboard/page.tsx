@@ -33,9 +33,7 @@ export const metadata = {
 
 export default function Page() {
   return (
-    <Suspense
-      fallback={<div className="p-8 text-center text-gray-500">로딩 중...</div>}
-    >
+    <Suspense fallback={null}>
       <DashboardClientWrapper />
     </Suspense>
   );

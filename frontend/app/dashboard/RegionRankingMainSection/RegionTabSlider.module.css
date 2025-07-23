@@ -6,19 +6,19 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;  /* 수직 중앙정렬 */
-  align-items: center;      /* 수평 중앙정렬 */
+  justify-content: center; /* 수직 중앙정렬 */
+  align-items: center; /* 수평 중앙정렬 */
 }
 
 .bgWrap {
   width: 100vw;
   /* 높이를 min-height로 지정하면 위아래가 딱 붙지 않을 수 있으니 height로 설정 */
   height: 420px;
-  background: transparent;   /* 이미 부모가 노란색 */
+  background: transparent; /* 이미 부모가 노란색 */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;   /* 수직 중앙정렬 */
+  justify-content: center; /* 수직 중앙정렬 */
   padding: 0;
   margin: 0;
   position: relative;
@@ -73,7 +73,10 @@
   min-width: 80px;
   outline: none;
   cursor: pointer;
-  transition: background 0.14s, color 0.13s, border 0.13s;
+  transition:
+    background 0.14s,
+    color 0.13s,
+    border 0.13s;
   margin: 0;
   letter-spacing: -1px;
   border: 2px solid #ececec;
@@ -110,7 +113,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: border 0.18s, box-shadow 0.14s;
+  transition:
+    border 0.18s,
+    box-shadow 0.14s;
 }
 
 .regionActive {
