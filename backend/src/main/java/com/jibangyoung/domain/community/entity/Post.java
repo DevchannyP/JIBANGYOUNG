@@ -2,38 +2,35 @@ package com.jibangyoung.domain.community.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Table(name = "posts")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
+@Table(name = "posts")
 public class Post {
 
-    
+    // 기본 식별자
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "user_id")
+    //사용자 및 지역
+    @Column(name = "user_id", nullable = false)
     private long userId;
 
-    @Column(name = "region_id")
+    @Column(name = "region_id", nullable = false)
     private long regionId;
 
+    // 게시글 카테고리
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 30)
+    private PostCategory category;
+
+    // 콘텐츠 정보
     @Column(name = "title", length = 200, nullable = false)
     private String title;
 
@@ -43,12 +40,14 @@ public class Post {
     @Column(name = "tag", length = 50)
     private String tag;
 
+    // 게시글 메타 정보
     @Column(name = "likes", nullable = false)
     private int likes;
 
     @Column(name = "views", nullable = false)
     private int views;
 
+    // 상태 정보
     @Column(name = "is_notice", nullable = false)
     private boolean isNotice;
 
@@ -58,12 +57,14 @@ public class Post {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
+    // 시간 정보
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // 자동 시간 처리
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -75,4 +76,17 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 내부 enum으로 카테고리 정의
+    @Getter
+    public enum PostCategory {
+        FREE("자유"),
+        QUESTION("질문"),
+        SETTLEMENT_REVIEW("정착 후기");
+
+        private final String label;
+
+        PostCategory(String label) {
+            this.label = label;
+        }
+    }
 }
