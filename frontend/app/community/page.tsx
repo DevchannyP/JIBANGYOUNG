@@ -1,10 +1,10 @@
 // app/community/page.tsx
 import styles from "./Community.module.css";
+import PaginationWrapper from "./components/PaginationWrapper";
 import PostsTable from "./components/PostTable";
 import RegionBoardNavigation from "./components/RegionBoardNavigation";
 import TodayPopularPosts from "./components/TodayPopularPosts";
 import WeeklyPopularPosts from "./components/WeeklyPopularPosts";
-
 
 const posts = [
   {
@@ -119,6 +119,9 @@ export default function CommunityPage() {
         </div>
         <div className={"community-container"}>
           <PostsTable posts={posts} />
+        </div>
+        <div>
+          <PaginationWrapper totalPages={10} />
         </div>
       </main>
     </div>
