@@ -29,7 +29,7 @@ export function AdminUserList({
   // 권한 변경
   const handleRoleChange = (id: number, newRole: string) => {
     console.log(`변경된 유저 ID: ${id}, 새로운 권한: ${newRole}`);
-    
+
     setEditedRoles((prev) => ({
       ...prev,
       [id]: newRole,
@@ -38,50 +38,49 @@ export function AdminUserList({
   };
 
   // 권한 저장
-const handleSave = async () => {
-  // 변경된 유저 중 실제로 role이 다른 경우만 필터링
-  const changedUsers = allUsers.filter((user) => {
-    const changedRole = editedRoles[user.id];
-    return changedRole && changedRole !== user.role;
-  });
-
-  if (changedUsers.length === 0) {
-    alert("변경된 권한이 없습니다.");
-    return; //  API 호출 X
-  }
-
-  // 서버에 보낼 payload
-  const payload = changedUsers.map((user) => ({
-    id: user.id,
-    role: editedRoles[user.id],
-  }));
-
-  try {
-    await updateUserRoles(payload);
-
-    // 프론트 상태 업데이트
-    const updatedUsers = allUsers.map((user) => {
-      if (editedRoles[user.id]) {
-        return { ...user, role: editedRoles[user.id] };
-      }
-      return user;
+  const handleSave = async () => {
+    // 변경된 유저 중 실제로 role이 다른 경우만 필터링
+    const changedUsers = allUsers.filter((user) => {
+      const changedRole = editedRoles[user.id];
+      return changedRole && changedRole !== user.role;
     });
 
-    setUsers(updatedUsers);
-    setSearchResult(updatedUsers);
+    if (changedUsers.length === 0) {
+      alert("변경된 권한이 없습니다.");
+      return; //  API 호출 X
+    }
 
-    // 변경된 사람 이름 alert 출력
-    const changedNames = changedUsers.map((user) => user.nickname).join(", ");
-    alert(`${changedNames} 님의 권한이 변경되었습니다.`);
+    // 서버에 보낼 payload
+    const payload = changedUsers.map((user) => ({
+      id: user.id,
+      role: editedRoles[user.id],
+    }));
 
-    // 상태 초기화
-    setEditedRoles({});
-    setIsChanged(false);
-  } catch (e: any) {
-    alert(e.message || "저장 중 오류가 발생했습니다.");
-  }
-};
+    try {
+      await updateUserRoles(payload);
 
+      // 프론트 상태 업데이트
+      const updatedUsers = allUsers.map((user) => {
+        if (editedRoles[user.id]) {
+          return { ...user, role: editedRoles[user.id] };
+        }
+        return user;
+      });
+
+      setUsers(updatedUsers);
+      setSearchResult(updatedUsers);
+
+      // 변경된 사람 이름 alert 출력
+      const changedNames = changedUsers.map((user) => user.nickname).join(", ");
+      alert(`${changedNames} 님의 권한이 변경되었습니다.`);
+
+      // 상태 초기화
+      setEditedRoles({});
+      setIsChanged(false);
+    } catch (e: any) {
+      alert(e.message || "저장 중 오류가 발생했습니다.");
+    }
+  };
 
   const paginatedData = users.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -116,9 +115,11 @@ const handleSave = async () => {
               </td>
             </tr>
           ) : (
-            paginatedData.map((user) => (
+            paginatedData.map((user, index) => (
               <tr key={user.id}>
-                <td>{user.id}</td>
+                <td>
+                  {users.length - ((currentPage - 1) * ITEMS_PER_PAGE + index)}
+                </td>
                 <td>{user.username}</td>
                 <td>{user.nickname}</td>
                 <td>{user.gender}</td>

@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import styles from "../AdminPage.module.css";
+import styles from "../../admin/AdminPage.module.css";
 
 const menu = [
-  { name: "멘토 공지사항", href: "/mentors/notices" },
-  { name: "사용자 관리", href: "/admin/users" },
-  { name: "멘토 신청 목록", href: "/admin/mentorsApply" },
-  { name: "신고 목록", href: "/admin/reports" },
-  { name: "게시글 관리", href: "/admin/posts" },
+  { name: "멘토 공지사항", href: "/mentor/notices" },
+  { name: "멘토 신청 목록", href: "/mentor/mentorsApply" },
+  { name: "신고 목록", href: "/mentor/reports" },
+  { name: "유저 상태 제어", href: "/mentor/status" },
+  { name: "내 지역 멘토 목록", href: "/mentor/localMentors" },
+  { name: "멘토 활동 통계", href: "/mentor/stats" },
+  { name: "멘토 활동 로그", href: "/mentor/logs" },
 ];
 
-export default function AdminSidebar() {
+export default function MentorSidebar() {
   const pathname = usePathname();
 
   return (

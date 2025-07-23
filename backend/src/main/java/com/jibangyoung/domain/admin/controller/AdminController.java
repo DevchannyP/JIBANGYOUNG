@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/users")
 public class AdminController {
     private final AdUserService userService;
 
-    // 1. 유저 리스트 조회
-    @GetMapping("/users")
+    // 사용자관리_리스트 조회
+    @GetMapping
     public List<AdUserDTO> getAllUsers() {
         return userService.getAllUsers();
     }
-    // 유저 권한 변경 (일괄 변경처리 위해 POST)
-    @PostMapping("/users/roles")
+    // 사용자관리_권한 변경 (일괄 변경처리 위해 POST)
+    @PostMapping("/roles")
     public ResponseEntity<Void> updateUserRoles(@RequestBody List<AdUserRoleDTO> roleList) {
         // 테스트 코드
         System.out.println("=== 요청 도착 ===");

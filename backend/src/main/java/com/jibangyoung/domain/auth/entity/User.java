@@ -116,8 +116,8 @@ public class User {
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
-
+    // 관리자페이지_사용자관리(권한변경)
     public void changeRole(UserRole newRole) {
-    this.role = newRole;
+        this.role = newRole;
     }
 }

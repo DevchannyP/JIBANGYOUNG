@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor 
 @NoArgsConstructor
-// 1. 유저 리스트
+// 사용자관리
 public class AdUserDTO {
     private Long id;
     private String username;

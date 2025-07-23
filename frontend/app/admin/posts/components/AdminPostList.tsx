@@ -3,22 +3,14 @@
 import { useState } from "react";
 import styles from "../../AdminPage.module.css";
 import { Pagination } from "../../components/Pagination";
-
-interface Post {
-  no: number;
-  title: string;
-  writer: string;
-  date: string;
-  url: string;
-  region: string;
-  regionCode: number;
-}
+import { AdminPost } from "@/types/api/adminPost";
+import { deletePostById } from "@/libs/api/admin/admin.api";
 
 interface AdminPostListProps {
-  posts: Post[];
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
-  setSearchResult: React.Dispatch<React.SetStateAction<Post[]>>;
-  fullData: Post[];
+  posts: AdminPost[];
+  setPosts: React.Dispatch<React.SetStateAction<AdminPost[]>>;
+  setSearchResult: React.Dispatch<React.SetStateAction<AdminPost[]>>;
+  fullData: AdminPost[];
 }
 
 export function AdminPostList({
@@ -41,10 +33,15 @@ export function AdminPostList({
     setCurrentPage(page);
   };
 
-  const handleDelete = (no: number) => {
-    const updated = fullData.filter((p) => p.no !== no);
-    setPosts(updated);
-    setSearchResult(updated);
+  const handleDelete = async (id: number) => {
+    try {
+      await deletePostById(id);
+      const updated = fullData.filter((p) => p.id !== id);
+      setPosts(updated);
+      setSearchResult(updated);
+    } catch (e: any) {
+      alert("게시글 삭제 실패: " + e.message);
+    }
   };
 
   return (
@@ -56,38 +53,43 @@ export function AdminPostList({
             <th>제목</th>
             <th>작성자</th>
             <th>작성일자</th>
-            <th>권한</th>
+            <th>조회수</th>
+            <th>좋아요</th>
+            <th>관리</th>
           </tr>
         </thead>
         <tbody>
           {paginatedData.length === 0 ? (
             <tr>
-              <td colSpan={5} style={{ textAlign: "center", padding: "20px" }}>
+              <td colSpan={7} style={{ textAlign: "center", padding: "20px" }}>
                 일치하는 정보가 없습니다.
               </td>
             </tr>
           ) : (
             paginatedData.map((p, index) => (
-              <tr key={p.no}>
-                <td>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
-                <td>{p.title}</td>
-                <td>{p.writer}</td>
-                <td>{p.date}</td>
+              <tr key={p.id}>
                 <td>
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={styles.linkBtn}
-                  >
-                    🔗
-                  </a>
+                  {posts.length - ((currentPage - 1) * ITEMS_PER_PAGE + index)}
+                </td>
+                <td>{p.title}</td>
+                <td>{p.user_id}</td>
+                <td>{p.created_at}</td>
+                <td>{p.views}</td>
+                <td>{p.likes}</td>
+                <td>
                   <button
-                    onClick={() => handleDelete(p.no)}
+                    onClick={() => handleDelete(p.id)}
                     className={styles.deleteBtn}
                   >
                     삭제
                   </button>
+                  <a
+                    href={`/admin/posts/${p.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    URL
+                  </a>
                 </td>
               </tr>
             ))

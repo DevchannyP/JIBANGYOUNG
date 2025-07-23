@@ -1,7 +1,9 @@
 // libs/api/admin.api.ts
 
+import { AdminPost } from "@/types/api/adminPost";
 import { AdminUser } from "@/types/api/adminUser";
 import { AdminUserRole } from "@/types/api/adminUserRole";
+import { promises } from "dns";
 
 export interface ApiError {
   code?: string;
@@ -20,7 +22,7 @@ async function safeFetch(
   }
 }
 
-// 유저 리스트 조회 API
+// 사용자 리스트 조회 API
 export async function fetchAllUsers(): Promise<AdminUser[]> {
   const response = await safeFetch("http://localhost:8080/api/admin/users", {
     method: "GET",
@@ -45,16 +47,19 @@ export async function fetchAllUsers(): Promise<AdminUser[]> {
   return response.json();
 }
 
-// 유저 권한 변경 API
+// 사용자 권한 변경 API
 export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
-  const response = await safeFetch("http://localhost:8080/api/admin/users/roles", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  const response = await safeFetch(
+    "http://localhost:8080/api/admin/users/roles",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!response.ok) {
     let apiError: ApiError = { message: "유저 권한 변경 실패" };
@@ -66,5 +71,55 @@ export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
     }
 
     throw new Error(apiError.message || "유저 권한 변경 실패");
+  }
+}
+
+// 게시글 리스트 조회 API
+export async function featchAllPost(): Promise<AdminPost[]> {
+  const response = await safeFetch("http://localhost:8080/api/admin/posts", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "게시글 목록 조회 실패" };
+
+    try {
+      apiError = await response.json();
+    } catch {
+      // JSON 파싱 불가
+    }
+
+    throw new Error(apiError.message || "게시글 목록 조회 실패");
+  }
+  return response.json();
+}
+
+// 게시글 삭제 API
+export async function deletePostById(id: number): Promise<void> {
+  const response = await safeFetch(
+    "http://localhost:8080/api/admin/posts/${id}",
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "게시글 삭제 실패" };
+
+    try {
+      apiError = await response.json();
+    } catch {
+      // JSON 파싱 불가
+    }
+
+    throw new Error(apiError.message || "게시글 삭제 실패");
   }
 }

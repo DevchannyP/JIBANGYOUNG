@@ -17,9 +17,8 @@ public class AdUserService {
 
     private final AdUserRepository adUserRepository;
 
-    // 유저 리스트 조회
+    // 사용자 관리_조회
     public List<AdUserDTO> getAllUsers() {
-
         var users = adUserRepository.findAll();
 
         return users.stream()
@@ -37,7 +36,7 @@ public class AdUserService {
             .toList();
     }
 
-    // 전화번호 마스킹
+    // 사용자관리_전화번호 마스킹
     private String maskPhone(String phone) {
         if (phone == null || phone.length() < 8) {
             return phone;
@@ -45,13 +44,13 @@ public class AdUserService {
         return phone.replaceAll("(\\d{3})-(\\d{4})-(\\d{4})", "$1-****-$3");
     }
     
-    // 권한 변경
+    // 사용자관리_권한 변경
     @Transactional
     public void updateRoles(List<AdUserRoleDTO> roleList) {
         for (AdUserRoleDTO dto : roleList) {
             var user = adUserRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
-
+            // entity/User 메소드 추가 
             user.changeRole(UserRole.valueOf(dto.getRole())); 
         }
     }

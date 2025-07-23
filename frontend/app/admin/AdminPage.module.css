@@ -262,3 +262,62 @@
   padding: 5px 10px;
   cursor: pointer;
 }
+
+/* 멘토 유저 상태제어*/
+
+.negativeScore {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.statusCell {
+  position: relative;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownButton {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  min-width: 50px;
+  text-align: center;
+}
+
+.dropdownButton:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 60px;
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+  color: #212529;
+}
+
+.dropdownItem:hover {
+  background-color: #f8f9fa;
+}
