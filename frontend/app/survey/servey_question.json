@@ -1,0 +1,142 @@
+[
+ {
+  "question_code": "Q1_age",
+  "question_text": "나이가 어떻게 되십니까?",
+  "filtering": true,
+  "input_type": "number"
+    },
+  {
+    "question_code": "Q1_education",
+    "question_text": "학력요건코드",
+    "filtering": true,
+    "options": [
+      {"option_code": "0049001", "option_text": "고졸 미만", "weight": 1.0},
+      {"option_code": "0049002", "option_text": "고교 재학", "weight": 1.0},
+      {"option_code": "0049003", "option_text": "고졸 예정", "weight": 1.0},
+      {"option_code": "0049004", "option_text": "고교 졸업", "weight": 1.0},
+      {"option_code": "0049005", "option_text": "대학 재학", "weight": 1.0},
+      {"option_code": "0049006", "option_text": "대졸 예정", "weight": 1.0},
+      {"option_code": "0049007", "option_text": "대학 졸업", "weight": 1.0},
+      {"option_code": "0049008", "option_text": "석.박사", "weight": 1.0},
+      {"option_code": "0049009", "option_text": "기타", "weight": 1.0}
+    ]
+  },
+  {
+    "question_code": "Q2",
+    "question_text": "정책특화요건코드",
+    "filtering": true,
+    "options": [
+      {"option_code": "0014001", "option_text": "중소기업", "weight": 1.0},
+      {"option_code": "0014002", "option_text": "여성", "weight": 1.0},
+      {"option_code": "0014003", "option_text": "기초생활수급자", "weight": 1.0},
+      {"option_code": "0014004", "option_text": "한부모가정", "weight": 1.0},
+      {"option_code": "0014005", "option_text": "장애인", "weight": 1.0},
+      {"option_code": "0014006", "option_text": "농업인", "weight": 1.0},
+      {"option_code": "0014007", "option_text": "군인", "weight": 1.0},
+      {"option_code": "0014008", "option_text": "지역인재", "weight": 1.0},
+      {"option_code": "0014010", "option_text": "해당없음", "weight": 1.0}
+    ]
+  },
+  {
+    "question_code": "Q3",
+    "question_text": "결혼상태코드",
+    "filtering": true,
+    "options": [
+      {"option_code": "A", "option_text": "미혼", "weight": 1.0},
+      {"option_code": "B", "option_text": "기혼", "weight": 1.0}
+    ]
+  },
+  {
+    "question_code": "Q4",
+    "question_text": "정책취업요건코드",
+    "filtering": true,
+    "options": [
+      {"option_code": "A", "option_text": "취업자", "weight": 1.0},
+      {"option_code": "B", "option_text": "구직자", "weight": 1.0}
+    ]
+  },
+  {
+    "question_code": "Q5",
+    "question_text": "정책대분류명",
+    "weighting": true,
+    "options": [
+      {"option_code": "A", "option_text": "주거지원", "weight": 1.2},
+      {"option_code": "B", "option_text": "취업지원", "weight": 1.1}
+    ]
+  },
+  {
+    "question_code": "Q6",
+    "question_text": "정책중분류명",
+    "weighting": true,
+    "options": [
+      {"option_code": "A", "option_text": "전세보증금", "weight": 1.3},
+      {"option_code": "B", "option_text": "직업훈련", "weight": 1.0}
+    ]
+  },
+  {
+    "question_code": "Q7",
+    "question_text": "의료 접근성을 얼마나 자주 이용하시나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "매우 자주 이용한다", "weight": 1.2},
+      {"option_code": "B", "option_text": "자주 이용한다", "weight": 1.1},
+      {"option_code": "C", "option_text": "보통이다", "weight": 1.0},
+      {"option_code": "D", "option_text": "가끔 이용한다", "weight": 0.9},
+      {"option_code": "E", "option_text": "거의 이용하지 않는다", "weight": 0.8}
+    ]
+  },
+  {
+    "question_code": "Q8",
+    "question_text": "병원을 정기적으로 가야하나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "매우 그렇다", "weight": 1.2},
+      {"option_code": "B", "option_text": "그렇다", "weight": 1.1},
+      {"option_code": "C", "option_text": "보통이다", "weight": 1.0},
+      {"option_code": "D", "option_text": "그렇지 않다", "weight": 0.9},
+      {"option_code": "E", "option_text": "매우 그렇지 않다", "weight": 0.8}
+    ]
+  },
+  {
+    "question_code": "Q9",
+    "question_text": "대중교통 이용을 선호하시나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "그렇다", "weight": 1.2},
+      {"option_code": "B", "option_text": "그렇지 않다", "weight": 0.8}
+    ]
+  },
+  {
+    "question_code": "Q10",
+    "question_text": "1주일동안 대중교통을 얼마나 이용하시나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "5 회 미만", "weight": 1.0},
+      {"option_code": "B", "option_text": "6 ~ 10 회", "weight": 0.7},
+      {"option_code": "C", "option_text": "11 ~ 15 회", "weight": 0.9},
+      {"option_code": "D", "option_text": "16 ~ 20 회", "weight": 1.1},
+      {"option_code": "E", "option_text": "21회 이상", "weight": 1.3}
+    ]
+  },
+  {
+    "question_code": "Q11",
+    "question_text": "현재 일을 하고 있나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "네", "weight": 0.8},
+      {"option_code": "B", "option_text": "아니요", "weight": 1.2}
+    ]
+  },
+  {
+    "question_code": "Q12",
+    "question_text": "지금 모아둔 돈이 얼마정도 있나요?",
+    "infra": true,
+    "options": [
+      {"option_code": "A", "option_text": "모아둔 돈 없음", "weight": 1.5},
+      {"option_code": "B", "option_text": "1000만원 미만", "weight": 1.1},
+      {"option_code": "C", "option_text": "1000 ~ 3000만원 미만", "weight": 1.0},
+      {"option_code": "D", "option_text": "4000 ~ 6000만원 미만", "weight": 0.8},
+      {"option_code": "E", "option_text": "6000만원 이상", "weight": 0.6}
+    ]
+  }
+]

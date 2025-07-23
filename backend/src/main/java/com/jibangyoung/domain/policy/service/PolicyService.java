@@ -84,7 +84,6 @@ private LocalDate extractDeadline(String aply_ymd, DateTimeFormatter formatter) 
         String formattedDate = endDateRaw.substring(0, 4) + "-" +
                                endDateRaw.substring(4, 6) + "-" +
                                endDateRaw.substring(6, 8);
-        System.out.println(formattedDate);
         return LocalDate.parse(formattedDate, formatter);
     } catch (Exception e) {
         return LocalDate.parse("2099-12-31", formatter); // 파싱 실패 시 상시 마감일

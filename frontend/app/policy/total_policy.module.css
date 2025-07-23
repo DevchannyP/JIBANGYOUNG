@@ -110,11 +110,10 @@
 }
 
 .item {
-  /* 기존 유지 + flex layout 고정 */
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 상단-중단-하단 균형 유지 */
-  height: 200px; /* 고정 높이 */
+  justify-content: space-between;
+  height: 200px;
   padding: 1rem;
   border-radius: 8px;
   background-color: #ffffff;
@@ -130,6 +129,95 @@
   border-color: #3b82f6;
 }
 
+/* 수정된 배지 컨테이너 - 더 안정적인 레이아웃 */
+.badgeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 좌측 배지들과 우측 하트 분리 */
+  width: 100%;
+  height: 32px; /* 고정 높이 */
+  margin-bottom: 0.5rem;
+  overflow: visible; /* hidden에서 변경 */
+}
+
+/* 좌측 배지들을 담는 컨테이너 */
+.badgeLeft {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* 8px에서 4px로 줄임 */
+  flex: 1;
+  min-width: 0; /* flex item이 축소될 수 있도록 */
+}
+
+/* D-day 배지 스타일 */
+.dDayBadge {
+  background-color: #6177f6;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0; /* 크기 고정 */
+}
+
+.dDayBadge.dDayZero {
+  background-color: #ff4d4f;
+}
+
+/* 시도명 배지 스타일 */
+.sidoName {
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px; /* 최대 너비 제한 */
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0; /* 크기 고정 */
+  margin-left: -6px; /* 좌측으로 이동 */
+}
+
+/* 북마크 버튼 컨테이너 */
+.bookmarkButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+/* 하트 아이콘 */
+.heartIcon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  font-size: 1.5rem;
+  line-height: 24px;
+  text-align: center;
+  color: #6177f6;
+  transition: transform 0.2s;
+  vertical-align: middle;
+}
+
+.heartIcon:hover {
+  transform: scale(1.1);
+}
+
+.heartIcon.bookmarked {
+  color: #6177F6;
+}
+
+/* 카드 헤더 */
 .cardHeader {
   display: flex;
   justify-content: space-between;
@@ -141,67 +229,14 @@
   font-size: 1rem;
   font-weight: 600;
   color: #6177F6;
-  margin-bottom: 0.5rem;
+  margin: 0.25rem 0;
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
-  margin-right: 0.5rem;
-}
-
-.bookmarkButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* 추가된 부분: D-day + 시도명 배지 */
-.badgeContainer {
-  display: flex;
-  align-items: center;
-  position: relative; /* 필요하면 유지 */
-  gap: 8px;
-  /* 고정 높이 부여 가능 */
-  height: 28px;
-  overflow: hidden;
-}
-
-/* D-day 배지 스타일 (이전처럼) */
-.dDayBadge {
-  background-color: #6177f6;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 0.85rem;
-  user-select: none;
-  white-space: nowrap;
-}
-
-/* D-day가 0일 때는 빨간색 배경 */
-.dDayBadge.dDayZero {
-  background-color: #ff4d4f;
-}
-
-/* 시도명 스타일 */
-.sidoName {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #555;
-  margin-left: 8px;
-  white-space: nowrap;
-}
-
-/* 정책명 위치 약간 하단으로 이동 */
-.adjustedCardHeader {
-  margin-top: 24px;
+  min-height: 2.6rem;
 }
 
 .itemSummary {
@@ -215,7 +250,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-height: 1.4;
-  min-height: 2.8rem; /* 고정 최소 높이 */
+  min-height: 2.8rem;
 }
 
 .policyInfo {
@@ -231,40 +266,6 @@
 .itemDate {
   font-size: 0.75rem;
   color: #6b7280;
-}
-
-/* 하트 아이콘 1.5배 크기 */
-.heartIcon {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  font-size: 1.8rem;
-  line-height: 30px;
-  text-align: center;
-  color: #6177f6;
-  transition: transform 0.2s;
-  vertical-align: middle;
-
-  position: relative;
-  top: 3px;  /* 3px 아래로 이동 */
-}
-
-
-.heartIcon:hover {
-  transform: scale(1.1);
-}
-
-.heartIcon.bookmarked {
-  color: #6177F6;
-}
-
-.bookmarkButton {
-  margin-left: auto;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
 }
 
 .pagination {
@@ -308,7 +309,6 @@
   background-color: #6177F6;
 }
 
-/* 검색 결과 없음 스타일 */
 .noResults {
   text-align: center;
   padding: 3rem 1rem;
@@ -355,6 +355,19 @@
     min-height: 180px;
   }
 
+  .sidoName {
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 3px 6px;
+    border-radius: 10px;
+    max-width: 60px; /* 모바일에서 더 작게 */
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    margin-left: -4px; /* 태블릿에서 좌측으로 이동 */
+  }
+
   .pagination {
     flex-wrap: wrap;
     gap: 0.25rem;
@@ -385,17 +398,23 @@
     min-height: 160px;
   }
 
-.itemTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #6177f6;
-  margin: 0.25rem 0 0 0; /* 위쪽 여백 줄임 */
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* 2줄로 제한 */
-  -webkit-box-orient: vertical;
-  min-height: 3rem; /* 고정 최소 높이 */
-}
+  .badgeContainer {
+    height: 28px; /* 모바일에서 더 작게 */
+  }
+
+  .sidoName {
+    max-width: 50px;
+    font-size: 0.7rem;
+  }
+
+  .heartIcon {
+    width: 20px;
+    height: 20px;
+    font-size: 1.2rem;
+  }
+
+  .bookmarkButton {
+    width: 28px;
+    height: 28px;
+  }
 }

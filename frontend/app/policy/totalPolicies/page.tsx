@@ -69,10 +69,11 @@ export default function PolicyPage() {
         const dDayA = (new Date(a.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         return dDayA - dDayB; // 남은 일 수가 적은 순
-      } else if (sortBy === "favorite_asc") {
-        //return (b.favoriteCount ?? 0) - (a.favoriteCount ?? 0); // 인기순
-        return null;
-      }
+       }
+       // else if (sortBy === "favorite_asc") {
+      //   //return (b.favoriteCount ?? 0) - (a.favoriteCount ?? 0); // 인기순
+      //   return 
+      // }
 
       return 0;
     });
@@ -94,7 +95,7 @@ export default function PolicyPage() {
 
   const router = useRouter();
 
-  const handleCardClick = (id: number) => router.push(`/policy_detail/${id}`);
+  const handleCardClick = (id: number) => router.push(`./policy_detail/${id}`);
   const handleSearch = (query: string) => setSearchQuery(query.trim());
   const handleClearSearch = () => setSearchQuery("");
   const handlePrevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);

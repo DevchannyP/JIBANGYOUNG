@@ -1,0 +1,235 @@
+/* 전체 레이아웃 */
+.survey-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #FFFFFF 100%);
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.survey-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 헤더 스타일 */
+.survey-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.survey-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.highlight {
+  color: #5b7cf5;
+  font-weight: 700;
+}
+
+/* 질문 카드 스타일 */
+.question-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  border: 1px solid rgba(91, 124, 245, 0.1);
+}
+
+.question-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.question-number {
+  color: #5b7cf5;
+  font-weight: 700;
+}
+
+/* 옵션 버튼 스타일 */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-button {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  color: #4a5568;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.option-button:hover {
+  border-color: #5b7cf5;
+  background: #f8faff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(91, 124, 245, 0.15);
+}
+
+.option-button.selected {
+  background: #5b7cf5;
+  border-color: #5b7cf5;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(91, 124, 245, 0.3);
+}
+
+.option-button.selected::before {
+  content: '✓';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* 네비게이션 버튼 스타일 */
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.nav-button {
+  padding: 12px 32px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 100px;
+}
+
+.prev-button {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #e2e8f0;
+}
+
+.prev-button:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.next-button {
+  background: #5b7cf5;
+  color: white;
+  box-shadow: 0 4px 15px rgba(91, 124, 245, 0.3);
+}
+
+.next-button:hover:not(:disabled) {
+  background: #4c63d2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(91, 124, 245, 0.4);
+}
+
+.next-button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 진행 버튼 스타일 */
+.progress-button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.progress-button {
+  background: #5b7cf5;
+  color: white;
+  border: none;
+  padding: 18px 50px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 25px rgba(91, 124, 245, 0.3);
+  width: 100%;
+  max-width: 400px;
+}
+
+.progress-button:hover {
+  background: #4c63d2;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 35px rgba(91, 124, 245, 0.4);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .survey-container {
+    padding: 20px 15px;
+  }
+  
+  .survey-header h1 {
+    font-size: 24px;
+  }
+  
+  .question-card {
+    padding: 30px 20px;
+    margin-bottom: 20px;
+  }
+  
+  .question-title {
+    font-size: 18px;
+    margin-bottom: 25px;
+  }
+  
+  .option-button {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+  
+  .nav-button {
+    padding: 10px 24px;
+    font-size: 15px;
+    min-width: 80px;
+  }
+  
+  .progress-button {
+    padding: 16px 40px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .survey-header h1 {
+    font-size: 22px;
+  }
+  
+  .question-card {
+    padding: 25px 15px;
+  }
+  
+  .navigation-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-button {
+    width: 100%;
+    max-width: 200px;
+  }
+}
