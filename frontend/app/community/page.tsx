@@ -104,7 +104,7 @@ export default function CommunityPage() {
     <div className="community-page">
       {/* ① 페이지 전체 배경을 담당 */}
       <main className={styles["community-container"]}>
-        <RegionBoardNavigation regions={regions} />
+        {/*<RegionBoardNavigation regions={regions}/>*/}
         {/* ② 실제 콘텐츠 래퍼 */}
         <div>
           {/* 인기글 섹션 */}
