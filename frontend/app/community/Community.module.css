@@ -17,17 +17,21 @@
 /* regionr-navigation */
 .regionr-navigation {
   display: flex;
+  width: 1000px;
   justify-content: center;
   gap: 0.75rem;
+  margin: 0 auto 15px;
   margin-bottom: 15px;
   flex-wrap: wrap;
 }
 .regionr-navigation button {
   font-weight: bold;
-  padding: 0.5rem 1rem;
+  height: 35px;
+  width: 80px;
+  padding: 5px 5px;
   border: 1px solid #ccc;
+  background-color: #ffffff;
   border-radius: 0.5rem;
-  background-color: #fff;
   color: #3a3c3f89;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -36,6 +40,18 @@
   background-color: #facc15;
   color: #191919;
   border-color: #facc151e;
+}
+.regionr-navigation button.region-active {
+  background-color: #facc15;
+  color: black;
+  font-weight: 600;
+  border: 1px solid #facc15;
+}
+
+.regionr-navigation button.region-active:hover {
+  background-color: #facc15;
+  color: black;
+  border: 1px solid #facc15;
 }
 
 .popular-section {
@@ -48,6 +64,8 @@
 }
 .popular-card {
   flex: 0;
+  width: 500px;
+  height: 515px;
   background-color: #fff;
   border: 1px solid #19191928;
   border-radius: 0.5rem;
@@ -154,6 +172,23 @@
   width: 1100px;
   border-collapse: collapse;
   margin: 0 auto;
+}
+.posts-table a {
+  color: #1f2937;           /* ✅ 고정 색상 */
+  text-decoration: none;
+}
+.posts-table tbody td:nth-child(1) {
+  text-align: left;
+  width: 100px;           /* ✅ 고정 너비 설정 */
+  white-space: nowrap;    /* ✅ 줄바꿈 방지 (필요시) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.posts-table tbody td:nth-child(2) {
+  text-align: left;       /* ✅ 왼쪽 정렬 */
+}
+.posts-table tbody td:nth-child(3) {
+  text-align: right;       
 }
 .regionTag {
   width: 60px;

@@ -2,10 +2,10 @@ package com.jibangyoung.domain.community.controller;
 
 import java.util.List;
 
+import com.jibangyoung.domain.community.entity.Post;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
 import com.jibangyoung.domain.community.dto.PostListDto;
 import com.jibangyoung.domain.community.service.CommunityService;
@@ -16,14 +16,22 @@ public class CommunityController {
 
     private final CommunityService communityService;
 
-    @GetMapping("/top-liked-week")
-    public List<PostListDto> topLikeWeek() {
-        return communityService.getCachedWeekTop10();
+    @GetMapping("/top-liked")
+    public List<PostListDto> getTopLikedByPeriod(@RequestParam(defaultValue = "today") String period) {
+        return communityService.getCachedTop10ByPeriod(period);
     }
-    @GetMapping("/top-liked-today")
-    public List<PostListDto> topLikeToday() {
-        return communityService.getCachedTodayTop10();
+    @GetMapping("/popular")
+    public Page<PostListDto> getPopularPosts(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return communityService.getPopularPostsPage(page, size);
     }
-
-
+    // CommunityController.java
+    @GetMapping("/{regionCode}")
+    public Page<PostListDto> getPostsByRegion(
+            @PathVariable String regionCode,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return communityService.getPostsByRegion(regionCode, page, size);
+    }
 }

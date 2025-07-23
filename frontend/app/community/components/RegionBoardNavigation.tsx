@@ -1,37 +1,33 @@
-// 지역 게시판 네비게이션
 "use client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 import styles from "../Community.module.css";
+import { region } from "../types";
 
-export type Region = "부산" | "제주도" | "서울" | "대구" | "인천";
-interface RegionBoardNavigationProps {
-  regions: Region[];
-  currentRegion?: Region;
-}
-
-const RegionBoardNavigation: React.FC<RegionBoardNavigationProps> = ({
-  regions,
-  currentRegion,
-}) => {
+const RegionBoardNavigation = () => {
   const router = useRouter();
+  const pathname = usePathname();
 
-  const handleRegionClick = (region: Region) => {
-    // 지역별 게시판 페이지로 이동
-    router.push(`${region.toLowerCase()}z`);
+  const handleRegionClick = (code: string) => {
+    router.push(`/community/${code}`); // 지역 코드 기반 URL 이동
   };
 
   return (
     <div className={styles["regionr-navigation"]}>
-      {regions.map((region) => (
-        <button
-          key={region}
-          className={currentRegion === region ? styles.active : ""}
-          onClick={() => handleRegionClick(region)}
-        >
-          {region}
-        </button>
-      ))}
+      {Object.entries(region)
+        .filter(([code]) => code !== "99") // 전국 제외
+        .map(([code, Name]) => {
+          const isActive = pathname === `/community/${code}`;
+          return (
+            <button
+              key={code}
+              onClick={() => handleRegionClick(code)}
+              className={isActive ? styles["region-active"] : ""}
+            >
+              {Name}
+            </button>
+          );
+        })}
     </div>
   );
 };
