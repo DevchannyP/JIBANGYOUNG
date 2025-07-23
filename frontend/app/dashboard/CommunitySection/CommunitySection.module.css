@@ -4,271 +4,294 @@
   background: #fff;
   position: relative;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
 }
 
 .bgYellow {
-  width: 100vw;
-  height: 130px;
-  background: #ffe140;
   position: absolute;
   left: 0;
   bottom: 0;
+  width: 100vw;
+  height: 34vh;
+  background: #ffe140;
   z-index: 0;
   pointer-events: none;
 }
 
-/* 중앙 컨텐츠 전체 (카드+타이틀 포함) */
-.innerWrap {
-  position: relative;
+/* 타이틀: 내부 상단 중앙 + 오른쪽 테이블 "콘텐츠"와 x축 완벽 맞춤 */
+.titleOverlay {
   width: 100%;
-  max-width: 1400px;
-  height: 100vh;
-  margin: 0 auto;
-}
-
-/* 커뮤니케이션 타이틀 (오른쪽 상단 오버레이) */
-.titleBoxCustom {
-  position: absolute;
-  top: 82px;     /* 시안 기준 */
-  right: 160px;   /* 시안 기준 */
-  z-index: 10;
-  width: 540px;
+  max-width: 650px;
+  min-width: 280px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-/* 카드 2개 좌우 배치 */
-.tablesBoxCustom {
-  display: flex;
-  flex-direction: row;
-  gap: 120px;         /* 카드 간격 (시안) */
-  margin-left: 120px; /* 왼쪽 여백 (시안) */
-  margin-top: 420px;  /* 상단 여백 (시안) */
-  align-items: flex-start;
-}
-
-/* 카드 개별 컨테이너 */
-.tableBoxLeft { margin-top: 0; }
-.tableBoxRight { margin-top: 270px; } /* 정책 인기 카드 세로 오프셋 */
-
-/* 카드 공통 */
-.tableCard {
-  border-radius: 16px;
-  box-shadow: 0 6px 32px 0 #d1bc3819;
-  width: 490px;
-  min-width: 320px;
-  max-width: 510px;
-  background: #fff;
-  padding-bottom: 18px;
-  box-sizing: border-box;
-  position: relative;
-}
-
-.monthlyCard {
-  border: 2.5px solid #ffb300;
-  padding: 42px 18px 22px 18px;
-  background: linear-gradient(120deg, #fffbe6 86%, #ffe140 100%);
-  box-shadow: 0 8px 32px 0 #ffb30020;
-}
-.policyCard {
-  border: 2.5px solid #232323;
-  padding: 42px 18px 22px 18px;
-  background: #fff;
-  box-shadow: 0 6px 32px 0 #d1bc3819;
-}
-
-/* 카드 헤더 */
-.tableHeaderMonthly,
-.tableHeaderPolicy {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  justify-content: flex-start;
-  position: relative;
-}
-.headerIconMonthly {
-  display: flex;
-  align-items: center;
   justify-content: center;
-  background: #ffb300;
-  border-radius: 8px;
-  padding: 3px 6px 2px 5px;
-  margin-right: 2px;
-  box-shadow: 0 2px 10px #ffb3001a;
-}
-.headerTextMonthly {
-  font-size: 21px;
-  font-weight: 900;
-  color: #fff;
-  background: #ffb300;
-  border-radius: 10px 10px 0 10px;
-  padding: 4px 22px 3px 16px;
-  border: 2.5px solid #ffb300;
-  position: absolute;
-  top: -14px;
-  left: 18px;
-  transform: translateY(-50%);
-  z-index: 2;
-  box-shadow: 0 2px 10px #ffb30010;
-}
-.headerIconPolicy {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffe140;
-  border-radius: 8px;
-  padding: 3px 6px 2px 5px;
-  margin-right: 2px;
-  box-shadow: 0 2px 10px #ffe1401a;
-}
-.headerTextPolicy {
-  font-size: 21px;
-  font-weight: 900;
-  color: #232323;
-  background: #ffe140;
-  border-radius: 10px 10px 0 10px;
-  padding: 4px 22px 3px 16px;
-  border: 2.5px solid #232323;
-  position: absolute;
-  top: -14px;
-  left: 18px;
-  transform: translateY(-50%);
-  z-index: 2;
+  margin-bottom: 80px; /* ✅ 기존 12px → 36px (더 크게 가능!) */
+  pointer-events: none;
 }
 
-/* 테이블 */
-.tableWrap {
-  width: 100%;
-  overflow-x: auto;
-}
-.dataTable {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 15px;
-  color: #232323;
-}
-.dataTableMonthly th,
-.dataTableMonthly td {
-  color: #ff9800;
-  font-weight: 600;
-}
-.dataTableMonthly thead th {
-  background: #fffbe6;
-  font-size: 16px;
-  border-bottom: 2px solid #ffd150;
-}
-.dataTableMonthly tbody tr {
-  border-bottom: 1px solid #ffeac3;
-}
-.dataTablePolicy thead th {
-  background: #fff;
-  font-size: 16px;
-  border-bottom: 2px solid #ececec;
-}
-.dataTablePolicy tbody tr {
-  border-bottom: 1px solid #f2f2f2;
-}
-.dataTable th,
-.dataTable td {
-  vertical-align: middle;
-  padding: 7px 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 230px;
-}
-.dataTable tbody tr:last-child {
-  border-bottom: none;
-}
-
-/* SectionTitle 내부 */
 .titleWrap {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* ← 여기만 center로! */
-  margin-bottom: 18px;
+  align-items: center;
 }
 .tabBtn {
   background: #fff;
   color: #232323;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 19px;
   border-radius: 999px;
-  padding: 8px 34px;
-  border: 2.5px solid #232323;
+  padding: 7px 32px 6px 32px;
+  border: none;
   outline: none;
-  margin-bottom: 16px;
+  margin-bottom: 13px;
   cursor: pointer;
   letter-spacing: -1px;
-  box-shadow: 0 2px 7px 0 #d1bc380f;
-    display: block;
-  margin: 0 auto 16px auto;  /* 상,좌우,하,좌우 */
+  box-shadow: 0 2px 14px #ffe14017;
+  transition:
+    background 0.16s,
+    color 0.16s,
+    box-shadow 0.13s;
+  pointer-events: auto;
 }
-
+.tabBtn:active,
+.tabBtn:focus {
+  background: #ffe140;
+  color: #232323;
+  box-shadow: 0 3px 16px #ffe1402b;
+}
 .titleSub {
-  font-size: 34px;
+  font-size: 2.02rem;
   font-weight: 400;
   color: #232323;
-  letter-spacing: -1.1px;
-  margin-top: 2px;
+  line-height: 1.32;
+  letter-spacing: -1.2px;
 }
 .titleHighlight {
   font-weight: 900;
-  font-size: 36px;
+  font-size: 2.1rem;
   color: #232323;
+  letter-spacing: -1px;
 }
 .hot {
-  color: #ffb300;
+  color: #ffe140;
+  font-size: inherit;
   font-weight: 900;
-  font-size: 36px;
-  letter-spacing: -0.6px;
+  margin-left: 2px;
+  letter-spacing: -2px;
+  text-shadow: 0 1px 5px #ffe1404d;
 }
 
-/* ===== 반응형 ===== */
-@media (max-width: 1100px) {
-  .innerWrap {
-    flex-direction: column;
-    align-items: center;
-    min-height: unset;
-    padding-top: 32px;
-    height: auto;
-  }
-  .titleBoxCustom {
-    position: static;
-    align-items: center;
-    width: 100vw;
-    min-width: 0;
-    margin-bottom: 16px;
-    right: unset;
-    top: unset;
-  }
-  .tablesBoxCustom {
-    margin-left: 0;
-    min-width: 0;
-    width: 100vw;
+/* 테이블 그룹 전체를 아래로 더 내림 */
+.tablesRow {
+  width: 100vw;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 92px;
+  padding-top: 180px;
+  padding-left: 68px;
+  z-index: 2;
+  position: relative;
+}
+
+.tableCol {
+  flex: none;
+  width: 520px;
+  max-width: 99vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+.tableCol:first-child {
+  margin-top: 0;
+}
+/* 오른쪽 테이블만 더 아래로! */
+.tableCol:last-child {
+  margin-top: 180px;
+}
+
+/* 카드(테이블) 공통 */
+.tableCardLabel {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #ffe140 72%, #fffbe6 100%);
+  color: #232323;
+  font-weight: 900;
+  font-size: 1.1rem;
+  border-radius: 17px 17px 0 0;
+  padding: 12px 40px 10px 27px;
+  border: none;
+  box-shadow: 0 2px 10px #ffe14011;
+  margin-bottom: -2px;
+  letter-spacing: -0.3px;
+  min-height: 45px;
+  position: relative;
+}
+.tableCardLabelIcon {
+  margin-right: 12px;
+  font-size: 1.22em;
+  line-height: 1;
+  display: inline-block;
+  filter: drop-shadow(0 1px 0 #fff9);
+}
+.tableCard {
+  background: #fff;
+  border: none;
+  border-radius: 0 0 19px 19px;
+  box-shadow:
+    0 6px 38px #ffe14013,
+    0 1.5px 4px #23232307;
+  padding: 0 0 19px 0;
+  margin: 0;
+  width: 100%;
+  max-width: 510px;
+  overflow-x: auto;
+  position: relative;
+  z-index: 1;
+  transition: box-shadow 0.17s;
+}
+
+/* 파도 애니메이션 */
+.waveCard {
+  opacity: 0;
+  transform: translateY(33px) scale(0.98) skewY(2.1deg);
+  transition:
+    opacity 0.82s cubic-bezier(0.44, 0.16, 0.48, 1),
+    transform 0.82s cubic-bezier(0.44, 0.16, 0.48, 1);
+  will-change: opacity, transform;
+  filter: blur(1.2px) brightness(0.98);
+  outline: none;
+}
+.waveCard.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1) skewY(0);
+  filter: blur(0) brightness(1);
+  box-shadow:
+    0 10px 32px #ffe14020,
+    0 2px 7px #f6f6f660;
+}
+
+/* 테이블 디자인: 선X, 행컬러/hover 부드럽게 */
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 0 0 18px 18px;
+  background: #fff;
+  box-shadow: 0 2.5px 18px #ffe14008;
+}
+.dataTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  color: #232323;
+  font-size: 15.7px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: none;
+  border: none;
+}
+.dataTable th,
+.dataTable td {
+  padding: 12px 14px;
+  font-weight: 400;
+  background: #fff;
+  text-align: left;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.13s;
+  border: none;
+  box-shadow: none !important;
+}
+.dataTable thead th {
+  font-weight: 700;
+  font-size: 1.1em;
+  background: linear-gradient(90deg, #fffbe6 70%, #fff 100%);
+  letter-spacing: -0.8px;
+  color: #232323;
+  border-radius: 0;
+  border: none;
+}
+.dataTable tbody tr {
+  transition: background 0.14s;
+  border: none;
+  box-shadow: none;
+}
+.dataTable tbody tr:nth-child(even) td {
+  background: #fffef3;
+}
+.dataTable tbody tr:hover td {
+  background: #fff7c7;
+}
+.dataTable tbody tr:last-child td {
+  border-bottom: none;
+}
+.dataTable td.hot,
+.dataTable th.hot {
+  color: #ffe140;
+  font-weight: 700;
+  text-align: right;
+}
+.dataTable td.right,
+.dataTable th.right {
+  text-align: right;
+}
+
+@media (max-width: 1200px) {
+  .tablesRow {
     flex-direction: column;
     gap: 38px;
+    padding-left: 0;
     align-items: center;
-    margin-top: 24px;
+    padding-top: 130px;
   }
-  .tableBoxLeft,
-  .tableBoxRight {
-    margin-top: 0 !important;
+  .titleOverlay {
+    width: 100%;
+    max-width: 610px;
+    min-width: 0;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .tableCol:first-child {
+    margin-top: 0;
+  }
+  .tableCol:last-child {
+    margin-top: 42px;
+  }
+  .titleWrap {
+    align-items: center;
+  }
+  .titleSub,
+  .titleHighlight,
+  .hot {
+    font-size: 20px !important;
+  }
+  .sectionRoot {
+    padding-bottom: 14vw;
+  }
+}
+
+@media (max-width: 650px) {
+  .tableCardLabel {
+    font-size: 0.97rem;
+    padding: 8px 17px 7px 13px;
   }
   .tableCard {
-    width: 95vw;
-    min-width: 0;
-    max-width: 99vw;
+    border-radius: 0 0 14px 14px;
   }
-  .headerTextMonthly,
-  .headerTextPolicy {
-    position: static;
-    transform: none;
-    margin-bottom: 12px;
+  .dataTable th,
+  .dataTable td {
+    padding: 6.5px 3px;
+    font-size: 0.95em;
   }
 }

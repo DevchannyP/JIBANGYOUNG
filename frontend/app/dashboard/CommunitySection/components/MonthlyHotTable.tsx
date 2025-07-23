@@ -1,5 +1,4 @@
 import styles from "../CommunitySection.module.css";
-import { Flame } from "lucide-react";
 
 export default function MonthlyHotTable() {
   const rows = Array(10)
@@ -13,18 +12,16 @@ export default function MonthlyHotTable() {
     }));
 
   return (
-    <section className={`${styles.tableCard} ${styles.monthlyCard}`}>
-      <div className={styles.tableHeaderMonthly}>
-        <span className={styles.headerIconMonthly}>
-          <Flame fill="#fff" stroke="#ffb300" size={22} />
-        </span>
-        <span className={styles.headerTextMonthly}>월간 인기</span>
+    <div className={styles.tableCard}>
+      <div className={styles.tableCardLabel}>
+        <span className={styles.tableCardLabelIcon}>📅</span>
+        월간 인기
       </div>
       <div className={styles.tableWrap}>
-        <table className={`${styles.dataTable} ${styles.dataTableMonthly}`}>
+        <table className={styles.dataTable}>
           <thead>
             <tr>
-              <th>NO</th>
+              <th style={{ width: 40 }}>NO</th>
               <th>제목</th>
               <th>글쓴이</th>
               <th>조회</th>
@@ -44,6 +41,6 @@ export default function MonthlyHotTable() {
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 }

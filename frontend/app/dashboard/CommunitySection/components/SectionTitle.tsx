@@ -12,8 +12,8 @@ export default function SectionTitle({ align = "right" }: Props) {
           align === "left"
             ? "flex-start"
             : align === "center"
-            ? "center"
-            : "flex-end",
+              ? "center"
+              : "flex-end",
       }}
     >
       <button className={styles.tabBtn}>커뮤니케이션</button>

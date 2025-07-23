@@ -11,7 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jibangyoung.domain.auth.dto.*;
+import com.jibangyoung.domain.auth.dto.CheckEmailResponse;
+import com.jibangyoung.domain.auth.dto.CheckUsernameResponse;
+import com.jibangyoung.domain.auth.dto.LoginRequestDto;
+import com.jibangyoung.domain.auth.dto.LoginResponseDto;
+import com.jibangyoung.domain.auth.dto.SignupRequestDto;
+import com.jibangyoung.domain.auth.dto.UserDto;
 import com.jibangyoung.domain.auth.entity.EmailVerification;
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.entity.UserStatus;
@@ -51,8 +56,6 @@ public class AuthService {
             throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
         if (userRepository.existsByEmail(signupRequest.getEmail()))
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
-
-        // TODO: 이메일 인증(verify) 필요 시 아래에서 검증
 
         User user = User.createUser(
                 signupRequest.getUsername(),

@@ -61,8 +61,12 @@ main {
   left: 0;
   z-index: 100;
   min-height: 66px;
-  border-bottom: 1.5px solid #fae364;
+
+  /* 아래 두 줄 제거 또는 수정 */
+  border-bottom: none; /* 기존 제거한 부분 유지 */
+  box-shadow: none; /* ✅ 이 줄 추가: 그림자 제거 */
 }
+
 .header-inner {
   width: 100%;
   max-width: 1400px;
