@@ -1,0 +1,183 @@
+/* =========================
+   마이페이지 전체 레이아웃 (시안 일치)
+   ========================= */
+
+/* --- 전체 그리드 구조 --- */
+.mypageGridLayoutReversed {
+  display: grid;
+  grid-template-columns: 1fr 270px;
+  min-height: 100vh;
+  background: #fffef8;
+  font-family: "Pretendard", sans-serif;
+}
+
+/* === 좌측: 프로필 + 콘텐츠 === */
+.mypageLeftPanel {
+  background: #fffef8;
+  padding: 42px 56px 60px;
+  overflow-y: auto;
+}
+
+/* 프로필 카드 */
+.mypageProfileCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1.5px solid #dadada;
+  border-radius: 13px;
+  padding: 38px 48px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 13px rgba(45, 45, 45, 0.07);
+}
+
+.mypageProfileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 1.05rem;
+  color: #2b2b2b;
+  font-weight: 500;
+}
+
+.mypageProfileNickname {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.mypageProfileBear {
+  width: 160px;
+  height: 160px;
+  border-radius: 13px;
+  object-fit: contain;
+  background: #fafafa;
+  border: 2.3px solid #ececec;
+}
+
+/* --- 지역 점수 섹션 --- */
+.mypageSectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #181818;
+  margin-bottom: 12px;
+}
+
+.mypageSectionTitle hr {
+  margin-top: 6px;
+  border: none;
+  border-bottom: 2px solid #ffe140;
+  width: 100%;
+}
+
+.mypageRegionScoreRow {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.mypageSelect {
+  border: 1.7px solid #d2d2d2;
+  border-radius: 9px;
+  background: #fff;
+  padding: 10.5px 16px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #222;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  width: 185px;
+  position: relative;
+}
+
+/* 점수 리스트 */
+.mypageScoreList {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 34px;
+  font-size: 1.05rem;
+  color: #303a48;
+  line-height: 1.75rem;
+}
+
+.mypageScoreList li {
+  margin-bottom: 6px;
+}
+
+.scoreValue {
+  color: #2351e8;
+  font-weight: 700;
+  margin-left: 7px;
+}
+
+/* 진행률 박스 */
+.mypageProgressBox {
+  background: #fff;
+  border: 1.7px solid #e2e2e2;
+  border-radius: 14px;
+  padding: 29px 34px;
+  margin-top: 32px;
+  max-width: 360px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 13px rgba(100, 100, 100, 0.07);
+}
+
+.mypageProgressBox strong {
+  font-size: 1.17rem;
+  color: #262626;
+}
+
+/* === 우측: 사이드바 === */
+.mypageRightSidebar {
+  width: 270px;
+  background: #2f2f2f;
+  border-left: 2px solid #dadada;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.mypageSidebar {
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+}
+
+.mypageSidebarLink {
+  padding: 19px 24px 19px 32px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.07rem;
+  text-align: left;
+  font-weight: 500;
+  border-bottom: 1.5px solid #474747;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+  letter-spacing: -0.01rem;
+}
+
+.mypageSidebarLink:hover {
+  background: #3b3b3b;
+}
+
+.mypageSidebarLink.active,
+.mypageSidebarLink[aria-current="page"] {
+  background: #ffe600;
+  color: #2f2f2f !important;
+  font-weight: 700;
+}
+
+/* === 로딩 === */
+.mypageLoading {
+  padding: 80px 0;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #888;
+}
