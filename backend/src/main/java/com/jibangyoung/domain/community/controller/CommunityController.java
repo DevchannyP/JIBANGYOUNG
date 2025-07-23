@@ -24,4 +24,6 @@ public class CommunityController {
     public List<PostListDto> topLikeToday() {
         return communityService.getCachedTodayTop10();
     }
+
+
 }

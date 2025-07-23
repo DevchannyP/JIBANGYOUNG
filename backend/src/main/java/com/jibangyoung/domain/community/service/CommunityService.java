@@ -25,14 +25,7 @@ public class CommunityService {
     // 좋아요(likes) 수 기준 상위 10개를 내림차순으로 조회한다.
     public List<PostListDto> getRecentTop10(LocalDateTime since) {
         return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
-                .map(post -> new PostListDto(
-                        post.getId(),
-                        post.getTitle(),
-                        post.getLikes(),
-                        post.getViews(),
-                        post.getCreatedAt(),
-                        post.getUserId(),
-                        post.getRegionId()))
+                .map(post -> PostListDto.from(post, null))
                 .collect(Collectors.toList());
     }
     //
