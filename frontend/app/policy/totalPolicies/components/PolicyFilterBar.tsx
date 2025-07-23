@@ -1,4 +1,3 @@
-// app/policy/totalPolicies/components/PolicyFilterBar.tsx (개선된 필터 바)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,8 +6,8 @@ import styles from '../../total_policy.module.css';
 interface PolicyFilterBarProps {
   searchType: string;
   setSearchType: (type: string) => void;
-  region: number;
-  setRegion: (region: number) => void;
+  region: number;               
+  setRegion: (region: number) => void;  
   sortBy: string;
   setSortBy: (sort: string) => void;
   onSearch: (query: string) => void;
@@ -28,19 +27,26 @@ export default function PolicyFilterBar({
   onClearSearch
 }: PolicyFilterBarProps) {
   const [tempQuery, setTempQuery] = useState('');
+  const [tempRegion, setTempRegion] = useState(region);
 
-  // 외부에서 searchQuery가 변경될 때 tempQuery도 동기화
   useEffect(() => {
     setTempQuery(searchQuery);
   }, [searchQuery]);
 
+  useEffect(() => {
+    setTempRegion(region);
+  }, [region]);
+
   const handleSearchSubmit = () => {
-    onSearch(tempQuery);
+    setRegion(tempRegion);  
+    onSearch(tempQuery);    
   };
 
   const handleClearClick = () => {
     setTempQuery('');
-    onClearSearch();
+    setTempRegion(99999);  // 전국 초기화
+    setRegion(99999);      // 부모 상태(region)도 전국으로 변경
+    onClearSearch();       // 검색어 초기화 -> 전체 정책 다시 로드
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -55,13 +61,27 @@ export default function PolicyFilterBar({
         <label htmlFor="region">지역:</label>
         <select 
           id="region" 
-          value={region} 
-          onChange={(e) => setRegion(Number(e.target.value))} 
+          value={tempRegion} 
+          onChange={(e) => setTempRegion(Number(e.target.value))} 
           className={styles.select}
         >
           <option value={99999}>전국</option>
           <option value={11000}>서울</option>
           <option value={26000}>부산</option>
+          <option value={27000}>대구</option>
+          <option value={28000}>인천</option>
+          <option value={29000}>광주</option>
+          <option value={30000}>대전</option>
+          <option value={31000}>울산</option>
+          <option value={36110}>세종</option>
+          <option value={41000}>경기</option>
+          <option value={43000}>충북</option>
+          <option value={44000}>충남</option>
+          <option value={46000}>전남</option>
+          <option value={47000}>경북</option>
+          <option value={48000}>경남</option>
+          <option value={51000}>강원</option>
+          <option value={52000}>부산</option>
           <option value={50000}>제주</option>
         </select>
       </div>
@@ -107,7 +127,7 @@ export default function PolicyFilterBar({
         >
           검색
         </button>
-        {searchQuery && (
+        {(searchQuery || tempQuery) && (
           <button 
             className={styles.clearButton} 
             onClick={handleClearClick}

@@ -110,16 +110,18 @@
 }
 
 .item {
-  border-radius: 8px;
-  padding: 1rem;
-  background-color: #ffffff;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  height: 200px;
+  /* 기존 유지 + flex layout 고정 */
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* 상단-중단-하단 균형 유지 */
+  height: 200px; /* 고정 높이 */
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .item:hover {
@@ -160,27 +162,64 @@
   flex-shrink: 0;
 }
 
+/* 추가된 부분: D-day + 시도명 배지 */
+.badgeContainer {
+  display: flex;
+  align-items: center;
+  position: relative; /* 필요하면 유지 */
+  gap: 8px;
+  /* 고정 높이 부여 가능 */
+  height: 28px;
+  overflow: hidden;
+}
+
+/* D-day 배지 스타일 (이전처럼) */
+.dDayBadge {
+  background-color: #6177f6;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* D-day가 0일 때는 빨간색 배경 */
+.dDayBadge.dDayZero {
+  background-color: #ff4d4f;
+}
+
+/* 시도명 스타일 */
+.sidoName {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #555;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+/* 정책명 위치 약간 하단으로 이동 */
+.adjustedCardHeader {
+  margin-top: 24px;
+}
+
 .itemSummary {
   font-size: 0.8rem;
   color: #4b5563;
   margin-bottom: 0.75rem;
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden;
   line-height: 1.4;
+  min-height: 2.8rem; /* 고정 최소 높이 */
 }
 
 .policyInfo {
   margin-bottom: 0.75rem;
-}
-
-.itemSupport {
-  font-size: 0.8rem;
-  color: #059669;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
 }
 
 .itemCategory {
@@ -194,12 +233,22 @@
   color: #6b7280;
 }
 
+/* 하트 아이콘 1.5배 크기 */
 .heartIcon {
-  font-size: 2rem;
-  color: #6177F6;
-  cursor: pointer;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  font-size: 1.8rem;
+  line-height: 30px;
+  text-align: center;
+  color: #6177f6;
   transition: transform 0.2s;
+  vertical-align: middle;
+
+  position: relative;
+  top: 3px;  /* 3px 아래로 이동 */
 }
+
 
 .heartIcon:hover {
   transform: scale(1.1);
@@ -207,6 +256,15 @@
 
 .heartIcon.bookmarked {
   color: #6177F6;
+}
+
+.bookmarkButton {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .pagination {
@@ -283,25 +341,25 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .searchInputContainer {
     width: 100%;
   }
-  
+
   .list {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .item {
     height: auto;
     min-height: 180px;
   }
-  
+
   .pagination {
     flex-wrap: wrap;
     gap: 0.25rem;
   }
-  
+
   .pageButton {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
@@ -312,22 +370,32 @@
   .content {
     padding: 1rem;
   }
-  
+
   .headerTitle {
     font-size: 2rem;
   }
-  
+
   .list {
     grid-template-columns: 1fr;
   }
-  
+
   .item {
     padding: 1rem;
     height: auto;
     min-height: 160px;
   }
-  
-  .itemTitle {
-    font-size: 1rem;
-  }
+
+.itemTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6177f6;
+  margin: 0.25rem 0 0 0; /* 위쪽 여백 줄임 */
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 2줄로 제한 */
+  -webkit-box-orient: vertical;
+  min-height: 3rem; /* 고정 최소 높이 */
+}
 }

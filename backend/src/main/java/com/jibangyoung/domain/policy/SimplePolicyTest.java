@@ -34,11 +34,11 @@ public class SimplePolicyTest {
         //service에서 조회
          System.out.println("=== Service에서 조회 테스트 ===");
         List<PolicyCardDto> servicePolicies = policyService.getActivePolicyCards();
-        System.out.println("총 개수:"+servicePolicies.size());
-        // for (PolicyCardDto policy : servicePolicies) {
-        //     System.out.println("NO: " + policy.getNO() +
-        //             ", plcyNm: " + policy.getPlcy_nm() +
-        //             ", aplyYmd: " + policy.getDeadline());
-        // }
+        for (PolicyCardDto policy : servicePolicies) {
+            System.out.println("NO: " + policy.getNO() +
+                    ", plcyNm: " + policy.getPlcy_nm() +
+                    ", aplyYmd: " + policy.getDeadline() +
+                    ", sidoName: " + policy.getSidoName());
+        }
     }
 }

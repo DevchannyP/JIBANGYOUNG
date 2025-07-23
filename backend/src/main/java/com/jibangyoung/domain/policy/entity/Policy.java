@@ -80,6 +80,9 @@ public class Policy {
     @Column(name = "etc_mttr_cn", columnDefinition = "TEXT")
     private String etc_mttr_cn;
 
+    @Column(name = "plcy_no", length = 30)
+    private String plcy_no;
+
     @Column(name = "sbmsn_dcmnt_cn", columnDefinition = "TEXT")
     private String sbmsn_dcmnt_cn;
 

@@ -21,35 +21,24 @@ const PolicyCard: React.FC<PolicyCardProps> = ({
   };
 
   let dDayText = '';
-if (policy.deadline === '2099-12-31') {
-  dDayText = '상시';
-} else {
-  dDayText = policy.d_day === 0 ? 'D-day' : `D-${policy.d_day}`;
-}
+  if (policy.deadline === '2099-12-31') {
+    dDayText = '상시';
+  } else {
+    dDayText = policy.d_day === 0 ? 'D-day' : `D-${policy.d_day}`;
+  }
 
   return (
     <div className={styles.item} onClick={onClick} style={{ position: 'relative' }}>
       <div
-        style={{
-          position: 'absolute',
-          top: 8,
-          left: 8,
-          backgroundColor: policy.d_day === 0 ? '#ff4d4f' : '#1890ff',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontWeight: 'bold',
-          fontSize: '0.85rem',
-          userSelect: 'none',
-          zIndex: 10,
-        }}
+        className={styles.badgeContainer} // CSS로 위치 제어
       >
-        {dDayText}
-      </div>
-
-      <div className={styles.cardHeader}>
-        <h3 className={styles.itemTitle}>{policy.plcy_nm}</h3>
-        {onBookmarkToggle && (
+        <span className={styles.dDayBadge}>
+          {dDayText}
+        </span>
+        <span className={styles.sidoName}>
+          {policy.sidoName || '지역 미등록'}
+        </span>
+            {onBookmarkToggle && (
           <button
             className={styles.bookmarkButton}
             onClick={handleBookmarkClick}
@@ -62,6 +51,10 @@ if (policy.deadline === '2099-12-31') {
             </span>
           </button>
         )}
+      </div>
+
+      <div className={`${styles.cardHeader} ${styles.adjustedCardHeader}`}>
+        <h3 className={styles.itemTitle}>{policy.plcy_nm}</h3>
       </div>
 
       <p style={{ marginTop: '8px', color: '#555', fontSize: '0.9rem' }}>

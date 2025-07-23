@@ -9,41 +9,50 @@ import PolicyCounter from './components/PolicyCounter';
 import styles from '../total_policy.module.css';
 import { PolicyCard } from "@/types/api/policy.c";
 import { fetchAllPolicies } from "@/libs/api/policy/policy.c";
-import { fetchPoliciesByRegion } from "@/libs/api/policy/region.api"; // 추가
+import { fetchPoliciesByRegion } from "@/libs/api/policy/region.api";
 
 export default function PolicyPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchType, setSearchType] = useState('title');
-  const [region, setRegion] = useState<number>(99999); // 99999 : 전국
-  const [sortBy, setSortBy] = useState('date_desc');
+  const [region, setRegion] = useState<number>(99999); // 99999: 전국
+  const [sortBy, setSortBy] = useState('d_day_desc'); // D-Day 기준으로 변경
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
   const [policies, setPolicies] = useState<PolicyCard[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // regionCode 변경 시마다 데이터 새로 fetch
+  // 정책 데이터 불러오기
   useEffect(() => {
-    if (region === 99999) {
-      // 전국
-      fetchAllPolicies()
-        .then(data => {
-          console.log('전체 정책 데이터:', data);
-          setPolicies(data);
-        })
-        .catch(err => console.error('전체 정책 API 호출 에러:', err));
-    } else {
-      // 지역별 조회
-      fetchPoliciesByRegion(region)
-        .then(data => {
-          console.log(`지역 ${region} 데이터:`, data);
-          setPolicies(data);
-        })
-        .catch(err => console.error('지역별 정책 API 호출 에러:', err));
-    }
+    setIsLoading(true);
+    const fetchPolicies = async () => {
+      try {
+        if (region === 99999) {
+          const allData = await fetchAllPolicies();
+          setPolicies(allData);
+        } else {
+          const [regionData, nationalData] = await Promise.all([
+            fetchPoliciesByRegion(region),
+            fetchPoliciesByRegion(99999),
+          ]);
+          const merged = [...regionData, ...nationalData].filter(
+            (policy, index, self) =>
+              index === self.findIndex(p => p.plcy_no === policy.plcy_no)
+          );
+          setPolicies(merged);
+        }
+      } catch (err) {
+        console.error("정책 데이터 API 호출 에러:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPolicies();
   }, [region]);
 
   const itemsPerPage = 12;
 
+  // 검색어와 정렬 적용 (D-Day 기준 정렬 적용)
   const filteredAndSortedPolicies = useMemo(() => {
     let filtered = policies;
 
@@ -54,11 +63,17 @@ export default function PolicyPage() {
     }
 
     filtered.sort((a, b) => {
-      if (sortBy === 'date_desc') {
-        return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
-      } else if (sortBy === 'date_asc') {
-        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      const today = new Date();
+
+      if (sortBy === "d_day_desc") {
+        const dDayA = (new Date(a.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+        const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+        return dDayA - dDayB; // 남은 일 수가 적은 순
+      } else if (sortBy === "favorite_asc") {
+        //return (b.favoriteCount ?? 0) - (a.favoriteCount ?? 0); // 인기순
+        return null;
       }
+
       return 0;
     });
 
@@ -67,11 +82,10 @@ export default function PolicyPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedCategories, sortBy, region]);
+  }, [searchQuery, sortBy, region]);
 
   const totalFiltered = filteredAndSortedPolicies.length;
   const totalPages = Math.ceil(totalFiltered / itemsPerPage);
-  const hasResults = totalFiltered > 0;
 
   const paginatedPolicies = filteredAndSortedPolicies.slice(
     (currentPage - 1) * itemsPerPage,
@@ -82,7 +96,7 @@ export default function PolicyPage() {
 
   const handleCardClick = (id: number) => router.push(`/policy_detail/${id}`);
   const handleSearch = (query: string) => setSearchQuery(query.trim());
-  const handleClearSearch = () => setSearchQuery('');
+  const handleClearSearch = () => setSearchQuery("");
   const handlePrevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
 
@@ -111,7 +125,9 @@ export default function PolicyPage() {
           onClearSearch={handleClearSearch}
         />
 
-        {!hasResults ? (
+        {isLoading ? (
+          <div className={styles.loading}>데이터를 불러오는 중...</div>
+        ) : totalFiltered === 0 ? (
           <div className={styles.noResults}>
             <h3>검색 결과가 없습니다.</h3>
             <p>검색어: {searchQuery}</p>

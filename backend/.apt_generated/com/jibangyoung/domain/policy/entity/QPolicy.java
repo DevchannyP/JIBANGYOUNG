@@ -47,8 +47,6 @@ public class QPolicy extends EntityPathBase<Policy> {
 
     public final StringPath plcy_nm = createString("plcy_nm");
 
-    public final StringPath plcy_no = createString("plcy_no");
-
     public final StringPath plcy_sprt_cn = createString("plcy_sprt_cn");
 
     public final StringPath ptcp_prp_trgt_cn = createString("ptcp_prp_trgt_cn");
