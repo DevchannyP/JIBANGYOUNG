@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // ✅ 개발 단계(전체 허용, 인증 건너뜀!)
         // =====================
         filterChain.doFilter(request, response);
-        return;
 
         // =====================
         // 🚩 실서비스(운영)로 전환 시엔 아래 주석 해제! =====================
@@ -70,17 +69,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 실서비스에서만 사용!
     private boolean isPermitAllUri(String uri) {
         boolean result = uri.contains("/api/admin/")
-            || uri.contains("/api/auth/")
-            || uri.contains("/api/users/")
-            || uri.contains("/api/community/")
-            || uri.contains("/api/dashboard/")
-            || uri.contains("/api/mentor/")
-            || uri.contains("/api/mypage/")
-            || uri.contains("/api/policy/")
-            || uri.contains("/api/recommendation/")
-            || uri.contains("/api/report/")
-            || uri.contains("/api/search/")
-            || uri.contains("/api/survey/");
+                || uri.contains("/api/auth/")
+                || uri.contains("/api/users/")
+                || uri.contains("/api/community/")
+                || uri.contains("/api/dashboard/")
+                || uri.contains("/api/mentor/")
+                || uri.contains("/api/mypage/")
+                || uri.contains("/api/policy/")
+                || uri.contains("/api/recommendation/")
+                || uri.contains("/api/report/")
+                || uri.contains("/api/search/")
+                || uri.contains("/api/survey/");
         log.warn("[JWT FILTER] permitAll 체크: {} → {}", uri, result);
         return result;
     }
