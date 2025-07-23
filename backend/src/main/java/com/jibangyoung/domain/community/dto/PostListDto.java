@@ -3,6 +3,7 @@ package com.jibangyoung.domain.community.dto;
 import java.time.LocalDateTime;
 
 import com.jibangyoung.domain.community.entity.Post;
+import com.jibangyoung.domain.community.support.RegionSidoMapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +32,8 @@ public class PostListDto {
     private Long regionId;
     private String regionName;
 
-    public static PostListDto from(Post post, String regionName) {
+    public static PostListDto from(Post post) {
+        String regionName = RegionSidoMapper.getRegionName(post.getRegionId());
         return PostListDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())

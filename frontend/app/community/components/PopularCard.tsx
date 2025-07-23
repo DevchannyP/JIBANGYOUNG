@@ -1,10 +1,9 @@
-// app/community/components/PopularCard.tsx
 import Link from "next/link";
 import styles from "../Community.module.css";
 import { PostListDto } from "../types";
 
 interface Props {
-  title: string;              // 카드 헤더 (e.g. "일간 인기", "주간 인기")
+  title: string;
   posts: PostListDto[];
 }
 
@@ -21,7 +20,7 @@ export default function PopularCard({ title, posts }: Props) {
           <li key={p.id}>
             <div className={styles["rank"]}>{idx + 1}</div>
             <div className={styles["title"]}>
-              <Link href={`/community/posts/${p.id}`}>
+              <Link href={`/community/${String(p.regionId).slice(0, 2)}/${p.id}`}>
                 {p.title}
               </Link>
             </div>
