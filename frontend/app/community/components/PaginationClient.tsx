@@ -19,13 +19,24 @@ const PaginationClient: React.FC<PaginationClientProps> = ({ totalPages }) => {
     router.push(`?${params.toString()}`);
   };
 
-  const getPageNumbers = () => {
-    const pages = [];
-    const start = Math.max(1, currentPage - 2);
-    const end = Math.min(totalPages, start + 4);
-    for (let i = start; i <= end; i++) pages.push(i);
-    return pages;
-  };
+const getPageNumbers = () => {
+  const maxPagesToShow = 5;
+  const pages = [];
+
+  let start = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+  let end = Math.min(totalPages, start + maxPagesToShow - 1);
+
+  if (end - start < maxPagesToShow - 1) {
+    start = Math.max(1, end - maxPagesToShow + 1);
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+};
+
 
   return (
     <div className={styles.pagination}>

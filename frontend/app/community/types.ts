@@ -28,3 +28,13 @@ export const region: Record<string, string> = {
   "52": "전라북도",
   "99": "전국",
 };
+
+// 게시글 상세에서 사용할 타입
+export interface DetailProps {
+  title: string;
+  author: string;
+  createdAt: string;
+  views: number;
+  likes: number;
+  content: string;
+}

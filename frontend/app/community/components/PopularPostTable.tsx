@@ -3,11 +3,11 @@ import styles from "../Community.module.css";
 import { PostListDto } from "../types";
 import Link from "next/link";
 
-interface PopularPostTableProps {
+interface PostListDtoProps {
   posts: PostListDto[];
 }
 
-const PopularPostTable: React.FC<PopularPostTableProps> = ({ posts }) => {
+const PopularPostTable: React.FC<PostListDtoProps> = ({ posts }) => {
   return (
     <table className={styles["posts-table"]}>
       <thead>
