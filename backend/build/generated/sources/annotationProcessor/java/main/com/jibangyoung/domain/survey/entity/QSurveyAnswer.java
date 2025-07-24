@@ -21,7 +21,11 @@ public class QSurveyAnswer extends EntityPathBase<SurveyAnswer> {
 
     public final NumberPath<Long> answerId = createNumber("answerId", Long.class);
 
-    public final StringPath answerValue = createString("answerValue");
+    public final StringPath answerText = createString("answerText");
+
+    public final NumberPath<Integer> answerWeight = createNumber("answerWeight", Integer.class);
+
+    public final NumberPath<Integer> optionCode = createNumber("optionCode", Integer.class);
 
     public final StringPath questionId = createString("questionId");
 

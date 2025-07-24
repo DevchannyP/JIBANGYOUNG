@@ -1,15 +1,11 @@
 // libs/api/survey/surveyAnswer.ts
+import { AnswerFormat } from '@/types/api/survey_a';
 
-export interface SurveyAnswersPayload {
-  answers: { [questionCode: string]: any };
-  // 필요하면 userId 같은 추가 필드도 여기에 포함 가능
-  
-}
-const API_BASE_URL = "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function saveSurveyAnswers(payload: SurveyAnswersPayload) {
+export async function saveSurveyAnswers(payload: AnswerFormat) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/survey/answers`, {
+    const response = await fetch(`${API_BASE_URL}/api/survey/surveyAnswer`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

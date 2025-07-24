@@ -23,7 +23,7 @@ public class QSurveyAnswer extends EntityPathBase<SurveyAnswer> {
 
     public final StringPath answerText = createString("answerText");
 
-    public final NumberPath<Float> answerWeight = createNumber("answerWeight", Float.class);
+    public final NumberPath<Integer> answerWeight = createNumber("answerWeight", Integer.class);
 
     public final NumberPath<Integer> optionCode = createNumber("optionCode", Integer.class);
 

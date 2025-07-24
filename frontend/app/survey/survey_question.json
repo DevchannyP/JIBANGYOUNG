@@ -7,7 +7,7 @@
     "db_field": "age"
   },
   {
-    "question_code": "Q1_education",
+    "question_code": "Q2",
     "question_text": "최종 학력은 어떻게 되십니까?",
     "filtering": true,
     "db_field": "education_code",
@@ -24,7 +24,7 @@
     ]
   },
   {
-    "question_code": "Q2",
+    "question_code": "Q3",
     "question_text": "다음 중 해당하는 항목이 있으신가요? (복수 선택 가능)",
     "filtering": true,
     "db_field": "special_requirement_code",
@@ -42,7 +42,7 @@
     ]
   },
   {
-    "question_code": "Q3",
+    "question_code": "Q4",
     "question_text": "결혼 상태는 어떻게 되십니까?",
     "filtering": true,
     "db_field": "marital_status_code",
@@ -52,7 +52,7 @@
     ]
   },
   {
-    "question_code": "Q4",
+    "question_code": "Q5",
     "question_text": "현재 취업 상태는 어떻게 되십니까?",
     "filtering": true,
     "db_field": "employment_requirement_code",
@@ -62,7 +62,7 @@
     ]
   },
   {
-    "question_code": "Q5",
+    "question_code": "Q6",
     "question_text": "어떤 분야의 정책에 관심이 있으신가요?",
     "weighting": true,
     "db_field": "major_category",
@@ -72,7 +72,7 @@
     ]
   },
   {
-    "question_code": "Q6",
+    "question_code": "Q7",
     "question_text": "구체적으로 어떤 지원을 원하시나요?",
     "weighting": true,
     "db_field": "sub_category",
@@ -82,7 +82,7 @@
     ]
   },
   {
-    "question_code": "Q7",
+    "question_code": "Q8",
     "question_text": "평소에 병원을 얼마나 자주 이용하시나요?",
     "infra": true,
     "db_field": "q7_option",
@@ -95,7 +95,7 @@
     ]
   },
   {
-    "question_code": "Q8",
+    "question_code": "Q9",
     "question_text": "병원을 정기적으로 가야하나요?",
     "infra": true,
     "db_field": "q8_option",
@@ -108,7 +108,7 @@
     ]
   },
   {
-    "question_code": "Q9",
+    "question_code": "Q10",
     "question_text": "대중교통 이용을 선호하시나요?",
     "infra": true,
     "db_field": "q9_option",
@@ -118,7 +118,7 @@
     ]
   },
   {
-    "question_code": "Q10",
+    "question_code": "Q11",
     "question_text": "1주일동안 대중교통을 얼마나 이용하시나요?",
     "infra": true,
     "db_field": "q10_option",
@@ -131,7 +131,7 @@
     ]
   },
   {
-    "question_code": "Q11",
+    "question_code": "Q12",
     "question_text": "현재 일을 하고 있나요?",
     "infra": true,
     "db_field": "q11_option",
@@ -141,7 +141,7 @@
     ]
   },
   {
-    "question_code": "Q12",
+    "question_code": "Q13",
     "question_text": "지금 모아둔 돈이 얼마정도 있나요?",
     "infra": true,
     "db_field": "q12_option",

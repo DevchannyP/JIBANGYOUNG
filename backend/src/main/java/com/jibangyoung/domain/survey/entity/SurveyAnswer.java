@@ -43,7 +43,7 @@ public class SurveyAnswer {
     private String answerText;
     
     @Column(name = "answer_weight", nullable = false)
-    private Float answerWeight;
+    private Integer answerWeight;
     
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)
