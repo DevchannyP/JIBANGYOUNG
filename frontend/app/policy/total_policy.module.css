@@ -367,15 +367,116 @@
     flex-shrink: 0;
     margin-left: -4px; /* 태블릿에서 좌측으로 이동 */
   }
+  
+}
 
+/* 페이지네이션 컨테이너 - 중앙 정렬 */
+.paginationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* 페이지 정보 텍스트 */
+.paginationInfo {
+  text-align: center;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* 페이지네이션 버튼 그룹 - 중앙 정렬 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 40px;
+  text-align: center;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pageButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f9fafb;
+}
+
+.navButton {
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.activePage {
+  background-color: #6177F6;
+  color: white;
+  border-color: #6177F6;
+}
+
+.activePage:hover {
+  background-color: #5a67d8;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .paginationContainer {
+    gap: 0.75rem;
+  }
+  
   .pagination {
-    flex-wrap: wrap;
     gap: 0.25rem;
+    justify-content: center;
   }
 
   .pageButton {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
+    min-width: 36px;
+  }
+
+  .navButton {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .paginationContainer {
+    gap: 0.5rem;
+  }
+  
+  .pagination {
+    gap: 0.125rem;
+  }
+
+  .pageButton {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 32px;
+  }
+
+  .pageInfo {
+    font-size: 0.75rem;
   }
 }
 
@@ -417,4 +518,5 @@
     width: 28px;
     height: 28px;
   }
+
 }

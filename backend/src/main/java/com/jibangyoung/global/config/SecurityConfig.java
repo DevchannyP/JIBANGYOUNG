@@ -43,6 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/policy/**").permitAll()
+                .requestMatchers("/api/survey/**").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex

@@ -1,4 +1,3 @@
-
 interface ProgressButtonProps {
   onClick: () => void;
 }

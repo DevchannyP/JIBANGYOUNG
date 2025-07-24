@@ -1,19 +1,49 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import styles from '../../total_policy.module.css';
 
 interface PolicyFilterBarProps {
-  searchType: string;
-  setSearchType: (type: string) => void;
+  searchType: 'title' | 'keyword';
+  setSearchType: (type: 'title' | 'keyword') => void;
   region: number;               
   setRegion: (region: number) => void;  
-  sortBy: string;
-  setSortBy: (sort: string) => void;
+  sortBy: 'd_day_desc' | 'favorite_asc';
+  setSortBy: (sort: 'd_day_desc' | 'favorite_asc') => void;
   onSearch: (query: string) => void;
   searchQuery: string;
   onClearSearch: () => void;
 }
+
+// 지역 코드 매핑
+const REGION_OPTIONS = [
+  { value: 99999, label: '전국' },
+  { value: 11000, label: '서울' },
+  { value: 26000, label: '부산' },
+  { value: 27000, label: '대구' },
+  { value: 28000, label: '인천' },
+  { value: 29000, label: '광주' },
+  { value: 30000, label: '대전' },
+  { value: 31000, label: '울산' },
+  { value: 36110, label: '세종' },
+  { value: 41000, label: '경기' },
+  { value: 43000, label: '충북' },
+  { value: 44000, label: '충남' },
+  { value: 45000, label: '전북' },
+  { value: 46000, label: '전남' },
+  { value: 47000, label: '경북' },
+  { value: 48000, label: '경남' },
+  { value: 51000, label: '강원' },
+  { value: 50000, label: '제주' },
+] as const;
+
+const SEARCH_TYPE_OPTIONS = [
+  { value: 'title' as const, label: '제목' },
+  { value: 'keyword' as const, label: '키워드' },
+] as const;
+
+const SORT_OPTIONS = [
+  { value: 'd_day_desc' as const, label: '마감빠른순' },
+  { value: 'favorite_asc' as const, label: '인기순' },
+] as const;
 
 export default function PolicyFilterBar({
   searchType,
@@ -26,9 +56,11 @@ export default function PolicyFilterBar({
   searchQuery,
   onClearSearch
 }: PolicyFilterBarProps) {
-  const [tempQuery, setTempQuery] = useState('');
+  // 로컬 상태로 임시 값들 관리
+  const [tempQuery, setTempQuery] = useState(searchQuery);
   const [tempRegion, setTempRegion] = useState(region);
 
+  // 외부 상태 변경 시 로컬 상태 동기화
   useEffect(() => {
     setTempQuery(searchQuery);
   }, [searchQuery]);
@@ -37,104 +69,132 @@ export default function PolicyFilterBar({
     setTempRegion(region);
   }, [region]);
 
-  const handleSearchSubmit = () => {
+  // 검색 실행
+  const handleSearchSubmit = useCallback(() => {
     setRegion(tempRegion);  
-    onSearch(tempQuery);    
-  };
+    onSearch(tempQuery.trim());    
+  }, [tempRegion, tempQuery, setRegion, onSearch]);
 
-  const handleClearClick = () => {
+  // 필터 초기화
+  const handleClearClick = useCallback(() => {
     setTempQuery('');
-    setTempRegion(99999);  // 전국 초기화
-    setRegion(99999);      // 부모 상태(region)도 전국으로 변경
-    onClearSearch();       // 검색어 초기화 -> 전체 정책 다시 로드
-  };
+    setTempRegion(99999);
+    setSearchType('title');
+    setSortBy('d_day_desc');
+    onClearSearch();
+  }, [setSearchType, setSortBy, onClearSearch]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // 엔터키 검색
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSearchSubmit();
     }
-  };
+  }, [handleSearchSubmit]);
+
+  // 검색 타입 변경 시 즉시 적용
+  const handleSearchTypeChange = useCallback((newType: 'title' | 'keyword') => {
+    setSearchType(newType);
+    // 검색어가 있으면 새 타입으로 즉시 검색
+    if (tempQuery.trim()) {
+      onSearch(tempQuery.trim());
+    }
+  }, [setSearchType, tempQuery, onSearch]);
+
+  // 정렬 변경 시 즉시 적용
+  const handleSortChange = useCallback((newSort: 'd_day_desc' | 'favorite_asc') => {
+    setSortBy(newSort);
+  }, [setSortBy]);
+
+  const hasActiveFilters = searchQuery || region !== 99999 || searchType !== 'title' || sortBy !== 'd_day_desc';
 
   return (
     <div className={styles.filterBar}>
-      <div>
-        <label htmlFor="region">지역:</label>
+      <div className={styles.filterGroup}>
+        <label htmlFor="region" className={styles.filterLabel}>
+          지역:
+        </label>
         <select 
           id="region" 
           value={tempRegion} 
           onChange={(e) => setTempRegion(Number(e.target.value))} 
           className={styles.select}
+          aria-label="지역 선택"
         >
-          <option value={99999}>전국</option>
-          <option value={11000}>서울</option>
-          <option value={26000}>부산</option>
-          <option value={27000}>대구</option>
-          <option value={28000}>인천</option>
-          <option value={29000}>광주</option>
-          <option value={30000}>대전</option>
-          <option value={31000}>울산</option>
-          <option value={36110}>세종</option>
-          <option value={41000}>경기</option>
-          <option value={43000}>충북</option>
-          <option value={44000}>충남</option>
-          <option value={46000}>전남</option>
-          <option value={47000}>경북</option>
-          <option value={48000}>경남</option>
-          <option value={51000}>강원</option>
-          <option value={52000}>부산</option>
-          <option value={50000}>제주</option>
+          {REGION_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
       
-      <div>
-        <label htmlFor="sortBy">정렬:</label>
+      <div className={styles.filterGroup}>
+        <label htmlFor="sortBy" className={styles.filterLabel}>
+          정렬:
+        </label>
         <select 
           id="sortBy" 
           value={sortBy} 
-          onChange={(e) => setSortBy(e.target.value)} 
+          onChange={(e) => handleSortChange(e.target.value as 'd_day_desc' | 'favorite_asc')} 
           className={styles.select}
+          aria-label="정렬 방식 선택"
         >
-          <option value="d_day_desc">마감빠른순</option>
-          <option value="favorite_asc">인기순</option>
+          {SORT_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
       
-      <div>
-        <label htmlFor="searchType">검색 조건:</label>
+      <div className={styles.filterGroup}>
+        <label htmlFor="searchType" className={styles.filterLabel}>
+          검색 조건:
+        </label>
         <select 
           id="searchType" 
           value={searchType} 
-          onChange={(e) => setSearchType(e.target.value)} 
+          onChange={(e) => handleSearchTypeChange(e.target.value as 'title' | 'keyword')} 
           className={styles.select}
+          aria-label="검색 조건 선택"
         >
-          <option value="title">제목</option>
-          <option value="keyword">키워드</option>
+          {SEARCH_TYPE_OPTIONS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
         </select>
       </div>
       
-      <div className={styles.searchInputContainer}>
-        <input
-          type="text"
-          value={tempQuery}
-          onChange={(e) => setTempQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="검색어 입력"
-          className={styles.searchInput}
-        />
-        <button 
-          className={styles.searchButton} 
-          onClick={handleSearchSubmit}
-        >
-          검색
-        </button>
-        {(searchQuery || tempQuery) && (
+      <div className={styles.searchContainer}>
+        <div className={styles.searchInputContainer}>
+          <input
+            type="text"
+            value={tempQuery}
+            onChange={(e) => setTempQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={`${searchType === 'title' ? '제목' : '키워드'}으로 검색`}
+            className={styles.searchInput}
+            aria-label="검색어 입력"
+          />
+          <button 
+            className={styles.searchButton} 
+            onClick={handleSearchSubmit}
+            type="button"
+            aria-label="검색 실행"
+          >
+            검색
+          </button>
           <button 
             className={styles.clearButton} 
             onClick={handleClearClick}
+            type="button"
+            aria-label="필터 초기화"
           >
             초기화
           </button>
-        )}
+        </div>
       </div>
     </div>
   );

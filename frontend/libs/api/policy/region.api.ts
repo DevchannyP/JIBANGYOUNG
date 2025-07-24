@@ -9,7 +9,6 @@ export const fetchPoliciesByRegion = async (region_code: number): Promise<Policy
     const res = await axios.get(`${API_BASE_URL}/api/policy/region.api`, {
       params: { region_code }
     });
-    console.log("호출 데이터:" + res.data)
     return res.data;
   } catch (error) {
     console.error('지역별 정책 API 호출 실패:', error);
