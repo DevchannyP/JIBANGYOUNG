@@ -1,4 +1,5 @@
 import { PostListDto } from "@/app/community/types";
+import type { DetailProps } from "@/app/community/types";
 
 export async function fetchPopularPosts(
   page: number,
@@ -27,7 +28,7 @@ export async function fetchCommunityPostsByRegion(
   page: number = 1
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/${regionCode}?page=${page}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/region/${regionCode}?page=${page}`,
     { cache: "no-store" }
   );
 
@@ -40,5 +41,27 @@ export async function fetchCommunityPostsByRegion(
   return {
     posts: data.content,
     totalPages: data.totalPages,
+  };
+}
+
+export async function fetchPostDetail(postId: string): Promise<DetailProps> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/post/${postId}`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) {
+    throw new Error("게시글 상세 정보를 불러오지 못했습니다");
+  }
+
+  const data = await res.json();
+
+  return {
+    title: data.title,
+    author: data.author,
+    createdAt: data.createdAt,
+    views: data.views,
+    likes: data.likes,
+    content: data.content,
   };
 }

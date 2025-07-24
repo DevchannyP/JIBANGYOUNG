@@ -1,5 +1,5 @@
 // app/community/page.tsx
-import { fetchPopularPosts } from "@/libs/api/community/community.api";
+import { fetchCommunityPostsByRegion} from "@/libs/api/community/community.api";
 import styles from "../Community.module.css";
 import PopularPostsByPeriod from "../components/PopularPostsByPeriod";
 import PopularPostTable from "../components/PopularPostTable";
@@ -11,32 +11,31 @@ interface PageProps {
 }
 
 export default async function CommunityPage({ searchParams }: PageProps) {
+
   const resolvedSearchParams = await searchParams;
   const pageParam = typeof resolvedSearchParams?.page === "string" ? resolvedSearchParams.page : "1";
-  const currentPage = parseInt(pageParam);
-  
-  const { posts, totalPages } = await fetchPopularPosts(currentPage);
+  const currentPage = Math.max(1, parseInt(pageParam, 10) || 1);
 
-  return (
-    <div className="community-page">
-      <main className={styles["community-container"]}>
-        <RegionBoardNavigation />
-
-        {/* 인기글 섹션 */}
-        <section className={styles["popular-section"]}>
-          <div>
-            <PopularPostsByPeriod period="week" title="주간 인기" />
+    const { posts, totalPages } = await fetchCommunityPostsByRegion(currentPage);
+    
+    return (
+      <div className="community-page">
+        <main className={styles["community-container"]}>
+          <RegionBoardNavigation />
+          {/* 인기글 섹션 */}
+          <section className={styles["popular-section"]}>
+            <div>
+              <PopularPostsByPeriod period="week" title="주간 인기" />
+            </div>
+            <div>
+              <PopularPostsByPeriod period="today" title="일간 인기" />
+            </div>
+          </section>
+          <div className="community-container">
+            <PopularPostTable posts={posts} />
+            <PaginationClient totalPages={totalPages} />
           </div>
-          <div>
-            <PopularPostsByPeriod period="today" title="일간 인기" />
-          </div>
-        </section>
-
-        <div className="community-container">
-          <PopularPostTable posts={posts} />
-          <PaginationClient totalPages={totalPages} />
-        </div>
-      </main>
-    </div>
-  );
+        </main>
+      </div>
+    );
 }

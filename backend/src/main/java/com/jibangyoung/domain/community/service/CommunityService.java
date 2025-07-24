@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,5 +66,11 @@ public class CommunityService {
         Pageable pageable = PageRequest.of(pageIndex, size);
         Page<Post> postPage = postRepository.findByRegionPrefix(regionCode, pageable);
         return postPage.map(PostListDto::from);
+    }
+    public PostDetailDto getPostDetail(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
+        System.out.println(post);
+        return PostDetailDto.from(post);
     }
 }
