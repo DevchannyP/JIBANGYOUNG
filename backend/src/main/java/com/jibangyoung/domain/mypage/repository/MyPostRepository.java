@@ -11,6 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * - Page, 최신순, totalCount 지원
  * - 확장: QueryDSL/조건검색, Slice 등 적용 용이
  */
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface MyPostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 }

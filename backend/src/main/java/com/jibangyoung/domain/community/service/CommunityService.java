@@ -5,16 +5,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jibangyoung.domain.community.dto.PostDetailDto;
-import com.jibangyoung.domain.community.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -57,18 +57,18 @@ public class CommunityService {
 
     public Page<PostListDto> getPopularPostsPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Post> postPage = postRepository.findPopularPosts(pageable);
+        Page<Posts> postPage = postRepository.findPopularPosts(pageable);
         return postPage.map(PostListDto::from); // ✅ now it's correct
     }
 
     public Page<PostListDto> getPostsByRegion(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
-        Page<Post> postPage = postRepository.findByRegionPrefix(regionCode, pageable);
+        Page<Posts> postPage = postRepository.findByRegionPrefix(regionCode, pageable);
         return postPage.map(PostListDto::from);
     }
     public PostDetailDto getPostDetail(Long postId) {
-        Post post = postRepository.findById(postId)
+        Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
         System.out.println(post);
         return PostDetailDto.from(post);

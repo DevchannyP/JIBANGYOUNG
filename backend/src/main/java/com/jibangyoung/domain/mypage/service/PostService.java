@@ -1,19 +1,22 @@
 package com.jibangyoung.domain.mypage.service;
 
-import com.jibangyoung.domain.auth.entity.User;
-import com.jibangyoung.domain.auth.repository.UserRepository;
-import com.jibangyoung.domain.mypage.dto.PostPreviewDto;
-import com.jibangyoung.domain.mypage.entity.Post;
-import com.jibangyoung.domain.mypage.repository.PostRepository;
-import com.jibangyoung.global.exception.ErrorCode;
-import com.jibangyoung.global.exception.NotFoundException;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import com.jibangyoung.domain.mypage.repository.MyPostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.jibangyoung.domain.auth.entity.User;
+import com.jibangyoung.domain.auth.repository.UserRepository;
+import com.jibangyoung.domain.mypage.dto.PostPreviewDto;
+import com.jibangyoung.domain.mypage.entity.Post;
+
+import com.jibangyoung.global.exception.ErrorCode;
+import com.jibangyoung.global.exception.NotFoundException;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * [실무] 내 게시글 조회 서비스
@@ -25,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final PostRepository postRepository;
+    private final MyPostRepository postRepository;
     private final UserRepository userRepository;
 
     /**

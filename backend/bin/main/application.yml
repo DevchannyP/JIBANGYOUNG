@@ -7,17 +7,34 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update # 운영은 validate 또는 none 권장
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  redis:
-    host: ${REDIS_HOST:localhost} # 환경변수 없을 때 기본값
-    port: ${REDIS_PORT:6379}
-    # timeout: 2000ms      # (선택) 연결 타임아웃
-    # password: xxx        # (보안/운영시 사용)
+  # redis:
+  #   host: ${REDIS_HOST:localhost}
+  #   port: ${REDIS_PORT:6379}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587 # ✅ 구글은 587(TLS) 권장, 465(SSL)는 옛날 방식
+    username: chsook40@gmail.com # 실제 보내는 gmail 주소
+    password: gembkubjcjxwtwzv # 2단계 인증 켜고 발급받은 앱 비밀번호 입력
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true # ✅ TLS 사용(587 포트)
+            required: true
+          # ssl:
+          #   enable: true   # 465(SSL) 쓸 때만 필요 (구글은 587/TLS 권장)
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 logging:
   level:
@@ -27,3 +44,15 @@ jwt:
   secret: wYEFYfrh8aSZu9gsSls7PVVrhERbR9bq3qHFsYGQ3a1TCkhsvMxnRhXWoEB4aj41+FTidD4r/DGt93P3zLKxLw==
   access-token-validity-ms: 900000 # 15분
   refresh-token-validity-ms: 1209600000 # 14일
+
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
