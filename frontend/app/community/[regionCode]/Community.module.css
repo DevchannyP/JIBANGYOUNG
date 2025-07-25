@@ -1,0 +1,500 @@
+/* Community Page Styles */
+
+.rightAlign {
+  text-align: center;
+}
+
+/* Container */
+.community-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 10px;
+  font-family: "SCDream", sans-serif;
+  color: #3a3c3f;
+  background-color: #fdfdfd;
+}
+
+/* regionr-navigation */
+.regionr-navigation {
+  display: flex;
+  width: 1400px;
+  justify-content: center;
+  gap: 5px;
+  margin: 0 auto 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+.regionr-navigation button {
+  font-weight: bold;
+  height: 35px;
+  width: 65px;
+  padding: 5px 5px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  border-radius: 5px;
+  color: #3a3c3f89;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.regionr-navigation button:hover {
+  background-color: #facc15;
+  color: #191919;
+  border-color: #facc151e;
+}
+.regionr-navigation button.region-active {
+  background-color: #facc15;
+  color: black;
+  font-weight: 600;
+  border: 1px solid #facc15;
+}
+
+.regionr-navigation button.region-active:hover {
+  background-color: #facc15;
+  color: black;
+  border: 1px solid #facc15;
+}
+
+.popular-section {
+  display: flex;
+  justify-content: center; /* ← 자식들을 가로축 중앙 정렬 */
+  align-items: flex-start; /* 필요하면 세로축도 정렬 (기본 stretch) */
+  gap: 1.5rem;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+.popular-card {
+  flex: 0;
+  width: 500px;
+  height: 515px;
+  background-color: #fff;
+  border: 1px solid #19191928;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.popular-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.popular-card-header h3 {
+  font-size: 20px;
+  font-weight: 700px;
+  margin: 0;
+}
+.popular-card-header .icon {
+  font-size: 20px;
+}
+
+.popular-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.popular-list li {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+.popular-list li + li {
+  margin-top: 0.25rem;
+}
+.popular-list li:hover {
+  background-color: #f5f5f5;
+}
+.popular-list .rank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 12px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.popular-list li:nth-child(-n + 3) .rank {
+  background-color: #facc15;
+  color: #fff;
+}
+.popular-list li:nth-child(n + 4) .rank {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+.popular-list .title {
+  flex: 1;
+  font-size: 14px;
+  width: 300px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popular-list .title a {
+  color: inherit;
+  text-decoration: none;
+}
+.popular-list .title a:hover {
+  text-decoration: underline;
+}
+.popular-list .stats {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+.popular-list .stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.popular-list .like-count {
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.popular-list .like-count span {
+  font-size: 12px;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+/* Posts Table */
+.posts-table {
+  width: 1100px;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+.posts-table a {
+  color: #1f2937;           /* ✅ 고정 색상 */
+  text-decoration: none;
+}
+.posts-table tbody td:nth-child(1) {
+  text-align: left;
+  width: 100px;           /* ✅ 고정 너비 설정 */
+  white-space: nowrap;    /* ✅ 줄바꿈 방지 (필요시) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.posts-table tbody td:nth-child(2) {
+  text-align: left;       /* ✅ 왼쪽 정렬 */
+}
+.posts-table tbody td:nth-child(3) {
+  text-align: right;       
+}
+.regionTag {
+  width: 60px;
+  border: 1px solid #1919195e;
+  padding: 2px 8px;
+  text-align: center;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin-right: 0.5rem; /* if you want a little space before the title */
+}
+.posts-table thead th {
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 2px solid #facc15;
+  font-size: 0.875rem;
+}
+.posts-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #3a3c3f;
+}
+.posts-table tbody td:nth-child(1) {
+  text-align: left;
+}
+.posts-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+.posts-table tbody tr.active {
+  background-color: #eff6ff;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.pagination button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #3a3c3f;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pagination button:hover {
+  background-color: #f6f6f6;
+}
+.pagination button.active {
+  background-color: #facc15;
+  color: #191919;
+  border-color: #facc15;
+}
+/* Community Page Styles */
+
+.rightAlign {
+  text-align: center;
+}
+
+/* Container */
+.community-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 10px;
+  font-family: "SCDream", sans-serif;
+  color: #3a3c3f;
+  background-color: #fdfdfd;
+}
+
+/* regionr-navigation */
+.regionr-navigation {
+  display: flex;
+  width: 1400px;
+  justify-content: center;
+  gap: 5px;
+  margin: 0 auto 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+.regionr-navigation button {
+  font-weight: bold;
+  height: 50px;
+  width: 120px;
+  padding: 5px 5px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  border-radius: 5px;
+  color: #3a3c3f89;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.regionr-navigation button:hover {
+  background-color: #facc15;
+  color: #191919;
+  border-color: #facc151e;
+}
+.regionr-navigation button.region-active {
+  background-color: #facc15;
+  color: black;
+  font-weight: 600;
+  border: 1px solid #facc15;
+}
+
+.regionr-navigation button.region-active:hover {
+  background-color: #facc15;
+  color: black;
+  border: 1px solid #facc15;
+}
+
+.popular-section {
+  display: flex;
+  justify-content: center; /* ← 자식들을 가로축 중앙 정렬 */
+  align-items: flex-start; /* 필요하면 세로축도 정렬 (기본 stretch) */
+  gap: 1.5rem;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+.popular-card {
+  flex: 0;
+  width: 500px;
+  height: 515px;
+  background-color: #fff;
+  border: 1px solid #19191928;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.popular-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.popular-card-header h3 {
+  font-size: 20px;
+  font-weight: 700px;
+  margin: 0;
+}
+.popular-card-header .icon {
+  font-size: 20px;
+}
+
+.popular-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.popular-list li {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+.popular-list li + li {
+  margin-top: 0.25rem;
+}
+.popular-list li:hover {
+  background-color: #f5f5f5;
+}
+.popular-list .rank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 12px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.popular-list li:nth-child(-n + 3) .rank {
+  background-color: #facc15;
+  color: #fff;
+}
+.popular-list li:nth-child(n + 4) .rank {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+.popular-list .title {
+  flex: 1;
+  font-size: 14px;
+  width: 300px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popular-list .title a {
+  color: inherit;
+  text-decoration: none;
+}
+.popular-list .title a:hover {
+  text-decoration: underline;
+}
+.popular-list .stats {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+.popular-list .stats span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.popular-list .like-count {
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+.popular-list .like-count span {
+  font-size: 12px;
+  color: #666;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+/* Posts Table */
+.posts-table {
+  width: 1100px;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+.posts-table a {
+  color: #1f2937;           /* ✅ 고정 색상 */
+  text-decoration: none;
+}
+.posts-table tbody td:nth-child(1) {
+  text-align: left;
+  width: 100px;           /* ✅ 고정 너비 설정 */
+  white-space: nowrap;    /* ✅ 줄바꿈 방지 (필요시) */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.posts-table tbody td:nth-child(2) {
+  text-align: left;       /* ✅ 왼쪽 정렬 */
+}
+.posts-table tbody td:nth-child(3) {
+  text-align: right;       
+}
+.regionTag {
+  width: 60px;
+  border: 1px solid #1919195e;
+  padding: 2px 8px;
+  text-align: center;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  display: inline-block;
+  margin-right: 0.5rem; /* if you want a little space before the title */
+}
+.posts-table thead th {
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 2px solid #facc15;
+  font-size: 0.875rem;
+}
+.posts-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #3a3c3f;
+}
+.posts-table tbody td:nth-child(1) {
+  text-align: left;
+}
+.posts-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+.posts-table tbody tr.active {
+  background-color: #eff6ff;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.pagination button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #3a3c3f;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pagination button:hover {
+  background-color: #f6f6f6;
+}
+.pagination button.active {
+  background-color: #facc15;
+  color: #191919;
+  border-color: #facc15;
+}

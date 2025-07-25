@@ -1,5 +1,5 @@
 // app/community/page.tsx
-import { fetchCommunityPostsByRegion} from "@/libs/api/community/community.api";
+import {fetchPopularPosts} from "@/libs/api/community/community.api";
 import styles from "../Community.module.css";
 import PopularPostsByPeriod from "../components/PopularPostsByPeriod";
 import PopularPostTable from "../components/PopularPostTable";
@@ -13,11 +13,11 @@ interface PageProps {
 export default async function CommunityPage({ searchParams }: PageProps) {
 
   const resolvedSearchParams = await searchParams;
-  const pageParam = typeof resolvedSearchParams?.page === "string" ? resolvedSearchParams.page : "1";
+  const pageParam = typeof resolvedSearchParams?.page === "string" ? resolvedSearchParams.page : "2";
   const currentPage = Math.max(1, parseInt(pageParam, 10) || 1);
 
-    const { posts, totalPages } = await fetchCommunityPostsByRegion(currentPage);
-    
+    const { posts, totalPages } = await fetchPopularPosts(currentPage);
+    console.log(posts);
     return (
       <div className="community-page">
         <main className={styles["community-container"]}>

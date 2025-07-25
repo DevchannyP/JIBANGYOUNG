@@ -14,7 +14,6 @@ const RegionPostTable: React.FC<PopularPostTableProps> = ({ posts }) => {
         <tr>
           <th>NO</th>
           <th>제목</th>
-          <th>글쓴이</th>
           <th>작성일</th>
           <th>조회</th>
           <th>추천</th>
@@ -28,18 +27,15 @@ const RegionPostTable: React.FC<PopularPostTableProps> = ({ posts }) => {
 
           return (
             <tr key={post.id}>
-              {/* NO or 공지 뱃지 */}
               <td>
                 {post.id}
               </td>
-              {/* 제목 영역 */}
               <td align="left">
                 <Link href={postLink} className={styles["full-cell-link"]}>
                   {post.title}
                 </Link>
               </td>
 
-              {/* <td>{post.author}</td> */}
               <td>{post.createdAt}</td>
               <td>{post.views}</td>
               <td>{post.likes}</td>

@@ -17,9 +17,9 @@
 /* regionr-navigation */
 .regionr-navigation {
   display: flex;
-  width: 1000px;
+  width: 1400px;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 5px;
   margin: 0 auto 15px;
   margin-bottom: 15px;
   flex-wrap: wrap;
@@ -27,11 +27,11 @@
 .regionr-navigation button {
   font-weight: bold;
   height: 35px;
-  width: 80px;
+  width: 65px;
   padding: 5px 5px;
   border: 1px solid #ccc;
   background-color: #ffffff;
-  border-radius: 0.5rem;
+  border-radius: 5px;
   color: #3a3c3f89;
   cursor: pointer;
   transition: background-color 0.2s;

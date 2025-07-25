@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const regionName = getRegionName(regionCode);
   
   return {
-    title: `${regionName} 커뮤니티 - 지방영`,
+    title: `${regionName} 커뮤니티 - 지방청년`,
     description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
     openGraph: {
-      title: `${regionName} 커뮤니티 - 지방영`,
+      title: `${regionName} 커뮤니티 - 지방청년`,
       description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
     },
   };
