@@ -10,16 +10,16 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QPost is a Querydsl query type for Post
+ * QPosts is a Querydsl query type for Posts
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QPost extends EntityPathBase<Post> {
+public class QPosts extends EntityPathBase<Posts> {
 
-    private static final long serialVersionUID = 1298507734L;
+    private static final long serialVersionUID = 1599034205L;
 
-    public static final QPost post = new QPost("post");
+    public static final QPosts posts = new QPosts("posts");
 
-    public final EnumPath<Post.PostCategory> category = createEnum("category", Post.PostCategory.class);
+    public final EnumPath<Posts.PostCategory> category = createEnum("category", Posts.PostCategory.class);
 
     public final StringPath content = createString("content");
 
@@ -47,16 +47,16 @@ public class QPost extends EntityPathBase<Post> {
 
     public final NumberPath<Integer> views = createNumber("views", Integer.class);
 
-    public QPost(String variable) {
-        super(Post.class, forVariable(variable));
+    public QPosts(String variable) {
+        super(Posts.class, forVariable(variable));
     }
 
-    public QPost(Path<? extends Post> path) {
+    public QPosts(Path<? extends Posts> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QPost(PathMetadata metadata) {
-        super(Post.class, metadata);
+    public QPosts(PathMetadata metadata) {
+        super(Posts.class, metadata);
     }
 
 }

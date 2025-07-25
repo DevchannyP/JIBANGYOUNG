@@ -1,13 +1,14 @@
 package com.jibangyoung.domain.community.dto;
 
-import com.jibangyoung.domain.community.entity.Post;
+import java.time.LocalDateTime;
+
+import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.support.RegionSidoMapper;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -40,7 +41,7 @@ public class PostDetailDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static PostDetailDto from(Post post) {
+    public static PostDetailDto from(Posts post) {
         return PostDetailDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
