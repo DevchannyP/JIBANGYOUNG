@@ -30,7 +30,8 @@ public class PasswordResetService {
 
 @Transactional
 public void sendResetPwEmail(PasswordResetRequest req) {
-    User user = userRepository.findByEmail(req.getEmail())
+    // 유저 존재 확인만 필요하므로 변수 제거
+    userRepository.findByEmail(req.getEmail())
             .orElseThrow(() -> new PasswordResetException(ErrorCode.USER_NOT_FOUND));
 
     tokenRepository.deleteByEmail(req.getEmail()); // 1회성 정책
@@ -46,12 +47,10 @@ public void sendResetPwEmail(PasswordResetRequest req) {
             .build();
     tokenRepository.save(entity);
 
-    // ---------- (★ 여기를 하드코딩) ----------
-    // String resetLink = "https://jibangyoung.kr/auth/reset-password?token=" + token;
-    String resetLink = "http://localhost:3000/auth/reset-password?token=" + token; // <-- 개발환경용!
-    // 운영은 위 주석처리, 개발/테스트는 아래 줄 사용
+    String resetLink = "http://localhost:3000/auth/reset-password?token=" + token; // 개발환경
     mailService.sendPasswordResetMail(req.getEmail(), resetLink);
 }
+
 
 
     // 2. 토큰 검증

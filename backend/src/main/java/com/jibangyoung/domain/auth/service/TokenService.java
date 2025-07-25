@@ -1,7 +1,17 @@
 // backend/src/main/java/com/jibangyoung/domain/auth/service/TokenService.java
 package com.jibangyoung.domain.auth.service;
 
-import com.jibangyoung.domain.auth.AuthConstants;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+// import com.jibangyoung.domain.auth.AuthConstants;
 import com.jibangyoung.domain.auth.dto.LoginResponseDto;
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.repository.UserRepository;
@@ -11,17 +21,9 @@ import com.jibangyoung.global.exception.BusinessException;
 import com.jibangyoung.global.exception.ErrorCode;
 import com.jibangyoung.global.security.CustomUserDetailsService;
 import com.jibangyoung.global.security.JwtTokenProvider;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
