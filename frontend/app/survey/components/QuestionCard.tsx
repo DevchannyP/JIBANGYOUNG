@@ -21,7 +21,7 @@ interface Question {
 
 interface AnswerObject {
   question_code: string;
-  option_code: string | number;
+  option_code: string; // string으로 통일
   answer_text: string;
   answer_weight: number;
 }
@@ -44,12 +44,11 @@ export default function QuestionCard({
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = parseInt(e.target.value);
     const answer: AnswerObject = {
       question_code: question.question_code,
-      option_code: numericValue,
+      option_code: e.target.value, // 문자열로 저장
       answer_text: e.target.value,
-      answer_weight: 0, // 가중치 없음 (숫자 입력형)
+      answer_weight: 0, // 가중치 없음
     };
     onAnswerSelect(answer);
   };

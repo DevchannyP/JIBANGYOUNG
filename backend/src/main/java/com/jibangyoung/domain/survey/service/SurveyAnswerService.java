@@ -48,28 +48,51 @@ public class SurveyAnswerService {
         surveyAnswer.setResponseId(responseId);
         surveyAnswer.setQuestionId(questionCode);
 
-        // optionCode, answerText, answerWeight 세팅 예시 (필요시 상세 구현)
-        int optionCode = 0; // 임시 기본값
-        surveyAnswer.setOptionCode(optionCode);
+        // optionCode를 String으로 저장
+        surveyAnswer.setOptionCode(String.valueOf(value));
 
+        // answerText 세팅
         if (answer.getText() instanceof String) {
             surveyAnswer.setAnswerText((String) answer.getText());
+        } else if (answer.getText() instanceof List) {
+            List<?> texts = (List<?>) answer.getText();
+            int index = 0;
+            if (answer.getValue() instanceof List) {
+                index = ((List<?>) answer.getValue()).indexOf(value);
+            }
+            String selectedText = (index >= 0 && index < texts.size()) ? String.valueOf(texts.get(index)) : String.valueOf(value);
+            surveyAnswer.setAnswerText(selectedText);
         } else {
             surveyAnswer.setAnswerText(String.valueOf(value));
         }
 
-        int weight = 0;
-        if (answer.getWeight() instanceof Number) {
-            weight = ((Number) answer.getWeight()).intValue();
-        } else if (answer.getWeight() instanceof String) {
-            try {
-                weight = Integer.parseInt((String) answer.getWeight());
-            } catch (NumberFormatException e) {
-                weight = 0;
+        // answerWeight 세팅 (float)
+        float weight = 0f;
+        if (answer.getWeight() instanceof List) {
+            List<?> weights = (List<?>) answer.getWeight();
+            int index = 0;
+            if (answer.getValue() instanceof List) {
+                index = ((List<?>) answer.getValue()).indexOf(value);
             }
+            if (index >= 0 && index < weights.size()) {
+                weight = parseToFloat(weights.get(index));
+            }
+        } else {
+            weight = parseToFloat(answer.getWeight());
         }
         surveyAnswer.setAnswerWeight(weight);
 
         return surveyAnswer;
+    }
+
+    private float parseToFloat(Object obj) {
+        if (obj instanceof Number) {
+            return ((Number) obj).floatValue();
+        }
+        try {
+            return Float.parseFloat(String.valueOf(obj));
+        } catch (Exception e) {
+            return 0f;
+        }
     }
 }

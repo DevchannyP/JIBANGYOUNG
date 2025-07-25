@@ -9,7 +9,7 @@ import { saveSurveyAnswers } from '@/libs/api/survey/surveyAnswer';
 
 interface AnswerObject {
   question_code: string;
-  option_code: string | number;
+  option_code: string; // string으로 통일
   answer_text: string;
   answer_weight: number;
 }
@@ -35,7 +35,7 @@ interface SurveyClientProps {
 interface AnswerFormat {
   answers: {
     [questionCode: string]: {
-      value: string | number | (string | number)[];
+      value: string | string[]; // 항상 string 유지
       text?: string | string[];
       weight?: number | number[];
       timestamp: number;
@@ -49,7 +49,7 @@ interface AnswerFormat {
   };
 }
 
-// rawAnswers 상태 (AnswerObject or AnswerObject[]) → AnswerFormat 변환 함수
+// rawAnswers → AnswerFormat 변환
 function transformToAnswerFormat(rawAnswers: { [key: string]: AnswerObject | AnswerObject[] }): AnswerFormat {
   const now = Date.now();
 
@@ -64,19 +64,17 @@ function transformToAnswerFormat(rawAnswers: { [key: string]: AnswerObject | Ans
 
   Object.entries(rawAnswers).forEach(([questionCode, answerValue]) => {
     if (Array.isArray(answerValue)) {
-      // 복수 선택: value는 option_code 배열, text는 answer_text 배열, weight는 answer_weight 배열
       answers[questionCode] = {
-        value: answerValue.map((ans) => ans.option_code),
+        value: answerValue.map((ans) => String(ans.option_code)),
         text: answerValue.map((ans) => ans.answer_text),
-        weight: answerValue.map((ans) => ans.answer_weight),
+        weight: answerValue.map((ans) => parseFloat(String(ans.answer_weight))),
         timestamp: now,
       };
     } else {
-      // 단일 선택 또는 입력
       answers[questionCode] = {
-        value: answerValue.option_code,
+        value: String(answerValue.option_code),
         text: answerValue.answer_text,
-        weight: answerValue.answer_weight,
+        weight: parseFloat(String(answerValue.answer_weight)),
         timestamp: now,
       };
     }
@@ -113,20 +111,20 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
     }
   };
 
-const handleSaveAnswer = async () => {
-  try {
-    const payload = transformToAnswerFormat(answers);
-    console.log('전송 payload:', payload);
+  const handleSaveAnswer = async () => {
+    try {
+      const payload = transformToAnswerFormat(answers);
+      console.log('전송 payload:', payload);
 
-    const result = await saveSurveyAnswers(payload);
+      const recommendationResult = await saveSurveyAnswers(payload);
 
-    alert('설문이 완료되었습니다.');
-    window.location.href = '../policy/custom_policies';
-  } catch (error) {
-    console.error('설문 저장 오류:', error);
-    alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');
-  }
-};
+      alert('설문이 완료되었습니다.');
+      window.location.href = `../recommendation?data=${encodeURIComponent(JSON.stringify(recommendationResult))}`;
+    } catch (error) {
+      console.error('설문 저장 오류:', error);
+      alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
 
   const isLastQuestion = currentQuestion === questions.length - 1;
   const currentQuestionCode = questions[currentQuestion]?.question_code;

@@ -60,16 +60,24 @@ export default function PolicyClient({ serverState }: { serverState: ServerState
   }, []);
 
   // 지역 변경 시 데이터 재패칭
-  const fetchPoliciesByRegionChange = useCallback(async (newRegion: number) => {
+ const fetchPoliciesByRegionChange = useCallback(async (newRegion: number) => {
+  setIsLoading(true);
+  setError(null);
+
+  try {
     if (newRegion === 99999) {
-      // 전국인 경우 기존 데이터 사용
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
+      // 전국인 경우 초기 전체 데이터로 복원
+      const allPolicies = await fetchAllPolicies();
+      const sorted = allPolicies.sort((a, b) => {
+        const today = new Date();
+        const dDayA = (new Date(a.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+        const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+        return dDayA - dDayB;
+      });
+      setPolicies(sorted);
+      setTotal(sorted.length);
+    } else {
+      // 특정 지역인 경우 기존 로직 유지
       const [regionData, nationalData] = await Promise.all([
         fetchPoliciesByRegion(newRegion),
         fetchPoliciesByRegion(99999),
@@ -82,12 +90,13 @@ export default function PolicyClient({ serverState }: { serverState: ServerState
 
       setPolicies(merged);
       setTotal(merged.length);
-    } catch (err) {
-      setError("데이터를 불러오는 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
     }
-  }, []);
+  } catch (err) {
+    setError("데이터를 불러오는 중 오류가 발생했습니다.");
+  } finally {
+    setIsLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     fetchPoliciesByRegionChange(region);

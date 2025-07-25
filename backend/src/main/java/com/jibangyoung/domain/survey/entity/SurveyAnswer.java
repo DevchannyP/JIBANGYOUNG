@@ -37,13 +37,13 @@ public class SurveyAnswer {
     
     // 기존 answer_value 대신 아래 컬럼들로 변경
     @Column(name = "option_code", nullable = false)
-    private Integer optionCode;
+    private String optionCode;
     
     @Column(name = "answer_text", nullable = false, length = 255)
     private String answerText;
     
     @Column(name = "answer_weight", nullable = false)
-    private Integer answerWeight;
+    private float answerWeight;
     
     @CreationTimestamp
     @Column(name = "submitted_at", updatable = false)
