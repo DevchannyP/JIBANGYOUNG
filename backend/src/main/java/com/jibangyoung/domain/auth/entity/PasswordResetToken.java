@@ -24,10 +24,14 @@ import lombok.NoArgsConstructor;
         @Index(name = "idx_prt_email", columnList = "email")
     }
 )
-@Getter @Builder
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PasswordResetToken {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 100)
@@ -42,6 +46,7 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean used = false;
 
@@ -49,8 +54,7 @@ public class PasswordResetToken {
         return LocalDateTime.now().isAfter(expiresAt);
     }
 
-    // PasswordResetToken.java (추가)
-public void setUsed(boolean used) {
-    this.used = used;
-}
+    public void setUsed(boolean used) {
+        this.used = used;
+    }
 }
