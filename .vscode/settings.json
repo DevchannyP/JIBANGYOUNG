@@ -1,0 +1,82 @@
+{
+  // ---------- (공통) ----------
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.autoSave": "onWindowChange",
+  "files.encoding": "utf8",
+  "files.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/build": true,
+    "**/.gradle": true
+  },
+  "eslint.enable": true,
+  "problems.showCurrentInStatus": true,
+
+  // ---------- (프론트: Tailwind, TypeScript) ----------
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html",
+    "javascript": "javascript",
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["tw`([^`]*)", 1],
+    ["tw\\(([^)]*)\\)", 1],
+    ["className=\"([^\"]*)", 1],
+    ["class=\"([^\"]*)", 1]
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  // ---------- (백엔드: Java/Spring 빌드패스) ----------
+  "java.project.sourcePaths": [
+    "backend/src/main/java",
+    "backend/modules/auth/src/main/java",
+    "backend/modules/user/src/main/java",
+    "backend/modules/policy/src/main/java",
+    "backend/modules/community/src/main/java",
+    "backend/core/security/src/main/java",
+    "backend/config/src/main/java"
+  ],
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-17",
+      "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.15.6-hotspot",
+      "default": true
+    }
+  ],
+  // 🟢 최신 VSCode/Java 확장: java.jdt.ls.java.home 사용!
+  "java.jdt.ls.java.home": "C:\\Program Files\\Eclipse Adoptium\\jdk-17.0.15.6-hotspot",
+
+  // ---------- (Gradle, 빌드 자동화) ----------
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.project.importHints": true,
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.errors.incompleteClasspath.severity": "error",
+  "java.configuration.maven.globalSettings": "",
+  "java.configuration.maven.userSettings": "",
+  "java.import.exclusions": [
+    "**/node_modules/**",
+    "**/.vscode/**"
+  ],
+  "java.autobuild.enabled": true,
+  "gradle.autoSync": true,
+
+  // ---------- (Kotlin, 기타) ----------
+  "kotlin.languageServer.enabled": true,
+
+  // ---------- (경로 인텔리센스, YAML, 기타) ----------
+  "path-intellisense.autoSlashAfterDirectory": true,
+  "path-intellisense.extensionOnImport": true,
+  "yaml.validate": true,
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "/.github/workflows/*"
+  },
+  "dotenv.enableAutocloaking": false,
+  "extensions.ignoreRecommendations": false
+}
