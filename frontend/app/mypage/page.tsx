@@ -1,4 +1,3 @@
-// app/mypage/page.tsx
 import MyPageClient from "./MyPageClient";
 
 export const metadata = {
@@ -7,7 +6,5 @@ export const metadata = {
 };
 
 export default function MyPagePage() {
-  // SSR: SEO/메타만
-  // CSR: 내부 Shell에서 상태/탭/데이터 전부 처리
   return <MyPageClient />;
 }

@@ -284,3 +284,19 @@ main {
     border-radius: 10px;
   }
 }
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+.skeleton {
+  display: block;
+  background: linear-gradient(90deg, #eeeeee 25%, #f4f4f4 50%, #eeeeee 75%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border-radius: 8px;
+}

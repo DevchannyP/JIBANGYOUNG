@@ -54,6 +54,7 @@ function LoginForm() {
         setError("로그인 응답이 올바르지 않습니다.");
         return;
       }
+
       setAuth(user, {
         accessToken,
         refreshToken,
@@ -62,9 +63,17 @@ function LoginForm() {
         issuedAt,
         expiresAt,
       });
-      setIsLoggingInNow(true); // ⭐️ 로그인 성공 직후 true로
+
+      // ✅ 여기 추가!
+      if (typeof window !== "undefined") {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userId", user.id.toString());
+      }
+
+      setIsLoggingInNow(true);
       router.push("/dashboard");
     },
+
     onError: (err: any) => {
       setError(
         err?.message ||
