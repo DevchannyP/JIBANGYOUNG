@@ -1,6 +1,7 @@
 import { PostListDto } from "@/app/community/types";
 import type { DetailProps } from "@/app/community/types";
 
+// 최신 인기글 리스트 /api/community/popular?page=${page}&size=${size}
 export async function fetchPopularPosts(
   page: number,
   size: number = 10
@@ -23,6 +24,7 @@ export async function fetchPopularPosts(
     totalPages: data.totalPages,
   };
 }
+//  
 export async function fetchCommunityPostsByRegion(
   regionCode: string,
   page: number = 1
