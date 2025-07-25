@@ -2,6 +2,8 @@ package com.jibangyoung.global.security;
 
 import java.io.IOException;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,19 +28,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
-        log.warn("[JWT FILTER] 요청 URI = {}", uri);
+        log.debug("[JWT FILTER] 요청 URI = {}", uri);
 
-        // =====================
-        // ✅ 개발 단계(전체 허용, 인증 건너뜀!)
-        // =====================
-        filterChain.doFilter(request, response);
-
-        // =====================
-        // 🚩 실서비스(운영)로 전환 시엔 아래 주석 해제! =====================
-        /*
-        // permitAll로 허용한 경로만 JWT 검사 없이 통과
+        // 아래 경로는 토큰 검사 없이 통과
         if (isPermitAllUri(uri)) {
-            log.warn("[JWT FILTER] permitAll 경로로 JWT 검사 없이 통과: {}", uri);
             filterChain.doFilter(request, response);
             return;
         }
@@ -46,45 +39,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         try {
-            if (StringUtils.hasText(token)) {
-                log.warn("[JWT FILTER] 토큰 감지, 유효성 검사 시도: {}", token);
-                if (jwtTokenProvider.validateToken(token)) {
-                    Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    log.warn("[JWT FILTER] JWT 인증 성공: {}", authentication.getName());
-                } else {
-                    log.warn("[JWT FILTER] 토큰 유효성 검사 실패");
-                }
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("[JWT FILTER] 인증 성공: {}", authentication.getName());
             } else {
-                log.warn("[JWT FILTER] 토큰 없음 (인증 불가 경로)");
+                log.debug("[JWT FILTER] 토큰 없음 or 유효성 실패");
+                SecurityContextHolder.clearContext();
             }
         } catch (Exception ex) {
-            log.warn("[JWT FILTER] JWT 인증 오류: {}", ex.getMessage());
+            log.warn("[JWT FILTER] 인증 오류: {}", ex.getMessage());
             SecurityContextHolder.clearContext();
         }
+
         filterChain.doFilter(request, response);
-        */
     }
 
-    // 실서비스에서만 사용!
     private boolean isPermitAllUri(String uri) {
-        boolean result = uri.contains("/api/admin/")
-                || uri.contains("/api/auth/")
-                || uri.contains("/api/users/")
-                || uri.contains("/api/community/")
-                || uri.contains("/api/dashboard/")
-                || uri.contains("/api/mentor/")
-                || uri.contains("/api/mypage/")
-                || uri.contains("/api/policy/")
-                || uri.contains("/api/recommendation/")
-                || uri.contains("/api/report/")
-                || uri.contains("/api/search/")
-                || uri.contains("/api/survey/");
-        log.warn("[JWT FILTER] permitAll 체크: {} → {}", uri, result);
-        return result;
+        // ✅ 실무: 모두 공개 허용할 경로를 여기서 명확히 지정
+        return uri.startsWith("/api/auth/")
+            || uri.startsWith("/api/public/")
+            || uri.startsWith("/api/admin/")
+            || uri.startsWith("/api/mentor/")
+            || uri.startsWith("/api/community/")
+            || uri.startsWith("/api/survey/")
+            || uri.startsWith("/api/dashboard/");
     }
 
-    // 실서비스에서만 사용!
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AuthConstants.AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(AuthConstants.TOKEN_PREFIX)) {

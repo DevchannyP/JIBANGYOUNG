@@ -1,0 +1,203 @@
+.fullpageScrollContainer {
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: linear-gradient(120deg, #ffe447 0% 44%, #fff 44% 100%);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
+  transition: background 0.36s cubic-bezier(0.4, 0.17, 0.8, 1.12);
+}
+
+/* --- dot nav yellow 스타일 --- */
+.dotNav {
+  position: fixed;
+  top: 50%;
+  right: 32px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  user-select: none;
+}
+.dot {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fffbe6;
+  border: 2.5px solid #ffe140;
+  box-shadow: 0 0 9px 2px #ffe1403c;
+  opacity: 0.33;
+  outline: none;
+  cursor: pointer;
+  transition:
+    opacity 0.24s,
+    box-shadow 0.19s,
+    border-color 0.18s,
+    transform 0.21s;
+  will-change: opacity, box-shadow, border-color, transform;
+}
+.dotActive {
+  opacity: 1;
+  border-color: #ffd600;
+  background: linear-gradient(140deg, #ffd600 55%, #ffe447 100%);
+  box-shadow:
+    0 0 0 4px #ffe14045,
+    0 2px 8px 0 #ffe14039;
+  transform: scale(1.16);
+}
+.dot:focus-visible {
+  box-shadow:
+    0 0 0 5px #ffe140be,
+    0 2px 8px 0 #ffd6005a;
+}
+.dot:hover:not(.dotActive) {
+  opacity: 0.8;
+  border-color: #ffe447;
+  transform: scale(1.08);
+}
+
+/* --- 안내문구 노란색 --- */
+.scrollGuide {
+  position: fixed;
+  left: 50%;
+  top: 32px;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 14px 28px;
+  background: #ffe447e9;
+  color: #232323;
+  font-size: 1.16rem;
+  border-radius: 14px;
+  font-weight: 700;
+  opacity: 0.97;
+  box-shadow: 0 3px 16px #ffd6003c;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  transition: opacity 0.45s;
+  text-shadow: 0 1px 0 #fff5;
+}
+
+.fullpageSection {
+  width: 100vw;
+  height: 100vh;
+  flex-shrink: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  outline: none;
+  position: relative;
+  box-sizing: border-box;
+  transition: background 0.25s;
+}
+.mainSection {
+  z-index: 2;
+}
+
+.sectionSkeleton,
+.skeletonLoader {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.22rem;
+  color: #444;
+}
+.skeletonLoader {
+  background: linear-gradient(120deg, #ffe447 0% 44%, #fff 44% 100%);
+  font-weight: 700;
+  color: #232323;
+  border-radius: 28px;
+}
+.visuallyHidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+@media (max-width: 900px) {
+  .fullpageSection {
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
+  }
+  .dotNav {
+    right: 9px;
+  }
+  .scrollGuide {
+    font-size: 0.99rem;
+    padding: 9px 15px;
+  }
+}
+
+.scrollGuide {
+  position: fixed;
+  left: 50%;
+  top: 32px;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 240px;
+  padding: 14px 30px;
+  background: rgba(255, 228, 71, 0.96);
+  color: #232323;
+  font-size: 1.22rem;
+  border-radius: 18px;
+  font-weight: 800;
+  opacity: 0.99;
+  box-shadow:
+    0 6px 32px #ffe1404d,
+    0 1.5px 7px #ffd6002d;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  transition:
+    opacity 0.42s,
+    filter 0.19s;
+  text-shadow:
+    0 2.5px 10px #fff5,
+    0 1.5px 1.5px #ffe14099;
+  filter: blur(0.3px) brightness(1.07) drop-shadow(0 1.5px 8px #ffe1407c);
+  backdrop-filter: blur(2.5px);
+  animation: scrollGuidePop 0.42s cubic-bezier(0.43, 1.28, 0.41, 0.92);
+}
+@keyframes scrollGuidePop {
+  0% {
+    transform: translateY(24px) scale(0.94);
+  }
+  85% {
+    transform: translateY(-4px) scale(1.04);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+.scrollGuideContent {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.scrollGuideText {
+  font-weight: 800;
+  font-size: 1.15em;
+  letter-spacing: 0.02em;
+}

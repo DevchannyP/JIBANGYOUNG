@@ -1,9 +1,4 @@
-/* ✅ 커스텀 폰트 등록: SCDream4 */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* ===== SCDream4 폰트 등록 (최상단!) ===== */
 @font-face {
   font-family: "SCDream";
   src: url("/fonts/SCDream4.otf") format("opentype");
@@ -12,25 +7,33 @@
   font-display: swap;
 }
 
-/* === 글로벌 기본 === */
+/* ===== 글로벌 설정 ===== */
+:root {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 html,
 body {
-  font-family: "SCDream", sans-serif;
-  margin: 0;
-  padding: 0;
+  font-family:
+    "SCDream", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", Arial,
+    sans-serif !important;
   background: #fffdf3;
   color: #3a3c3f;
   height: 100%;
   width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 body {
   min-height: 100vh;
-  width: 100%;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 main {
@@ -39,8 +42,8 @@ main {
   flex-direction: column;
 }
 
-/* === 공통 컨테이너 === */
-.container {
+/* ===== 컨테이너 (네임스페이스로 변경) ===== */
+.dashboard-container {
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
@@ -48,10 +51,8 @@ main {
   box-sizing: border-box;
 }
 
-/* ===================== */
-/* 🚩 헤더 Figma 스타일   */
-/* ===================== */
-header {
+/* ===== HEADER ===== */
+.header-root {
   width: 100%;
   background: #ffe140;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.07);
@@ -60,14 +61,13 @@ header {
   left: 0;
   z-index: 100;
   min-height: 66px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  border-bottom: 1.5px solid #fae364;
+
+  /* 아래 두 줄 제거 또는 수정 */
+  border-bottom: none; /* 기존 제거한 부분 유지 */
+  box-shadow: none; /* ✅ 이 줄 추가: 그림자 제거 */
 }
-.header-container,
-header .container {
+
+.header-inner {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -79,9 +79,9 @@ header .container {
   box-sizing: border-box;
 }
 
-/* ====== 로고 ====== */
-.logo {
-  font-size: 2.1rem; /* ✅ Figma 대비 작게 조정 (ex. 2.1rem) */
+/* ===== 로고 ===== */
+.header-logo {
+  font-size: 2.1rem;
   font-weight: 900;
   letter-spacing: -0.02em;
   color: #191919;
@@ -91,40 +91,56 @@ header .container {
   display: flex;
   align-items: center;
   user-select: none;
-  white-space: nowrap; /* ✅ 줄바꿈 방지 */
+  white-space: nowrap;
   transition: font-size 0.18s;
 }
 
-nav {
+.header-nav {
   display: flex;
-  gap: 28px; /* ✅ nav 간격 소폭 줄임 */
+  gap: 28px;
   align-items: center;
-  font-size: 1.04rem; /* ✅ nav 폰트도 소폭 축소 */
+  font-size: 1.04rem;
   margin-right: auto;
   width: 100%;
 }
-nav a {
+
+.header-nav-link,
+.header-nav-btn {
   font-size: 1.01rem;
   color: #232323;
   font-weight: 600;
   text-decoration: none;
   padding: 0 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
   transition: color 0.15s;
   position: relative;
   line-height: 1;
+  outline: none;
 }
-nav a:hover,
-nav a:focus-visible {
+
+.header-nav-link:focus,
+.header-nav-link:focus-visible,
+.header-nav-btn:focus,
+.header-nav-btn:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+  color: #facc15;
+  text-decoration: underline;
+}
+.header-nav-link:hover,
+.header-nav-btn:hover {
   color: #facc15;
   text-decoration: underline;
 }
 
-/* 드롭다운 */
+/* 드롭다운 (접근성) */
 .dropdown {
   position: relative;
   display: inline-block;
 }
-.dropdown-button {
+.dropdown-btn {
   background: none;
   border: none;
   font-size: 1.01rem;
@@ -132,12 +148,12 @@ nav a:focus-visible {
   color: #232323;
   cursor: pointer;
   padding: 0 4px;
-  outline: none;
-  letter-spacing: 0;
   transition: color 0.14s;
 }
-.dropdown-button:hover,
-.dropdown-button:focus-visible {
+.dropdown-btn[aria-expanded="true"],
+.dropdown-btn:hover,
+.dropdown-btn:focus,
+.dropdown-btn:focus-visible {
   color: #facc15;
   text-decoration: underline;
 }
@@ -168,21 +184,22 @@ nav a:focus-visible {
     background 0.13s,
     color 0.13s;
 }
-.dropdown-menu a:hover,
-.dropdown-menu a:focus-visible {
+.dropdown-menu a:focus,
+.dropdown-menu a:focus-visible,
+.dropdown-menu a:hover {
   background: #fff3bd;
   color: #e38d10;
 }
 
-/* ====== 우측 로그인 버튼 ====== */
+/* ====== 우측 버튼 ====== */
 .btn-primary {
   background: #fff;
   color: #1f2937;
   border: 1.5px solid #facc15;
   border-radius: 16px;
   font-weight: 700;
-  font-size: 1rem; /* ✅ 폰트 줄임 */
-  padding: 7px 22px; /* ✅ 패딩 축소 */
+  font-size: 1rem;
+  padding: 7px 22px;
   cursor: pointer;
   transition:
     background 0.12s,
@@ -194,21 +211,22 @@ nav a:focus-visible {
   line-height: 1;
   white-space: nowrap;
 }
-.btn-primary:hover,
-.btn-primary:focus-visible {
+.btn-primary:focus,
+.btn-primary:focus-visible,
+.btn-primary:hover {
   background: #facc15;
   color: #191919;
   border-color: #eeb806;
 }
 
-/* === Footer & 기타 === */
-footer {
+/* ===== FOOTER (네임스페이스 적용) ===== */
+.footer-root {
   background-color: #000000;
   color: #ffffff;
   padding: 1.5rem 1rem;
   width: 100%;
 }
-footer .container {
+.footer-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -216,51 +234,69 @@ footer .container {
   font-size: 0.75rem;
   width: 100%;
 }
-footer .links {
+.footer-links {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   color: #d1d5db;
 }
-footer a {
+.footer-link {
   color: inherit;
   text-decoration: underline;
 }
-footer a:hover {
+.footer-link:hover,
+.footer-link:focus,
+.footer-link:focus-visible {
   color: #facc15;
 }
 
-/* === 반응형 === */
+/* ===== 반응형 ===== */
 @media (max-width: 1200px) {
-  .header-container,
-  .container {
+  .header-inner,
+  .dashboard-container {
     padding: 0 16px;
   }
-  .logo {
+  .header-logo {
     font-size: 1.45rem;
   }
-  nav {
+  .header-nav {
     gap: 14px;
     font-size: 0.98rem;
   }
 }
 @media (max-width: 700px) {
-  .header-container,
-  .container {
+  .header-inner,
+  .dashboard-container {
     padding: 0 6px;
     min-height: 46px;
     height: 46px;
   }
-  .logo {
+  .header-logo {
     font-size: 1.01rem;
   }
-  nav {
+  .header-nav {
     gap: 5px;
-    font-size: 0.87rem;
+    font-size: 0.97rem;
   }
   .btn-primary {
-    font-size: 0.86rem;
-    padding: 5px 10px;
+    font-size: 0.91rem;
+    padding: 5px 12px;
     border-radius: 10px;
   }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+.skeleton {
+  display: block;
+  background: linear-gradient(90deg, #eeeeee 25%, #f4f4f4 50%, #eeeeee 75%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border-radius: 8px;
 }
