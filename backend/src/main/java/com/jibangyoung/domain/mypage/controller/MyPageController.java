@@ -1,113 +1,78 @@
 package com.jibangyoung.domain.mypage.controller;
 
-import java.security.Principal;
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jibangyoung.domain.mypage.dto.AlertDto;
-import com.jibangyoung.domain.mypage.dto.CommentPreviewDto;
-import com.jibangyoung.domain.mypage.dto.PostPreviewDto;
-import com.jibangyoung.domain.mypage.dto.ReportDto;
-import com.jibangyoung.domain.mypage.dto.UserProfileDto;
-import com.jibangyoung.domain.mypage.dto.UserSurveyDto;
-import com.jibangyoung.domain.mypage.entity.UserProfile;
-import com.jibangyoung.domain.mypage.exception.MyPageException;
-import com.jibangyoung.domain.mypage.repository.UserProfileRepository;
-import com.jibangyoung.domain.mypage.service.MyPageService;
-import com.jibangyoung.global.common.ApiResponse; // ✅ 주의: 공통 래퍼 import!
+import com.jibangyoung.domain.mypage.dto.AlertInfoDto;
+import com.jibangyoung.domain.mypage.service.AlertQueryService;
+import com.jibangyoung.domain.mypage.service.CommentService;
+import com.jibangyoung.domain.mypage.service.PostService;
+import com.jibangyoung.global.common.ApiResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * [마이페이지] API 컨트롤러
+ * - CSR 최적화 (ReactQuery, Skeleton, 페이징 대응)
+ * - 기능별 서비스 계층 위임
+ */
+@Tag(name = "마이페이지", description = "마이페이지 관련 API")
 @RestController
 @RequestMapping("/api/mypage")
 @RequiredArgsConstructor
 public class MyPageController {
 
-    private final MyPageService myPageService;
-    private final UserProfileRepository userProfileRepository;
+    private final AlertQueryService alertQueryService;
+    private final CommentService commentService;
+    private final PostService postService;
 
-    // 1. 내 프로필 조회
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfileDto>> getMyProfile(Principal principal) {
-        String username = principal.getName();
-        UserProfileDto dto = myPageService.getUserProfile(username);
-        return ResponseEntity.ok(ApiResponse.success(dto));
+    // --- [1] 관심 알림 조회 ---
+    @Operation(summary = "관심지역 알림 목록 조회 (Slice 기반)")
+    @GetMapping("/users/{userId}/alerts")
+    public ApiResponse<Slice<AlertInfoDto>> getUserAlerts(
+        @PathVariable Long userId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.success(alertQueryService.getUserAlerts(userId, page, size));
     }
 
-    // 2. 내 프로필 수정
-    @PatchMapping("/me")
-    public ResponseEntity<ApiResponse<Void>> updateProfile(@RequestBody UserProfileDto dto, Principal principal) {
-        String username = principal.getName();
-        myPageService.updateUserProfile(username, dto);
-        return ResponseEntity.ok(ApiResponse.success(null));
+    // --- [2] 댓글 ---
+    @Operation(summary = "내 댓글 목록 조회 (페이징)")
+    @GetMapping("/users/{userId}/comments")
+    public ApiResponse<?> getMyComments(
+        @PathVariable Long userId,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.success(commentService.getMyComments(userId, page, size));
     }
 
-    // 3. 내 설문 전체 이력
-    @GetMapping("/surveys")
-    public ResponseEntity<ApiResponse<List<UserSurveyDto>>> getMySurveys(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<UserSurveyDto> list = myPageService.getMySurveys(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
+    @Operation(summary = "내 댓글 삭제")
+    @DeleteMapping("/users/{userId}/comments/{commentId}")
+    public ApiResponse<?> deleteMyComment(
+        @PathVariable Long userId,
+        @PathVariable Long commentId
+    ) {
+        commentService.deleteMyComment(userId, commentId);
+        return ApiResponse.success("ok");
     }
 
-    // 4. 즐겨찾기 설문 목록
-    @GetMapping("/surveys/favorites")
-    public ResponseEntity<ApiResponse<List<UserSurveyDto>>> getFavoriteSurveys(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<UserSurveyDto> list = myPageService.getFavoriteSurveys(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
-    }
-
-    // 5. 즐겨찾기 설문 삭제
-    @DeleteMapping("/surveys/favorites/{id}")
-    public ResponseEntity<ApiResponse<Void>> removeFavoriteSurvey(@PathVariable Long id) {
-        myPageService.removeFavoriteSurvey(id);
-        return ResponseEntity.ok(ApiResponse.success(null));
-    }
-
-    // 6. 내 게시글 목록
-    @GetMapping("/posts")
-    public ResponseEntity<ApiResponse<List<PostPreviewDto>>> getMyPosts(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<PostPreviewDto> list = myPageService.getMyPosts(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
-    }
-
-    // 7. 내 댓글 목록
-    @GetMapping("/comments")
-    public ResponseEntity<ApiResponse<List<CommentPreviewDto>>> getMyComments(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<CommentPreviewDto> list = myPageService.getMyComments(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
-    }
-
-    // 8. 내 알림 목록
-    @GetMapping("/alerts")
-    public ResponseEntity<ApiResponse<List<AlertDto>>> getMyAlerts(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<AlertDto> list = myPageService.getMyAlerts(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
-    }
-
-    // 9. 내 신고 이력
-    @GetMapping("/reports")
-    public ResponseEntity<ApiResponse<List<ReportDto>>> getMyReports(Principal principal) {
-        Long userId = getUserId(principal.getName());
-        List<ReportDto> list = myPageService.getMyReports(userId);
-        return ResponseEntity.ok(ApiResponse.success(list));
-    }
-
-    private Long getUserId(String username) {
-        UserProfile user = userProfileRepository.findByUsername(username)
-            .orElseThrow(() -> new MyPageException("사용자를 찾을 수 없습니다."));
-        return user.getId();
+    // --- [3] 게시글 ---
+    @Operation(summary = "내 게시글 목록 조회 (페이징)")
+    @GetMapping("/users/{userId}/posts")
+    public ApiResponse<?> getMyPosts(
+        @PathVariable Long userId,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.success(postService.getMyPosts(userId, page, size));
     }
 }

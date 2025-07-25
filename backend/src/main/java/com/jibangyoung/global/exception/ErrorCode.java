@@ -13,6 +13,9 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "내부 서버 오류가 발생했습니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "INVALID_INPUT_VALUE", "입력값이 올바르지 않습니다."),
 
+    // [공통] 리소스 없음 (범용)
+    NOT_FOUND(HttpStatus.NOT_FOUND, "NOT_FOUND", "리소스를 찾을 수 없습니다."),
+
     // [인증/유저] 관련 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "존재하지 않는 계정입니다."),
     INVALID_LOGIN_CREDENTIALS(HttpStatus.UNAUTHORIZED, "INVALID_LOGIN_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
@@ -37,8 +40,12 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "접근 권한이 없습니다."),
     INSUFFICIENT_PRIVILEGES(HttpStatus.FORBIDDEN, "INSUFFICIENT_PRIVILEGES", "권한이 부족합니다."),
 
-    // [추가] 이메일 관련 에러 (메일 발송 실패 등)
-    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_FAILED", "메일 발송에 실패했습니다.");
+    // [이메일]
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_FAILED", "메일 발송에 실패했습니다."),
+
+    // [마이페이지/알림] 도메인별 추가 예시
+    MYPAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MYPAGE_NOT_FOUND", "마이페이지 정보를 찾을 수 없습니다."),
+    ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "ALERT_NOT_FOUND", "알림을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;

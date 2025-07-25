@@ -1,79 +1,106 @@
 "use client";
 
-import { useState } from "react";
-import { useUser } from "../../libs/hooks/useUser";
-import styles from "./components/MyPageLayout.module.css";
+import { useUserStore } from "@/store/userStore";
+import { useEffect, useState } from "react";
+import { getMyProfile } from "../../libs/api/mypage.api";
+import styles from "./MyPageLayout.module.css";
+import PanelRouter from "./components/PanelRouter";
+import SidebarNav, { type Tab } from "./components/SidebarNav";
 
-import EditUserInfoForm from "./components/EditUserInfoForm";
-import MyAlertList from "./components/MyAlertList";
-import MyCommentList from "./components/MyCommentList";
-import MyInfoCard from "./components/MyInfoCard";
-import MyPostList from "./components/MyPostList";
-import MyReportList from "./components/MyReportList";
-import MySurveyHistoryList from "./components/MySurveyHistoryList";
-import RegionScorePanel from "./components/RegionScorePanel";
-import SurveyFavoritesPanel from "./components/SurveyFavoritesPanel";
+function MyPageSkeleton() {
+  return (
+    <div className={styles.mypageGridLayout} aria-busy="true">
+      <aside className={styles.mypageSidebarWrap}>
+        <div className={styles.sidebarSkeleton} />
+      </aside>
+      <main className={styles.mypagePanelWrap}>
+        <div className={styles.panelSkeleton} />
+      </main>
+    </div>
+  );
+}
 
-type Tab =
-  | "score"
-  | "posts"
-  | "comments"
-  | "surveys"
-  | "favorites"
-  | "alerts"
-  | "reports"
-  | "edit";
-
-const TABS: { key: Tab; label: string }[] = [
-  { key: "score", label: "지역별 점수" },
-  { key: "posts", label: "내 게시글" },
-  { key: "comments", label: "내 댓글보기" },
-  { key: "surveys", label: "내 설문 이력" },
-  { key: "favorites", label: "관심지역 알림" },
-  { key: "alerts", label: "내 신고이력" },
-  { key: "reports", label: "멘토신청/멘토 공지사항" },
-  { key: "edit", label: "찜 정책" },
-];
+function MyPageError({ retry }: { retry: () => void }) {
+  return (
+    <div className={styles.mypageLoading} role="alert">
+      데이터를 불러오지 못했습니다.
+      <button className={styles.retryBtn} onClick={retry}>
+        다시 시도
+      </button>
+    </div>
+  );
+}
 
 export default function MyPageClient() {
-  const { data: user, isLoading } = useUser();
+  const { user, setUser, clearUser } = useUserStore();
   const [tab, setTab] = useState<Tab>("score");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  // 1. userId의 초기값을 undefined로
+  const [userId, setUserId] = useState<number | null | undefined>(undefined);
 
-  if (isLoading || !user) {
-    return <div className={styles.mypageLoading}>로딩중...</div>;
-  }
+  // 2. CSR에서만 localStorage에서 userId 읽기
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("userId");
+      setUserId(stored ? Number(stored) : null);
+    }
+  }, []);
+
+  // 3. userId 있을 때만 fetch
+  useEffect(() => {
+    if (!user && userId !== undefined && userId !== null) {
+      setIsLoading(true);
+      getMyProfile(userId)
+        .then((u) => {
+          setUser(u);
+          setIsError(false);
+        })
+        .catch(() => {
+          clearUser();
+          setIsError(true);
+        })
+        .finally(() => setIsLoading(false));
+    } else if (userId !== undefined) {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line
+  }, [userId]);
+
+  // 재시도 핸들러
+  const handleRetry = () => {
+    if (!userId) return;
+    setIsLoading(true);
+    setIsError(false);
+    getMyProfile(userId)
+      .then((u) => {
+        setUser(u);
+        setIsError(false);
+      })
+      .catch(() => {
+        clearUser();
+        setIsError(true);
+      })
+      .finally(() => setIsLoading(false));
+  };
+
+  // 4. hydration mismatch 방지: userId === undefined면 아무것도 렌더하지 않음
+  if (userId === undefined) return null; // 혹은 <MyPageSkeleton /> 등도 가능
+  if (userId === null) return <div>로그인이 필요합니다.</div>;
+  if (isLoading) return <MyPageSkeleton />;
+  if (isError || !user) return <MyPageError retry={handleRetry} />;
 
   return (
-    <div className={styles.mypageGridLayoutReversed}>
-      {/* 왼쪽: 프로필 카드 + 콘텐츠 패널 */}
-      <main className={styles.mypageLeftPanel}>
-        <MyInfoCard user={user} />
-        {tab === "score" && <RegionScorePanel user={user} />}
-        {tab === "posts" && <MyPostList />}
-        {tab === "comments" && <MyCommentList />}
-        {tab === "surveys" && <MySurveyHistoryList />}
-        {tab === "favorites" && <SurveyFavoritesPanel />}
-        {tab === "alerts" && <MyAlertList userId={user.id} />}
-        {tab === "reports" && <MyReportList userId={user.id} />}
-        {tab === "edit" && <EditUserInfoForm user={user} />}
-      </main>
-
-      {/* 오른쪽: 사이드바 메뉴만 */}
-      <aside className={styles.mypageRightSidebar}>
-        <nav className={styles.mypageSidebar} aria-label="마이페이지 메뉴">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              className={`${styles.mypageSidebarLink} ${
-                tab === t.key ? styles.active : ""
-              }`}
-              onClick={() => setTab(t.key)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </nav>
+    <div
+      className={styles.mypageGridLayout}
+      aria-label="마이페이지 전체 레이아웃"
+    >
+      <aside className={styles.mypageSidebarWrap}>
+        <SidebarNav tab={tab} setTab={setTab} userRole={user.role} />
       </aside>
+      <main className={styles.mypagePanelWrap} tabIndex={0}>
+        <PanelRouter tab={tab} user={user} />
+      </main>
     </div>
   );
 }

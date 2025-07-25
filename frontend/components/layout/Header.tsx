@@ -39,8 +39,15 @@ export default function Header() {
     try {
       if (refreshToken) await logoutApi(refreshToken);
     } catch {
+      // 에러 무시하고 강제 로그아웃 진행
     } finally {
-      logout();
+      if (typeof window !== "undefined") {
+        // ⭐️ 모든 인증 관련 로컬 키 제거
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userId");
+      }
+      logout(); // Zustand 상태 초기화
       router.push("/auth/login");
     }
   };

@@ -1,34 +1,52 @@
-// libs/api/mypage.api.ts
-import axios from "axios";
+import { api } from "../utils/api";
 
-// --- [1] DTO 타입 선언 (백엔드 DTO와 네이밍/필드 1:1 매칭) --- //
+// ---------- [1] ENUM/공통 타입 ----------
+
 export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
 
-export interface UserProfileDto {
+// 마이페이지 탭 키
+type Tab =
+  | "edit"
+  | "score"
+  | "posts"
+  | "comments"
+  | "surveys"
+  | "favorites"
+  | "alerts"
+  | "reports";
+
+export type { Tab };
+
+// Sidebar 메뉴 구조
+export interface SidebarMenuItem {
+  key: Tab | string;
+  label: string;
+  external?: boolean;
+  path?: string;
+  roles?: UserRole[];
+}
+
+// ---------- [2] DTO 타입 ----------
+
+export interface UserDto {
   id: number;
   username: string;
   email: string;
-  nickname?: string;
-  phone?: string;
+  nickname: string | null;
+  phone: string | null;
   role: UserRole;
   status: UserStatus;
-  profileImageUrl?: string;
-  birthDate?: string;
-  gender?: string;
-  region?: string;
-  lastLoginAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  profileImageUrl: string | null;
+  birthDate: string | null;
+  gender: "M" | "F" | null;
+  region: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface UserSurveyDto {
-  id: number;
-  title: string;
-  isFavorite: boolean;
-  participatedAt?: string;
-  resultUrl?: string;
-}
+export type UserProfileDto = UserDto;
 
 export interface PostPreviewDto {
   id: number;
@@ -41,19 +59,11 @@ export interface CommentPreviewDto {
   id: number;
   content: string;
   targetPostTitle: string;
+  targetPostId: number;
   createdAt: string;
 }
 
-export interface ReportDto {
-  id: number;
-  type: "post" | "comment";
-  targetTitle: string;
-  reason: string;
-  reportedAt: string;
-  status: "접수됨" | "처리중" | "처리완료";
-}
-
-export interface AlertDto {
+export interface AlertInfoDto {
   id: number;
   region: string;
   message: string;
@@ -61,158 +71,167 @@ export interface AlertDto {
   isRead: boolean;
 }
 
-// --- [2] ApiResponse 래퍼 (백엔드 표준 응답 구조 1:1) --- //
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string | null;
-  errorCode?: string | null;
+export interface SurveyHistoryDto {
+  id: number;
+  title: string;
+  participatedAt: string;
+  resultUrl?: string;
+  isFavorite: boolean;
 }
 
-export interface ApiError {
-  code?: string;
-  message: string;
+export interface SurveyFavoriteDto {
+  id: number;
+  title: string;
+  isFavorite: boolean;
+  participatedAt?: string;
 }
 
-// --- [3] axios 인스턴스 및 인터셉터 (JWT 자동 부착) --- //
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
-});
-
-// JWT accessToken 자동 부착 (로컬스토리지 기준)
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
-      if (token) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-function handleApiError(error: unknown): never {
-  if (axios.isAxiosError(error)) {
-    const res = error.response;
-    const apiError: ApiError = res?.data ?? { message: "요청 실패" };
-    throw new Error(apiError.message || "요청에 실패했습니다.");
-  }
-  throw new Error("네트워크 연결 실패 (서버 응답 없음)");
+export interface RegionScoreDto {
+  region: string;
+  postCount: number;
+  commentCount: number;
+  mentoringCount: number;
+  score: number;
+  promotionProgress: number;
+  daysToMentor: number;
+  scoreHistory?: Array<{
+    date: string;
+    delta: number;
+    reason: string;
+  }>;
 }
 
-// --- [4] 실제 API 함수 (백엔드 컨트롤러와 100% URI/DTO 일치) --- //
+// ---------- [3] API 함수 ----------
 
-// 1) 내 프로필 조회
-export async function fetchMyProfile(): Promise<UserProfileDto> {
-  try {
-    const res = await api.get<ApiResponse<UserProfileDto>>("/api/mypage/me");
-    if (!res.data.success || !res.data.data) {
-      throw new Error(res.data.message || "사용자 정보 불러오기 실패");
-    }
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export async function getMyProfile(userId: number): Promise<UserProfileDto> {
+  const res = await api.get(`/mypage/users/${userId}/profile`);
+  return res.data.data;
 }
 
-// 2) 내 프로필 수정
-export async function updateMyProfile(
-  payload: Partial<UserProfileDto>
+export async function patchMyProfile(
+  userId: number,
+  input: Partial<UserProfileDto>
 ): Promise<void> {
-  try {
-    const res = await api.patch<ApiResponse<void>>("/api/mypage/me", payload);
-    if (!res.data.success) throw new Error(res.data.message || "저장 실패");
-  } catch (error) {
-    handleApiError(error);
-  }
+  await api.patch(`/mypage/users/${userId}/profile`, input);
 }
 
-// 3) 내 설문 전체 이력
-export async function fetchMySurveys(): Promise<UserSurveyDto[]> {
-  try {
-    const res = await api.get<ApiResponse<UserSurveyDto[]>>(
-      "/api/mypage/surveys"
-    );
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export interface GetMyPostsParams {
+  userId: number;
+  page?: number;
+  size?: number;
+}
+export interface GetMyPostsResponse {
+  posts: PostPreviewDto[];
+  totalCount: number;
+}
+export async function getMyPosts(
+  params: GetMyPostsParams
+): Promise<GetMyPostsResponse> {
+  const { userId, page = 1, size = 10 } = params;
+  const res = await api.get(
+    `/mypage/users/${userId}/posts?page=${page}&size=${size}`
+  );
+  return res.data.data;
 }
 
-// 4) 즐겨찾기 설문 목록
-export async function fetchFavoriteSurveys(): Promise<UserSurveyDto[]> {
-  try {
-    const res = await api.get<ApiResponse<UserSurveyDto[]>>(
-      "/api/mypage/surveys/favorites"
-    );
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export interface GetMyCommentsParams {
+  userId: number;
+  page?: number;
+  size?: number;
+}
+export interface GetMyCommentsResponse {
+  comments: CommentPreviewDto[];
+  totalCount: number;
+}
+export async function getMyComments(
+  params: GetMyCommentsParams
+): Promise<GetMyCommentsResponse> {
+  const { userId, page = 1, size = 10 } = params;
+  const res = await api.get(
+    `/mypage/users/${userId}/comments?page=${page}&size=${size}`
+  );
+  return res.data.data;
 }
 
-// 5) 즐겨찾기 설문 삭제
-export async function removeFavoriteSurvey(surveyId: number): Promise<void> {
-  try {
-    const res = await api.delete<ApiResponse<void>>(
-      `/api/mypage/surveys/favorites/${surveyId}`
-    );
-    if (!res.data.success) throw new Error(res.data.message || "삭제 실패");
-  } catch (error) {
-    handleApiError(error);
-  }
+export async function deleteMyComment(
+  userId: number,
+  commentId: number
+): Promise<void> {
+  await api.delete(`/mypage/users/${userId}/comments/${commentId}`);
 }
 
-// 6) 내 게시글 목록
-export async function fetchMyPosts(): Promise<PostPreviewDto[]> {
-  try {
-    const res =
-      await api.get<ApiResponse<PostPreviewDto[]>>("/api/mypage/posts");
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export interface GetMyAlertsParams {
+  userId: number;
+  page?: number;
+  size?: number;
+}
+export interface GetMyAlertsResponse {
+  alerts: AlertInfoDto[];
+  totalCount: number;
+}
+export async function getMyAlerts(
+  params: GetMyAlertsParams
+): Promise<GetMyAlertsResponse> {
+  const { userId, page = 1, size = 10 } = params;
+  const res = await api.get(
+    `/mypage/users/${userId}/alerts?page=${page}&size=${size}`
+  );
+  return res.data.data;
 }
 
-// 7) 내 댓글 목록
-export async function fetchMyComments(): Promise<CommentPreviewDto[]> {
-  try {
-    const res = await api.get<ApiResponse<CommentPreviewDto[]>>(
-      "/api/mypage/comments"
-    );
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export interface GetMySurveyHistoryParams {
+  userId: number;
+  page?: number;
+  size?: number;
+  sort?: "recent" | "favorite";
+}
+export interface GetMySurveyHistoryResponse {
+  surveys: SurveyHistoryDto[];
+  totalCount: number;
+}
+export async function getMySurveyHistory(
+  params: GetMySurveyHistoryParams
+): Promise<GetMySurveyHistoryResponse> {
+  const { userId, page = 1, size = 10, sort = "recent" } = params;
+  const res = await api.get(
+    `/mypage/users/${userId}/surveys?page=${page}&size=${size}&sort=${sort}`
+  );
+  return res.data.data;
 }
 
-// 8) 내 알림 목록
-export async function fetchMyAlerts(): Promise<AlertDto[]> {
-  try {
-    const res = await api.get<ApiResponse<AlertDto[]>>("/api/mypage/alerts");
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export interface GetSurveyFavoritesParams {
+  userId: number;
+  page?: number;
+  size?: number;
+  sort?: "recent" | "title";
+}
+export interface GetSurveyFavoritesResponse {
+  favorites: SurveyFavoriteDto[];
+  totalCount: number;
+}
+export async function getSurveyFavorites(
+  params: GetSurveyFavoritesParams
+): Promise<GetSurveyFavoritesResponse> {
+  const { userId, page = 1, size = 10, sort = "recent" } = params;
+  const res = await api.get(
+    `/mypage/surveys/favorites?page=${page}&size=${size}&sort=${sort}`,
+    {
+      headers: { "X-User-Id": userId },
+    }
+  );
+  return res.data.data;
 }
 
-// 9) 내 신고 목록
-export async function fetchMyReports(): Promise<ReportDto[]> {
-  try {
-    const res = await api.get<ApiResponse<ReportDto[]>>("/api/mypage/reports");
-    if (!res.data.success) throw new Error(res.data.message || "조회 실패");
-    return res.data.data;
-  } catch (error) {
-    handleApiError(error);
-  }
+export async function toggleSurveyFavorite(
+  userId: number,
+  favoriteId: number
+): Promise<void> {
+  await api.post(`/mypage/surveys/favorites/${favoriteId}/toggle`, null, {
+    headers: { "X-User-Id": userId },
+  });
+}
+
+export async function getRegionScore(region: string): Promise<RegionScoreDto> {
+  const res = await api.get(`/mypage/region-scores/${region}`);
+  return res.data.data;
 }
