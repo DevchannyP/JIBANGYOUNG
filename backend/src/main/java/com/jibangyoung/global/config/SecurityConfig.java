@@ -48,7 +48,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000", 
+            "http://localhost:3000",
             "https://jibangyoung.kr" // 운영 도메인
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
@@ -71,9 +71,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(
                     "/api/auth/**",
-                    "/api/public/**"
+                    "/api/public/**",
+                    "/api/admin/**",
+                    "/api/mentor/**",
+                    "/api/community/**",
+                    "/api/survey/**",
+                    "/api/dashboard/**"
                 ).permitAll()
-                .anyRequest().authenticated() // 나머지는 인증 필요
+                .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
