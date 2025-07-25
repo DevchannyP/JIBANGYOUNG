@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         log.debug("[JWT FILTER] 요청 URI = {}", uri);
 
-        // 로그인/회원가입/공개 API는 토큰 검사 없이 통과
+        // 아래 경로는 토큰 검사 없이 통과
         if (isPermitAllUri(uri)) {
             filterChain.doFilter(request, response);
             return;
@@ -45,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.debug("[JWT FILTER] 인증 성공: {}", authentication.getName());
             } else {
                 log.debug("[JWT FILTER] 토큰 없음 or 유효성 실패");
-                // 인증 실패 시 context를 클리어해준다 (필수!)
                 SecurityContextHolder.clearContext();
             }
         } catch (Exception ex) {
@@ -57,9 +56,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isPermitAllUri(String uri) {
-        // 실제 서비스 정책에 맞게 수정
+        // ✅ 실무: 모두 공개 허용할 경로를 여기서 명확히 지정
         return uri.startsWith("/api/auth/")
-            || uri.startsWith("/api/public/");
+            || uri.startsWith("/api/public/")
+            || uri.startsWith("/api/admin/")
+            || uri.startsWith("/api/mentor/")
+            || uri.startsWith("/api/community/")
+            || uri.startsWith("/api/survey/")
+            || uri.startsWith("/api/dashboard/");
     }
 
     private String resolveToken(HttpServletRequest request) {
