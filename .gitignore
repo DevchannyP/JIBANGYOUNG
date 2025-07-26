@@ -22,9 +22,7 @@ pnpm-debug.log*
 # Java/Gradle / Spring Boot
 .gradle/
 build/
-*/build/
-target/
-bin/
+*/build/ 
 *.class
 *.log
 logs/
