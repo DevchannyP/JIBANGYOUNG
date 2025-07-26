@@ -1,8 +1,14 @@
 .mypageGridLayout {
   display: grid;
-  grid-template-columns: 250px 1fr;
-  min-height: 100vh;
-  background: #fffef8;
+  grid-template-columns: 250px 950px;
+  width: 1200px;
+  min-height: 600px;
+  margin: 0 auto;
+  padding: 0;
+  background: #f5f9ff;
+  border-radius: 18px;
+  box-shadow: 0 2px 20px 0 #eaf2fd;
+  overflow-x: auto;
 }
 .mypageSidebarWrap {
   background: #232323;
@@ -1006,17 +1012,20 @@
   }
 }
 /* 다크모드(확장) */
-@media (prefers-color-scheme: dark) {
+/* 반응형 제거 또는 강제로 고정 유지 */
+@media (max-width: 950px) {
   .mypageGridLayout {
-    background: #16191d;
-    box-shadow: 0 2px 12px 0 #13151a;
+    grid-template-columns: 220px 1fr; /* 고정 유지 */
+    padding: 44px 14px 80px 14px;     /* 원래대로 */
+    gap: 34px;
+  }
+  .mypageSidebarWrap {
+    min-width: 180px;
+    margin-bottom: 0;
   }
   .mypagePanelWrap {
-    background: #232530;
-    color: #fff;
-  }
-  .sidebarSkeleton,
-  .panelSkeleton {
-    background: #23294b;
+    padding: 36px 36px 28px 36px;
+    min-height: 540px;
+    border-radius: 16px;
   }
 }
