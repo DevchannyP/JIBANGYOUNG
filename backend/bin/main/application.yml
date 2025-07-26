@@ -45,14 +45,10 @@ jwt:
   access-token-validity-ms: 900000 # 15분
   refresh-token-validity-ms: 1209600000 # 14일
 
-cloud:
-  aws:
-    s3:
-      bucket: ${AWS_S3_BUCKET}
+aws:
+  s3:
+    region: ap-northeast-2 # 서울 리전
+    bucket: your-bucket-name
     credentials:
-      access-key: ${AWS_ACCESS_KEY_ID}
-      secret-key: ${AWS_SECRET_ACCESS_KEY}
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false
+      access-key: your-access-key
+      secret-key: your-secret-key

@@ -47,7 +47,7 @@ jwt:
 
 aws:
   s3:
-    region: ap-northeast-2  # 서울 리전
+    region: ap-northeast-2 # 서울 리전
     bucket: your-bucket-name
     credentials:
       access-key: your-access-key

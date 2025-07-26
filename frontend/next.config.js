@@ -7,16 +7,26 @@ const nextConfig = {
   // ✅ React 개발 모드에서 엄격한 검사 활성화 (렌더링 두 번 수행 등 부작용 탐지)
   reactStrictMode: true,
 
-  // ⚡ 최신 Next.js 15에서는 swcMinify, appDir 등이 자동 내장되어 제거
-  // swcMinify: true, ❌ 제거
-  // experimental: { appDir: true }, ❌ 제거
-
   // 🖼️ 외부 이미지 도메인 허용 설정 (next/image 최적화용)
+  // 👉 Next.js 15 기준으로 domains 대신 remotePatterns 사용
   images: {
-    domains: ["example.com"], // 필요 시 추가
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        pathname: '/**', // 모든 경로 허용
+      },
+      // 필요 시 여기에 다른 CDN 또는 이미지 도메인을 추가하세요
+      // 예:
+      // {
+      //   protocol: 'https',
+      //   hostname: 'images.unsplash.com',
+      //   pathname: '/**',
+      // },
+    ],
   },
 
-  // 🔧 Webpack 설정 확장 가능
+  // 🔧 Webpack 설정 확장 가능 (필요시만 수정)
   webpack(config, options) {
     return config;
   }

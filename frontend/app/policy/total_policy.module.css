@@ -1,0 +1,523 @@
+/* 기존 스타일 + 추가 개선사항 */
+.content {
+  min-height: 800px;
+  flex: 1;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #ffffff;
+}
+
+.headerTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1e3a8a;
+  margin: 2rem 0;
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.select {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #6177F6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.searchInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-grow: 1;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #6177F6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.searchButton {
+  padding: 0.5rem 1rem;
+  background-color: #6177F6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.searchButton:hover {
+  background-color: #6177F6;
+}
+
+.clearButton {
+  padding: 0.5rem 1rem;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.clearButton:hover {
+  background-color: #4b5563;
+}
+
+.counter {
+  background-color: #f3f4f6;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+  color: #6177F6;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 200px;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #3b82f6;
+}
+
+/* 수정된 배지 컨테이너 - 더 안정적인 레이아웃 */
+.badgeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 좌측 배지들과 우측 하트 분리 */
+  width: 100%;
+  height: 32px; /* 고정 높이 */
+  margin-bottom: 0.5rem;
+  overflow: visible; /* hidden에서 변경 */
+}
+
+/* 좌측 배지들을 담는 컨테이너 */
+.badgeLeft {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* 8px에서 4px로 줄임 */
+  flex: 1;
+  min-width: 0; /* flex item이 축소될 수 있도록 */
+}
+
+/* D-day 배지 스타일 */
+.dDayBadge {
+  background-color: #6177f6;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0; /* 크기 고정 */
+}
+
+.dDayBadge.dDayZero {
+  background-color: #ff4d4f;
+}
+
+/* 시도명 배지 스타일 */
+.sidoName {
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px; /* 최대 너비 제한 */
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0; /* 크기 고정 */
+  margin-left: -6px; /* 좌측으로 이동 */
+}
+
+/* 북마크 버튼 컨테이너 */
+.bookmarkButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+/* 하트 아이콘 */
+.heartIcon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  font-size: 1.5rem;
+  line-height: 24px;
+  text-align: center;
+  color: #6177f6;
+  transition: transform 0.2s;
+  vertical-align: middle;
+}
+
+.heartIcon:hover {
+  transform: scale(1.1);
+}
+
+.heartIcon.bookmarked {
+  color: #6177F6;
+}
+
+/* 카드 헤더 */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.itemTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6177F6;
+  margin: 0.25rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  min-height: 2.6rem;
+}
+
+.itemSummary {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  min-height: 2.8rem;
+}
+
+.policyInfo {
+  margin-bottom: 0.75rem;
+}
+
+.itemCategory {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.itemDate {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 40px;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pageButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f9fafb;
+}
+
+.activePage {
+  background-color: #6177F6;
+  color: white;
+  border-color: #6177F6;
+}
+
+.activePage:hover {
+  background-color: #6177F6;
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.noResults h3 {
+  font-size: 1.5rem;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.noResults p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .filterBar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .searchInputContainer {
+    width: 100%;
+  }
+
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .item {
+    height: auto;
+    min-height: 180px;
+  }
+
+  .sidoName {
+    background-color: #f3f4f6;
+    color: #374151;
+    padding: 3px 6px;
+    border-radius: 10px;
+    max-width: 60px; /* 모바일에서 더 작게 */
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+    margin-left: -4px; /* 태블릿에서 좌측으로 이동 */
+  }
+  
+}
+
+/* 페이지네이션 컨테이너 - 중앙 정렬 */
+.paginationContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* 페이지 정보 텍스트 */
+.paginationInfo {
+  text-align: center;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* 페이지네이션 버튼 그룹 - 중앙 정렬 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pageButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 40px;
+  text-align: center;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pageButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f9fafb;
+}
+
+.navButton {
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.activePage {
+  background-color: #6177F6;
+  color: white;
+  border-color: #6177F6;
+}
+
+.activePage:hover {
+  background-color: #5a67d8;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .paginationContainer {
+    gap: 0.75rem;
+  }
+  
+  .pagination {
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
+  .pageButton {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    min-width: 36px;
+  }
+
+  .navButton {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .paginationContainer {
+    gap: 0.5rem;
+  }
+  
+  .pagination {
+    gap: 0.125rem;
+  }
+
+  .pageButton {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 32px;
+  }
+
+  .pageInfo {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 1rem;
+  }
+
+  .headerTitle {
+    font-size: 2rem;
+  }
+
+  .list {
+    grid-template-columns: 1fr;
+  }
+
+  .item {
+    padding: 1rem;
+    height: auto;
+    min-height: 160px;
+  }
+
+  .badgeContainer {
+    height: 28px; /* 모바일에서 더 작게 */
+  }
+
+  .sidoName {
+    max-width: 50px;
+    font-size: 0.7rem;
+  }
+
+  .heartIcon {
+    width: 20px;
+    height: 20px;
+    font-size: 1.2rem;
+  }
+
+  .bookmarkButton {
+    width: 28px;
+    height: 28px;
+  }
+
+}
+

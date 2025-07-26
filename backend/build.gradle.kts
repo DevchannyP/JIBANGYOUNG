@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("application")
-    id("org.springframework.boot") version "3.5.3" // ✅ 버전 업!
+    id("org.springframework.boot") version "3.5.3" // ✅ 최신 버전
     id("io.spring.dependency-management") version "1.1.4"
 }
 
@@ -26,8 +26,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    // --- Mail: jakarta.mail 명시적 추가 (충돌방지) ---
+    // --- Mail 관련 명시적 설정 (jakarta 충돌 방지) ---
     implementation("com.sun.mail:jakarta.mail:2.0.1") {
         exclude(group = "javax.mail", module = "mail")
         exclude(group = "javax.activation", module = "activation")
@@ -36,12 +37,15 @@ dependencies {
         exclude(group = "javax.activation", module = "activation")
     }
 
-    // --- OAuth2 & Security ---
+    // --- Bean Validation (오류 해결용) ---
+    implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final") // ✅ 추가됨
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")         // ✅ 추가됨
+
+    // --- OAuth2 ---
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
     // --- JWT ---
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
@@ -49,7 +53,7 @@ dependencies {
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
     annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
 
-    // --- 기타 ---
+    // --- 기타 유틸 ---
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     implementation("software.amazon.awssdk:s3:2.25.22")
     implementation("co.elastic.clients:elasticsearch-java:8.12.0")
@@ -67,7 +71,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    // --- JPA Annotation 오류 방지 ---
+    // --- JPA Annotation 인식용 ---
     compileOnly("jakarta.persistence:jakarta.persistence-api:3.1.0")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api:3.1.0")
 
@@ -77,6 +81,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// === 애플리케이션 엔트리포인트 설정 ===
 val mainClassFqcn = "com.jibangyoung.JibangyoungApplication"
 
 application {
@@ -87,11 +92,13 @@ tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
     mainClass.set(mainClassFqcn)
 }
 
+// === 컴파일러 설정 ===
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(listOf("-parameters"))
 }
 
+// === 테스트 플랫폼 설정 ===
 tasks.test {
     useJUnitPlatform()
 }

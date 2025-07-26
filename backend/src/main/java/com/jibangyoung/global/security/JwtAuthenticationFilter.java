@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
         log.debug("[JWT FILTER] 요청 URI = {}", uri);
 
@@ -58,12 +58,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPermitAllUri(String uri) {
         // ✅ 실무: 모두 공개 허용할 경로를 여기서 명확히 지정
         return uri.startsWith("/api/auth/")
-            || uri.startsWith("/api/public/")
-            || uri.startsWith("/api/admin/")
-            || uri.startsWith("/api/mentor/")
-            || uri.startsWith("/api/community/")
-            || uri.startsWith("/api/survey/")
-            || uri.startsWith("/api/dashboard/");
+                || uri.startsWith("/api/public/")
+                || uri.startsWith("/api/admin/")
+                || uri.startsWith("/api/mentor/")
+                || uri.startsWith("/api/community/")
+                || uri.startsWith("/api/survey/")
+                || uri.startsWith("/api/policy/")
+                || uri.startsWith("/api/dashboard/");
     }
 
     private String resolveToken(HttpServletRequest request) {
