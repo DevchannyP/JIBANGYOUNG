@@ -1,15 +1,16 @@
 import type {
+  LoginResponse,
   UserDto,
   UserRole,
   UserStatus,
-  LoginResponse,
 } from "@/libs/api/auth/auth.api";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type { LoginResponse, UserDto, UserRole, UserStatus };
 
-type Tokens = Omit<LoginResponse, "user">; // user 제외 나머지 모두
+// user 제외 토큰 전부
+type Tokens = Omit<LoginResponse, "user">;
 
 export interface AuthState {
   user: UserDto | null;
@@ -19,8 +20,12 @@ export interface AuthState {
   expiresIn: number | null;
   issuedAt: string | null;
   expiresAt: string | null;
+  // 기존 setter
   setUser: (user: UserDto | null) => void;
+  // 1) (user, tokens) 타입
   setAuth: (user: UserDto, tokens: Tokens) => void;
+  // 2) ({ user, accessToken, refreshToken }) 타입도 지원
+  setAuthObj: (data: { user: UserDto; accessToken: string; refreshToken: string }) => void;
   logout: () => void;
 }
 
@@ -51,6 +56,17 @@ export const useAuthStore = create<AuthState>()(
         if (storage) {
           storage.setItem("accessToken", tokens.accessToken);
           storage.setItem("refreshToken", tokens.refreshToken);
+        }
+      },
+      setAuthObj: ({ user, accessToken, refreshToken }) => {
+        set({
+          user,
+          accessToken,
+          refreshToken,
+        });
+        if (storage) {
+          storage.setItem("accessToken", accessToken);
+          storage.setItem("refreshToken", refreshToken);
         }
       },
       logout: () => {
