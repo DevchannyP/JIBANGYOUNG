@@ -63,14 +63,10 @@ function ProfileSkeleton() {
 export default function ProfileEditPanel({ user }: ProfileEditPanelProps) {
   const [nickname, setNickname] = useState(user?.nickname ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
-  const [profileImageUrl, setProfileImageUrl] = useState(
-    user?.profileImageUrl ?? ""
-  );
-
-  console.log("ProfileEditPanel - user:", user); // 이 줄 추가
+  const [profileImageUrl, setProfileImageUrl] = useState(user?.profileImageUrl ?? "");
+  const [imgError, setImgError] = useState(false); // ✅ 추가: 이미지 에러 fallback 처리용
   const [success, setSuccess] = useState(false);
 
-  // ✅ userId로 전달
   const { mutate, isPending, error } = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("로그인 정보가 올바르지 않습니다.");
@@ -85,7 +81,7 @@ export default function ProfileEditPanel({ user }: ProfileEditPanelProps) {
   const statusLabel =
     user.status && STATUS_MAP[user.status as keyof typeof STATUS_MAP]
       ? STATUS_MAP[user.status as keyof typeof STATUS_MAP]
-      : (user.status ?? "-");
+      : user.status ?? "-";
 
   return (
     <section className={styles.mypageProfileCard} aria-label="프로필 정보">
@@ -156,15 +152,13 @@ export default function ProfileEditPanel({ user }: ProfileEditPanelProps) {
         )}
       </div>
       <Image
-        src={profileImageUrl || "/default-profile.webp"}
+        src={imgError || !profileImageUrl ? "/default-profile.webp" : profileImageUrl}
         alt="프로필 이미지"
         width={110}
         height={110}
         className={styles.mypageProfileBear}
         priority
-        onError={(e) =>
-          ((e.target as HTMLImageElement).src = "/default-profile.webp")
-        }
+        onError={() => setImgError(true)} // ✅ 이미지 실패 시 fallback 적용
       />
     </section>
   );

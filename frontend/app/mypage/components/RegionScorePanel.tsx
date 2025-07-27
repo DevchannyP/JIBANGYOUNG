@@ -9,58 +9,33 @@ import {
 } from "../../../libs/api/mypage.api";
 import styles from "../MyPageLayout.module.css";
 
+// region이 string or object or undefined 모두 지원하도록 안전화
+function normalizeRegionList(region: UserProfileDto["region"]): { id: number; name: string }[] {
+  if (!region) return [];
+  // 이미 객체 배열(서버 리팩토링 후) 케이스
+  if (Array.isArray(region) && typeof region[0] === "object") return region as any;
+  // 문자열 배열 케이스 (구 서버)
+  if (Array.isArray(region)) return region.map((name, i) => ({ id: i + 1, name }));
+  // 단일 문자열 케이스
+  return [{ id: 1, name: region as string }];
+}
+
 function RegionScoreSkeleton() {
   return (
     <section className={styles.mypageRegionScoreSkeleton} aria-busy="true">
-      <div
-        className={styles.mypageSectionTitle}
-        style={{ width: 120, background: "#ececec", borderRadius: 6 }}
-      >
-        &nbsp;
-      </div>
-      <div
-        className={styles.mypageRegionScoreRow}
-        style={{
-          height: 38,
-          background: "#eee",
-          borderRadius: 7,
-          margin: "15px 0",
-        }}
-      />
+      <div className={styles.mypageSectionTitle} style={{ width: 120 }} />
+      <div className={styles.mypageRegionScoreRow} style={{ height: 38 }} />
       <ul className={styles.mypageScoreList}>
         {[...Array(3)].map((_, i) => (
-          <li
-            key={i}
-            style={{
-              width: 220,
-              background: "#eee",
-              height: 21,
-              borderRadius: 6,
-              marginBottom: 8,
-            }}
-          >
-            &nbsp;
-          </li>
+          <li key={i} style={{ width: 220, height: 21, marginBottom: 8 }} />
         ))}
       </ul>
-      <div
-        className={styles.mypageProgressBox}
-        style={{
-          height: 50,
-          background: "#eee",
-          borderRadius: 10,
-          margin: "14px 0",
-        }}
-      />
+      <div className={styles.mypageProgressBox} style={{ height: 50 }} />
     </section>
   );
 }
 
-function ScoreHistoryTable({
-  history,
-}: {
-  history?: RegionScoreDto["scoreHistory"];
-}) {
+function ScoreHistoryTable({ history }: { history?: RegionScoreDto["scoreHistory"] }) {
   if (!history?.length) return null;
   return (
     <table className={styles.mypageScoreHistoryTable} aria-label="점수 내역">
@@ -89,23 +64,18 @@ function ScoreHistoryTable({
 }
 
 export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
-  // 관심지역 다중 선택
-  const regionList: string[] = useMemo(() => {
-    if (!user.region) return [];
-    return Array.isArray(user.region) ? user.region : [user.region];
-  }, [user.region]);
-  const [region, setRegion] = useState(regionList[0] ?? "");
+  // regionList는 항상 [{id, name}, ...] 형식 보장
+  const regionList = useMemo(() => normalizeRegionList(user.region), [user.region]);
+  const [regionId, setRegionId] = useState(regionList[0]?.id ?? null);
 
-  // 실시간 지역 점수 fetch
   const { data, isLoading, isError, refetch } = useQuery<RegionScoreDto>({
-    queryKey: ["user", "region-score", region],
-    queryFn: () => getRegionScore(region),
-    enabled: !!region,
+    queryKey: ["region-score", regionId],
+    queryFn: () => getRegionScore(regionId!),
+    enabled: !!regionId,
     staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 10,
   });
 
-  if (!region) {
+  if (!regionList.length || !regionId) {
     return (
       <section>
         <div className={styles.mypageSectionTitle}>지역별 점수</div>
@@ -119,40 +89,32 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
       </section>
     );
   }
+
   if (isLoading) return <RegionScoreSkeleton />;
-  if (isError)
+  if (isError || !data)
     return (
       <div className={styles.mypageRegionScoreError}>
         점수 정보를 불러오지 못했습니다.{" "}
         <button onClick={() => refetch()}>다시 시도</button>
       </div>
     );
-  // ⭐⭐⭐ data undefined 방지(불가피한 네트워크 예외 등)
-  if (!data)
-    return (
-      <div className={styles.mypageRegionScoreError}>
-        점수 정보를 찾을 수 없습니다.
-      </div>
-    );
 
   return (
     <section aria-labelledby="region-score-title">
       <div className={styles.mypageSectionTitle} id="region-score-title">
-        지역별 점수
+        {data.regionName} 점수 요약
       </div>
       <div className={styles.mypageRegionScoreRow}>
-        <label htmlFor="regionSelect" style={{ fontWeight: 500 }}>
-          내 지역선택
-        </label>
+        <label htmlFor="regionSelect">내 지역선택</label>
         <select
           id="regionSelect"
           className={styles.mypageSelect}
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
+          value={regionId ?? ""}
+          onChange={(e) => setRegionId(Number(e.target.value))}
         >
           {regionList.map((r) => (
-            <option key={r} value={r}>
-              {r}
+            <option key={r.id} value={r.id}>
+              {r.name}
             </option>
           ))}
         </select>
@@ -168,9 +130,7 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
         </li>
         <li>
           <span>멘토링 활동 수</span>
-          <span className={styles.scoreValue}>
-            {data.mentoringCount}회 × 20점
-          </span>
+          <span className={styles.scoreValue}>{data.mentoringCount}회 × 20점</span>
         </li>
       </ul>
       <div className={styles.mypageProgressBox}>
@@ -179,20 +139,16 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
           <div className={styles.mypageProgressBar}>
             <div
               className={styles.mypageProgressFill}
-              style={{
-                width: `${Math.round((data.promotionProgress ?? 0) * 100)}%`,
-              }}
-              aria-label={`승급 진행률: ${Math.round(
-                (data.promotionProgress ?? 0) * 100
-              )}%`}
+              style={{ width: `${Math.round(data.promotionProgress * 100)}%` }}
+              aria-label={`승급 진행률: ${Math.round(data.promotionProgress * 100)}%`}
             />
           </div>
           <span className={styles.mypageProgressPercent}>
-            {Math.round((data.promotionProgress ?? 0) * 100)}%
+            {Math.round(data.promotionProgress * 100)}%
           </span>
         </div>
         <div className={styles.mypageProgressInfo}>
-          누적 {data.score}점 / 멘토 인증:{" "}
+          누적 {data.score}점 / 멘토 인증까지{" "}
           <span style={{ color: "#fc3535" }}>{data.daysToMentor}일</span>
         </div>
       </div>

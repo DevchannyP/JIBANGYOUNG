@@ -98,7 +98,7 @@ const PolicyCounter = memo<PolicyCounterProps>(({
             )}
             {hasSearchQuery && (
               <span className={styles.filterTag}>
-                🔍 "{searchQuery}"
+                🔍 &quot;{searchQuery}&quot;
               </span>
             )}
           </div>

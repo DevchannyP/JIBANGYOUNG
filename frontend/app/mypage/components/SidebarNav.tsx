@@ -24,7 +24,7 @@ const SIDEBAR_MENU: SidebarMenuItem[] = [
     key: "policyFavorite",
     label: "찜 정책",
     external: true,
-    path: "/policy/favorite",
+    path: "/policy/rec_Policies",
   },
 ];
 
@@ -34,14 +34,14 @@ const QUICKLINKS: SidebarMenuItem[] = [
     key: "mentorDashboard",
     label: "멘토 대시보드",
     external: true,
-    path: "/mentor/dashboard",
+    path: "/mentor",
     roles: ["MENTOR_A", "MENTOR_B", "MENTOR_C", "ADMIN"],
   },
   {
     key: "adminDashboard",
     label: "관리자 대시보드",
     external: true,
-    path: "/admin/dashboard",
+    path: "/admin",
     roles: ["ADMIN"],
   },
   {
@@ -120,3 +120,4 @@ export default function SidebarNav({
 }
 
 export type { Tab };
+
