@@ -37,10 +37,9 @@ public class MyPageController {
     @Operation(summary = "관심지역 알림 목록 조회 (Slice 기반)")
     @GetMapping("/users/{userId}/alerts")
     public ApiResponse<Slice<AlertInfoDto>> getUserAlerts(
-        @PathVariable Long userId,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
-    ) {
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.success(alertQueryService.getUserAlerts(userId, page, size));
     }
 
@@ -48,19 +47,17 @@ public class MyPageController {
     @Operation(summary = "내 댓글 목록 조회 (페이징)")
     @GetMapping("/users/{userId}/comments")
     public ApiResponse<?> getMyComments(
-        @PathVariable Long userId,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size
-    ) {
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.success(commentService.getMyComments(userId, page, size));
     }
 
     @Operation(summary = "내 댓글 삭제")
     @DeleteMapping("/users/{userId}/comments/{commentId}")
     public ApiResponse<?> deleteMyComment(
-        @PathVariable Long userId,
-        @PathVariable Long commentId
-    ) {
+            @PathVariable Long userId,
+            @PathVariable Long commentId) {
         commentService.deleteMyComment(userId, commentId);
         return ApiResponse.success("ok");
     }
@@ -68,11 +65,10 @@ public class MyPageController {
     // --- [3] 게시글 ---
     @Operation(summary = "내 게시글 목록 조회 (페이징)")
     @GetMapping("/users/{userId}/posts")
-    public ApiResponse<?> getMyPosts(
-        @PathVariable Long userId,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size
-    ) {
+    public ApiResponse<PostService.PostListResponse> getMyPosts(
+            @PathVariable long userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.success(postService.getMyPosts(userId, page, size));
     }
 }

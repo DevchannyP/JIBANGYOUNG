@@ -4,6 +4,8 @@ import { api } from "../utils/api";
 
 export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
+export type PostCategory = "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
+
 
 // 마이페이지 탭 키
 type Tab =
@@ -51,7 +53,12 @@ export type UserProfileDto = UserDto;
 export interface PostPreviewDto {
   id: number;
   title: string;
-  region: string;
+  tag: string | null; // 반드시 null 허용!
+  category: PostCategory;
+  isNotice: boolean;
+  isMentorOnly: boolean;
+  likes: number;
+  views: number;
   createdAt: string;
 }
 
@@ -87,18 +94,19 @@ export interface SurveyFavoriteDto {
 }
 
 export interface RegionScoreDto {
-  region: string;
+  regionId: number;
+  regionName: string;
   postCount: number;
   commentCount: number;
   mentoringCount: number;
   score: number;
   promotionProgress: number;
   daysToMentor: number;
-  scoreHistory?: Array<{
+  scoreHistory: {
     date: string;
     delta: number;
     reason: string;
-  }>;
+  }[];
 }
 
 // ---------- [3] API 함수 ----------
@@ -128,12 +136,15 @@ export async function getMyPosts(
   params: GetMyPostsParams
 ): Promise<GetMyPostsResponse> {
   const { userId, page = 1, size = 10 } = params;
-  const res = await api.get(
-    `/mypage/users/${userId}/posts?page=${page}&size=${size}`
-  );
-  return res.data.data;
-}
 
+  // 쿼리스트링 조립 대신 params 옵션 사용(인코딩/가독성/캐싱키 일관성)
+  const res = await api.get(`/mypage/users/${userId}/posts`, {
+    params: { page, size },
+  });
+
+  // 항상 { posts, totalCount } 구조 기대
+  return res.data.data as GetMyPostsResponse;
+}
 export interface GetMyCommentsParams {
   userId: number;
   page?: number;
@@ -231,7 +242,7 @@ export async function toggleSurveyFavorite(
   });
 }
 
-export async function getRegionScore(region: string): Promise<RegionScoreDto> {
-  const res = await api.get(`/mypage/region-scores/${region}`);
-  return res.data.data;
+export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
+  const res = await api.get(`/api/mypage/region-score/${regionId}`);
+  return res.data;
 }

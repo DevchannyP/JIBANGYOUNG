@@ -1,27 +1,34 @@
 package com.jibangyoung.domain.mypage.dto;
 
-import com.jibangyoung.domain.mypage.entity.Post;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
-/**
- * [실무] 게시글 미리보기 DTO
- * - 프론트/ReactQuery와 1:1 매칭, 불필요 필드 배제
- */
+import com.jibangyoung.domain.mypage.entity.Post;
+import com.jibangyoung.domain.mypage.entity.PostCategory;
+
+import lombok.Builder;
+
 @Builder
 public record PostPreviewDto(
-    Long id,
-    String title,
-    String region,
-    LocalDateTime createdAt
-) {
+        Long id,
+        String title,
+        PostCategory category,
+        String tag, // null 허용
+        int likes,
+        int views,
+        boolean isNotice,
+        boolean isMentorOnly,
+        LocalDateTime createdAt) {
     public static PostPreviewDto from(Post post) {
         return PostPreviewDto.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .region(post.getRegion())
-            .createdAt(post.getCreatedAt())
-            .build();
+                .id(post.getId())
+                .title(post.getTitle())
+                .category(post.getCategory())
+                .tag(post.getTag())
+                .likes(post.getLikes())
+                .views(post.getViews())
+                .isNotice(post.isNotice())
+                .isMentorOnly(post.isMentorOnly())
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 }
