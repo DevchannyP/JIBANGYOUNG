@@ -1,9 +1,9 @@
 // libs/api/admin.api.ts
 
 import { AdminPost } from "@/types/api/adminPost";
+import { AdminRegion } from "@/types/api/adminRegion";
 import { AdminUser } from "@/types/api/adminUser";
 import { AdminUserRole } from "@/types/api/adminUserRole";
-import { promises } from "dns";
 
 export interface ApiError {
   code?: string;
@@ -122,4 +122,26 @@ export async function deletePostById(id: number): Promise<void> {
 
     throw new Error(apiError.message || "게시글 삭제 실패");
   }
+}
+
+// 시/도 리스트 조회 API
+export async function fetchAdminRegion(): Promise<AdminRegion[]> {
+  const response = await safeFetch("http://localhost:8080/api/admin/region", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "지역 목록 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {
+      // JSON 파싱 불가
+    }
+    throw new Error(apiError.message || "지역 목록 조회 실패");
+  }
+  return response.json();
 }
