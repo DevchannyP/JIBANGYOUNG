@@ -4,13 +4,11 @@ import type {
   UserRole,
   UserStatus,
 } from "@/libs/api/auth/auth.api";
+import type { Tokens } from "@/libs/api/axios";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type { LoginResponse, UserDto, UserRole, UserStatus };
-
-// user 제외 토큰 전부
-type Tokens = Omit<LoginResponse, "user">;
 
 export interface AuthState {
   user: UserDto | null;
@@ -20,16 +18,12 @@ export interface AuthState {
   expiresIn: number | null;
   issuedAt: string | null;
   expiresAt: string | null;
-  // 기존 setter
   setUser: (user: UserDto | null) => void;
-  // 1) (user, tokens) 타입
-  setAuth: (user: UserDto, tokens: Tokens) => void;
-  // 2) ({ user, accessToken, refreshToken }) 타입도 지원
+  setAuth: (user: UserDto, tokens: Tokens) => void; // 타입 통일!
   setAuthObj: (data: { user: UserDto; accessToken: string; refreshToken: string }) => void;
   logout: () => void;
 }
 
-// SSR/CSR-safe localStorage 핸들러
 const storage = typeof window !== "undefined" ? window.localStorage : undefined;
 
 export const useAuthStore = create<AuthState>()(
@@ -48,10 +42,10 @@ export const useAuthStore = create<AuthState>()(
           user,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
-          tokenType: tokens.tokenType,
-          expiresIn: tokens.expiresIn,
-          issuedAt: tokens.issuedAt,
-          expiresAt: tokens.expiresAt,
+          tokenType: tokens.tokenType ?? null,
+          expiresIn: tokens.expiresIn ?? null,
+          issuedAt: tokens.issuedAt ?? null,
+          expiresAt: tokens.expiresAt ?? null,
         });
         if (storage) {
           storage.setItem("accessToken", tokens.accessToken);

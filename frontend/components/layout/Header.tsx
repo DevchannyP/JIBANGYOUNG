@@ -21,7 +21,6 @@ const dropdownItems = [
   { label: "멘토 신청", path: "/mentor" },
   { label: "공지 대시보드", path: "/notice" },
   { label: "공지 상세", path: "/notice/detail" },
-  // { label: "마이페이지", path: "/mypage" }, // 드롭다운에서 제외
   { label: "신고 내역", path: "/mypage/reports" },
   { label: "관리자 페이지", path: "/admin" },
 ];
@@ -42,10 +41,12 @@ export default function Header() {
       // 에러 무시하고 강제 로그아웃 진행
     } finally {
       if (typeof window !== "undefined") {
-        // ⭐️ 모든 인증 관련 로컬 키 제거
+        // ⭐️ 인증 관련 모든 로컬/세션 키와 임시 플래그 완전 정리
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("userId");
+        localStorage.removeItem("sessionExpired");
+        // 필요시 sessionStorage.clear(); react-query 캐시도 클리어 가능
       }
       logout(); // Zustand 상태 초기화
       router.push("/auth/login");
@@ -150,7 +151,6 @@ export default function Header() {
               👱‍♂️
             </span>
           </button>
-          {/* 로그인/로그아웃 버튼 */}
           {!isLoggedIn ? (
             <Link href="/auth/login" className="btn-primary">
               로그인
