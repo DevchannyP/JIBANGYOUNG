@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import QuestionCard from './components/QuestionCard';
+import { saveSurveyAnswers } from '@/libs/api/survey/surveyAnswer';
+import { useEffect, useState } from 'react';
 import NavigationButtons from './components/NavigationButtons';
 import ProgressButton from './components/ProgressButton';
+import QuestionCard from './components/QuestionCard';
 import './survey.css';
-import { saveSurveyAnswers } from '@/libs/api/survey/surveyAnswer';
 
 interface AnswerObject {
   question_code: string;
@@ -116,10 +116,10 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
       const payload = transformToAnswerFormat(answers);
       console.log('전송 payload:', payload);
 
-      const recommendationResult = await saveSurveyAnswers(payload);
+      const {userId, responseId} = await saveSurveyAnswers(payload);
 
       alert('설문이 완료되었습니다.');
-      window.location.href = `../recommendation?data=${encodeURIComponent(JSON.stringify(recommendationResult))}`;
+      window.location.href = `../recommendation/${userId}/${responseId}`;
     } catch (error) {
       console.error('설문 저장 오류:', error);
       alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');

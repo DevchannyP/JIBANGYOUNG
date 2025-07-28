@@ -74,11 +74,11 @@
     "weighting": true,
     "db_field": "major_category",
     "options": [
-      {"option_code": "1", "option_text": "일자리", "weight": 1.3},
-      {"option_code": "2", "option_text": "주거", "weight": 1.3},
-      {"option_code": "3", "option_text": "교육", "weight": 1.3},
-      {"option_code": "4", "option_text": "복지문화", "weight": 1.3},
-      {"option_code": "5", "option_text": "참여권리", "weight": 1.3}
+      {"option_code": "일자리", "option_text": "일자리", "weight": 1.3},
+      {"option_code": "주거", "option_text": "주거", "weight": 1.3},
+      {"option_code": "교육", "option_text": "교육", "weight": 1.3},
+      {"option_code": "복지문화", "option_text": "복지문화", "weight": 1.3},
+      {"option_code": "참여권리", "option_text": "참여권리", "weight": 1.3}
     ]
   },
   {
@@ -87,23 +87,23 @@
     "weighting": true,
     "db_field": "sub_category",
     "options": [
-      {"option_code": "1", "option_text": "취업", "weight": 1.3},
-      {"option_code": "2", "option_text": "재직자", "weight": 1.3},
-      {"option_code": "3", "option_text": "창업", "weight": 1.3},
-      {"option_code": "4", "option_text": "주택 및 거주지", "weight": 1.3},
-      {"option_code": "5", "option_text": "기숙사", "weight": 1.3},
-      {"option_code": "6", "option_text": "전월세 및 주거급여 지원", "weight": 1.3},
-      {"option_code": "7", "option_text": "미래역량강화", "weight": 1.3},
-      {"option_code": "8", "option_text": "교육비지원", "weight": 1.3},
-      {"option_code": "9", "option_text": "온라인교육", "weight": 1.3},
-      {"option_code": "10", "option_text": "취약계층 및 금융지원", "weight": 1.3},
-      {"option_code": "11", "option_text": "건강", "weight": 1.3},
-      {"option_code": "12", "option_text": "예술인지원", "weight": 1.3},
-      {"option_code": "13", "option_text": "문화활동", "weight": 1.3},
-      {"option_code": "14", "option_text": "청년참여", "weight": 1.3},
-      {"option_code": "15", "option_text": "정책인프라구축", "weight": 1.3},
-      {"option_code": "16", "option_text": "청년국제교류", "weight": 1.3},
-      {"option_code": "17", "option_text": "권익보호", "weight": 1.3}
+      {"option_code": "취업", "option_text": "취업", "weight": 1.3},
+      {"option_code": "재직자", "option_text": "재직자", "weight": 1.3},
+      {"option_code": "창업", "option_text": "창업", "weight": 1.3},
+      {"option_code": "주택 및 거주지", "option_text": "주택 및 거주지", "weight": 1.3},
+      {"option_code": "기숙사", "option_text": "기숙사", "weight": 1.3},
+      {"option_code": "전월세 및 주거급여 지원", "option_text": "전월세 및 주거급여 지원", "weight": 1.3},
+      {"option_code": "미래역량강화", "option_text": "미래역량강화", "weight": 1.3},
+      {"option_code": "교육비지원", "option_text": "교육비지원", "weight": 1.3},
+      {"option_code": "온라인교육", "option_text": "온라인교육", "weight": 1.3},
+      {"option_code": "취약계층 및 금융지원", "option_text": "취약계층 및 금융지원", "weight": 1.3},
+      {"option_code": "건강", "option_text": "건강", "weight": 1.3},
+      {"option_code": "예술인지원", "option_text": "예술인지원", "weight": 1.3},
+      {"option_code": "문화활동", "option_text": "문화활동", "weight": 1.3},
+      {"option_code": "청년참여", "option_text": "청년참여", "weight": 1.3},
+      {"option_code": "정책인프라구축", "option_text": "정책인프라구축", "weight": 1.3},
+      {"option_code": "청년국제교류", "option_text": "청년국제교류", "weight": 1.3},
+      {"option_code": "권익보호", "option_text": "권익보호", "weight": 1.3}
     ]
   },
   {

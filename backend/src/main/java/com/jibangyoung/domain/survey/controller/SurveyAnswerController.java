@@ -1,6 +1,5 @@
 package com.jibangyoung.domain.survey.controller;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -23,10 +22,14 @@ public class SurveyAnswerController {
 
     // 설문 응답 저장
     @PostMapping("/surveyAnswer")
-    public ResponseEntity<Map<String, String>> saveAnswers(@RequestBody AnswerJsonDto request) {
-        Long userId = 1001L;
-        service.saveSurveyAnswers(userId, request.getAnswers());
-        Map<String, String> body = Collections.singletonMap("message", "설문 응답이 저장되었습니다.");
+    public ResponseEntity<Map<String, Long>> saveAnswers(@RequestBody AnswerJsonDto request) {
+        Long userId = 1001L; // 로그인 사용자 ID
+        Long responseId = service.saveSurveyAnswers(userId, request.getAnswers());
+
+        Map<String, Long> body = Map.of(
+                "userId", userId,
+                "responseId", responseId);
+
         return ResponseEntity.ok(body);
     }
 }
