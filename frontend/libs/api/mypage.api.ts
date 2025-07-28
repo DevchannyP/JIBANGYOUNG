@@ -5,7 +5,6 @@ export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
 export type PostCategory = "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
 
-// 마이페이지 탭 키
 export type Tab =
   | "edit"
   | "score"
@@ -14,7 +13,7 @@ export type Tab =
   | "surveys"
   | "favorites"
   | "alerts"
-  | "reports";
+  | "reports"; // 반드시 포함!
 
 // Sidebar 메뉴 구조
 export interface SidebarMenuItem {
@@ -104,6 +103,19 @@ export interface RegionScoreDto {
     reason: string;
   }[];
 }
+
+
+export interface MyReportDto {
+  id: number;
+  targetType: string;         // POST | COMMENT | USER | POLICY
+  targetId: number;
+  reasonCode: string;
+  reasonDetail: string | null;
+  createdAt: string;
+  reviewResultCode: string;   // PENDING | APPROVED 등
+  // reviewedAt?: string;     // 필요시 확장
+}
+
 
 // ---------- [3] API 함수 ----------
 
@@ -251,4 +263,15 @@ export async function toggleSurveyFavorite(
 export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
   const res = await api.get(`/api/mypage/region-score/${regionId}`);
   return res.data as RegionScoreDto;
+}
+
+// [신고 이력] -- 🆕 내 신고이력 API 통합 (envelope 패턴 없을 때 안전하게)
+export async function getMyReports(userId: number): Promise<MyReportDto[]> {
+  if (!userId) throw new Error("로그인 정보가 필요합니다");
+  // ✅ baseURL이 "/api"라면 URL에 중복 prefix 없이!
+  const res = await api.get("/mypage/reports", { params: { userId } });
+  // ✅ envelope 패턴/배열 모두 대응
+  const reports = Array.isArray(res.data) ? res.data : res.data.data;
+  if (!Array.isArray(reports)) throw new Error("신고내역 데이터 오류");
+  return reports as MyReportDto[];
 }

@@ -1,16 +1,24 @@
-// libs/api/axios.ts
 import { useAuthStore } from "@/store/authStore";
 import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosResponse,
-    InternalAxiosRequestConfig,
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
 
 /* ------------------------------------------------------------------ */
-/* 1. 타입 선언                                                        */
+/* 1. 타입 선언 (AuthStore와 완전 동일하게 맞춤)                       */
 /* ------------------------------------------------------------------ */
+export type Tokens = {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string | null;
+  expiresIn: number | null;
+  issuedAt: string | null;
+  expiresAt: string | null;
+};
+
 interface AxiosRequestConfigRetry extends AxiosRequestConfig {
   _retry?: boolean;
 }
@@ -25,16 +33,11 @@ interface ApiErrorResponse {
 interface RefreshSuccessPayload {
   accessToken: string;
   refreshToken?: string;
-  user: any; // 필요하면 UserDto로 교체
-}
-
-interface Tokens {
-  accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresIn: number;
-  issuedAt: string;
-  expiresAt: string;
+  user: any; // 필요시 UserDto로 교체
+  tokenType?: string | null;
+  expiresIn?: number | null;
+  issuedAt?: string | null;
+  expiresAt?: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,7 +75,7 @@ const notify = (token: string) => {
 };
 
 /* ------------------------------------------------------------------ */
-/* 5. 응답 인터셉터 – 토큰 만료 감지 & 재발급                          */
+/* 5. 응답 인터셉터 – 토큰 만료 감지 & 재발급 & 강제 로그아웃          */
 /* ------------------------------------------------------------------ */
 api.interceptors.response.use(
   (res) => res,
@@ -83,34 +86,34 @@ api.interceptors.response.use(
     const status = error.response.status;
     const errCode = error.response.data?.code ?? error.response.data?.errorCode;
 
+    // [1] accessToken 만료/오류 여부 판정
     const tokenExpired =
       status === 401 &&
-      ["TOKEN_EXPIRED", "INVALID_TOKEN", "EXPIRED_ACCESS_TOKEN"].includes(
-        errCode ?? ""
-      );
+      ["TOKEN_EXPIRED", "INVALID_TOKEN", "EXPIRED_ACCESS_TOKEN"].includes(errCode ?? "");
 
     if (!tokenExpired) return Promise.reject(error);
 
-    /* 이미 한 번 재시도했다면 그대로 에러 반환 */
-    if (originalRequest._retry) return Promise.reject(error);
-    originalRequest._retry = true;
-
-    const refreshToken =
+    // [2] refreshToken 자체가 없으면 → 강제 로그아웃 + 세션 만료 플래그
+    const prevRefreshToken =
       typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
 
-    if (!refreshToken) {
-      useAuthStore.getState().logout();
+    if (!prevRefreshToken) {
+      useAuthStore.getState().logout?.();
       localStorage.setItem("sessionExpired", "true");
       return Promise.reject(error);
     }
 
-    /* ----- ① 재발급 진행 중이면 큐에 보관 ----- */
+    // [3] 이미 재발급 시도된 요청이면 반복 방지
+    if (originalRequest._retry) return Promise.reject(error);
+    originalRequest._retry = true;
+
+    // [4] 토큰 리프레시 진행 중이면 큐에 대기(중복 호출 방지)
     if (isRefreshing) {
       return new Promise<AxiosResponse>((resolve, reject) => {
-        subscribe(async (newToken) => {
+        subscribe(async (newAccessToken) => {
           try {
             if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
             }
             const res = await api(originalRequest);
             resolve(res);
@@ -121,7 +124,7 @@ api.interceptors.response.use(
       });
     }
 
-    /* ----- ② 실제 리프레시 호출 ----- */
+    // [5] 실제 토큰 리프레시 시도
     isRefreshing = true;
     try {
       const refreshRes = await axios.post<
@@ -132,7 +135,7 @@ api.interceptors.response.use(
         {},
         {
           headers: {
-            "Refresh-Token": refreshToken,
+            "Refresh-Token": prevRefreshToken,
             "Content-Type": "application/json",
           },
           withCredentials: true,
@@ -143,17 +146,26 @@ api.interceptors.response.use(
         accessToken,
         refreshToken: newRefreshToken,
         user,
+        tokenType,
+        expiresIn,
+        issuedAt,
+        expiresAt,
       } = refreshRes.data.data;
 
-      /* 로컬·상태 갱신 */
+      // refreshToken이 오면 무조건 덮어쓰기
+      const mergedRefresh = newRefreshToken ?? prevRefreshToken;
       localStorage.setItem("accessToken", accessToken);
-      const mergedRefresh = newRefreshToken ?? refreshToken;
       localStorage.setItem("refreshToken", mergedRefresh);
 
-      // ✅ setAuth(user, tokens) 두 인자 호출
-      useAuthStore
-        .getState()
-        .setAuth(user, { accessToken, refreshToken: mergedRefresh } as Tokens);
+      // ✅ Tokens 구조 완전히 맞추기 (null 병합 연산자 활용)
+      useAuthStore.getState().setAuth?.(user, {
+        accessToken,
+        refreshToken: mergedRefresh,
+        tokenType: tokenType ?? null,
+        expiresIn: expiresIn ?? null,
+        issuedAt: issuedAt ?? null,
+        expiresAt: expiresAt ?? null,
+      });
 
       notify(accessToken);
       isRefreshing = false;
@@ -164,7 +176,7 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshErr) {
       isRefreshing = false;
-      useAuthStore.getState().logout();
+      useAuthStore.getState().logout?.();
       localStorage.setItem("sessionExpired", "true");
       return Promise.reject(refreshErr);
     }

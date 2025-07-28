@@ -1,4 +1,3 @@
-// app/(auth)/login/components/LoginForm.tsx
 "use client";
 
 import { loginWithEmail } from "@/libs/api/auth/auth.api";
@@ -15,7 +14,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [isLoggingInNow, setIsLoggingInNow] = useState(false); // ⭐️ 로그인 성공시 true
+  const [isLoggingInNow, setIsLoggingInNow] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -58,16 +57,18 @@ function LoginForm() {
       setAuth(user, {
         accessToken,
         refreshToken,
-        tokenType,
-        expiresIn,
-        issuedAt,
-        expiresAt,
+        tokenType: tokenType ?? null,
+        expiresIn: expiresIn ?? null,
+        issuedAt: issuedAt ?? null,
+        expiresAt: expiresAt ?? null,
       });
 
-      // ✅ 여기 추가!
+      // ✅ 모든 인증/임시/플래그 로컬스토리지 동기화 및 정리
       if (typeof window !== "undefined") {
         localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("userId", user.id.toString());
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("userId", user.id?.toString() ?? "");
+        localStorage.removeItem("sessionExpired"); // 이전 만료플래그 초기화
       }
 
       setIsLoggingInNow(true);
@@ -99,10 +100,8 @@ function LoginForm() {
     handleLogin();
   };
 
-  // ⭐️ 로그인 성공시 아무것도 렌더하지 않음 (페이지 전환 대기)
   if (isLoggingInNow) return null;
 
-  // ⭐️ accessToken만 있는 경우(=로그인된 상태, but 직접 로그인한게 아님)
   if (accessToken) {
     return (
       <div
@@ -143,7 +142,6 @@ function LoginForm() {
     );
   }
 
-  // 👇 로그인 폼
   return (
     <form
       className={styles.formContainer}

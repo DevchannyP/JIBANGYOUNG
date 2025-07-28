@@ -42,7 +42,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-
     // ======== 회원가입 & 로그인 ========
 
     @Operation(summary = "회원가입")
@@ -63,11 +62,10 @@ public class AuthController {
 
     @Operation(summary = "리프레시 토큰으로 토큰 재발급")
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<LoginResponseDto>> refreshToken(
+    public ResponseEntity<LoginResponseDto> refreshAccessToken(
             @RequestHeader("Refresh-Token") String refreshToken) {
-        log.info("[REFRESH] 토큰 갱신 요청");
-        LoginResponseDto loginResponse = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok(ApiResponse.success(loginResponse, "토큰이 갱신되었습니다."));
+        LoginResponseDto response = authService.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "로그아웃")
@@ -141,6 +139,5 @@ public class AuthController {
         String username = authService.findIdByEmailAndCode(req.getEmail(), req.getCode());
         return ResponseEntity.ok(ApiResponse.success(new FindIdResponse(username), "아이디 조회 성공"));
     }
-
 
 }
