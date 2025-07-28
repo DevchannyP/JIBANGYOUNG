@@ -1,0 +1,658 @@
+/* ================================
+   메인 페이지 스타일
+   ================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.main {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.content {
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+/* ================================
+   인기글 카드 스타일
+   ================================ */
+.cardsContainer {
+  margin-bottom: 20px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnailFallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.thumbnailFallback::before {
+  content: "📝";
+}
+
+.cardContent {
+  padding: 16px;
+}
+
+.cardTitle {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cardTitle a {
+  color: #333;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardTitle a:hover {
+  color: #007bff;
+}
+
+.cardDescription {
+  margin: 0;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ================================
+   네비게이션 스타일
+   ================================ */
+.navigation {
+  display: flex;
+  gap: 0;
+  margin: 20px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.navButton {
+  padding: 12px 20px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navButton:hover {
+  background: #e9ecef;
+}
+
+.navButton:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.navButton.active {
+  background: #ffd43b;
+  color: #333;
+  font-weight: 500;
+}
+
+.searchButton {
+  margin-left: auto;
+  padding: 12px 20px;
+  background: #ffd43b;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-radius: 0 8px 0 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ================================
+   게시판 컨텐츠 스타일
+   ================================ */
+.boardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0 20px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0;
+}
+
+.boardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.writeButton {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.writeButton:hover {
+  background: #0056b3;
+}
+
+.bottomSection {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+}
+
+/* ================================
+   테이블 스타일
+   ================================ */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.headerRow {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.headerRow th {
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 500;
+  color: #495057;
+  border-right: 1px solid #dee2e6;
+}
+
+.headerRow th:last-child {
+  border-right: none;
+}
+
+.noColumn {
+  width: 80px;
+}
+
+.titleColumn {
+  width: auto;
+  text-align: left !important;
+}
+
+.authorColumn {
+  width: 100px;
+}
+
+.dateColumn {
+  width: 100px;
+}
+
+.viewsColumn {
+  width: 60px;
+}
+
+.commentsColumn {
+  width: 60px;
+}
+
+.tableRow {
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.tableRow:hover {
+  background-color: #f8f9fa;
+}
+
+.tableRow td {
+  padding: 12px 8px;
+  text-align: center;
+  vertical-align: middle;
+  border-right: 1px solid #f0f0f0;
+}
+
+.tableRow td:last-child {
+  border-right: none;
+}
+
+.noCell {
+  font-weight: 500;
+  color: #666;
+}
+
+.categoryBadge {
+  background: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.titleCell {
+  text-align: left !important;
+  padding-left: 16px !important;
+}
+
+.titleLink {
+  color: #333;
+  text-decoration: none;
+  display: block;
+  line-height: 1.4;
+}
+
+.titleLink:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.authorCell {
+  color: #666;
+  font-size: 13px;
+}
+
+.dateCell {
+  color: #888;
+  font-size: 13px;
+}
+
+.viewsCell,
+.commentsCell {
+  color: #666;
+  font-size: 13px;
+}
+
+/* ================================
+   검색 섹션 스타일
+   ================================ */
+.searchForm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.searchSelect {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.searchSelect:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.searchInput {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 200px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.searchInput::placeholder {
+  color: #999;
+}
+
+.searchSubmitButton {
+  padding: 8px 16px;
+  background: #ffd43b;
+  border: 1px solid #ffd43b;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.searchSubmitButton:hover {
+  background: #ffcd07;
+  border-color: #ffcd07;
+}
+
+.searchSubmitButton:active {
+  transform: translateY(1px);
+}
+
+/* ================================
+   페이지네이션 스타일
+   ================================ */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageButton,
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.pageButton:hover,
+.navButton:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.pageButton.active {
+  background: #ffd43b;
+  border-color: #ffd43b;
+  color: #333;
+  font-weight: 500;
+}
+
+.pageButton.active:hover {
+  background: #ffcd07;
+  border-color: #ffcd07;
+}
+
+.navButton {
+  font-weight: bold;
+  user-select: none;
+}
+
+/* ================================
+   사이드바 인기글 스타일
+   ================================ */
+.sidebarContainer {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ffd43b;
+}
+
+.sidebarTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.shareButton {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.shareButton:hover {
+  background: #f8f9fa;
+}
+
+.sidebarList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebarItem:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 20px;
+}
+
+.sidebarLink {
+  flex: 1;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sidebarLink:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.indicator {
+  color: #ffd43b;
+  font-size: 8px;
+  margin-left: auto;
+}
+
+/* ================================
+   반응형 미디어 쿼리
+   ================================ */
+@media (max-width: 1024px) {
+  .cardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+  }
+  
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .cardContent {
+    padding: 12px;
+  }
+  
+  .cardTitle {
+    font-size: 13px;
+  }
+  
+  .cardDescription {
+    font-size: 11px;
+  }
+  
+  .navigation {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .navButton,
+  .searchButton {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .boardHeader {
+    padding: 16px;
+  }
+  
+  .boardTitle {
+    font-size: 16px;
+  }
+  
+  .writeButton {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .bottomSection {
+    flex-direction: column;
+    gap: 20px;
+    padding: 16px;
+  }
+  
+  .table {
+    font-size: 12px;
+  }
+  
+  .headerRow th,
+  .tableRow td {
+    padding: 8px 4px;
+  }
+  
+  .noColumn {
+    width: 50px;
+  }
+  
+  .authorColumn,
+  .dateColumn {
+    width: 80px;
+  }
+  
+  .viewsColumn,
+  .commentsColumn {
+    width: 40px;
+  }
+  
+  .titleCell {
+    padding-left: 8px !important;
+  }
+  
+  .searchForm {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .searchInput {
+    width: 100%;
+  }
+  
+  .sidebarContainer {
+    padding: 16px;
+  }
+  
+  .sidebarTitle {
+    font-size: 14px;
+  }
+  
+  .sidebarLink {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}

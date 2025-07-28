@@ -2,12 +2,13 @@ package com.jibangyoung.domain.community.controller;
 
 import java.util.List;
 
-import com.jibangyoung.domain.community.dto.PostDetailDto;
+import com.jibangyoung.domain.community.dto.*;
+import com.jibangyoung.domain.community.service.PresignedUrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.jibangyoung.domain.community.dto.PostListDto;
 import com.jibangyoung.domain.community.service.CommunityService;
 @RestController
 @RequestMapping("/api/community")
@@ -15,6 +16,12 @@ import com.jibangyoung.domain.community.service.CommunityService;
 public class CommunityController {
 
     private final CommunityService communityService;
+    private final PresignedUrlService presignedUrlService;
+
+    @GetMapping("/region")
+    public List<RegionResponseDto> getRegionCodes() {
+        return communityService.getAllRegionsBoard();
+    }
 
     @GetMapping("/top-liked")
     public List<PostListDto> getTopLikedByPeriod(@RequestParam(defaultValue = "today") String period) {
@@ -36,5 +43,14 @@ public class CommunityController {
     @GetMapping("/post/{postId}")
     public PostDetailDto getPostDetail(@PathVariable Long postId) {
         return communityService.getPostDetail(postId);
+    }
+
+    @PostMapping("/presign")
+    public PresignedUrlResponse getPresignedUrl(@RequestBody PresignedUrlRequest request) {
+        String fileName = "post-images/" + request.getFileName();
+        String presignedUrl = presignedUrlService.generatePresignedUrl(fileName, request.getContentType());
+        String publicUrl = presignedUrlService.getPublicUrl(fileName);
+
+        return new PresignedUrlResponse(presignedUrl, publicUrl);
     }
 }

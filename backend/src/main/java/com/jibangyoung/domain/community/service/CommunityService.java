@@ -1,10 +1,12 @@
 package com.jibangyoung.domain.community.service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.jibangyoung.domain.community.dto.RegionResponseDto;
+import com.jibangyoung.domain.policy.entity.Region;
+import com.jibangyoung.domain.policy.repository.RegionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +25,48 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CommunityService {
     private final PostRepository postRepository;
+    private final RegionRepository regionRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+
+    // 지역 코드
+    // 지역 시도
+    // 지역 군구 - (없으면 시도)
+    public List<RegionResponseDto> getAllRegionsBoard() {
+        List<Region> regions = regionRepository.findAllByOrderByRegionCode();
+
+        Map<String, Map<String, RegionResponseDto>> regionMap = new LinkedHashMap<>();
+
+        for (Region region : regions) {
+            String sido = region.getSido();
+            String guGun1 = region.getGuGun1();
+
+            String finalGuGun = (guGun1 == null || guGun1.trim().isEmpty()) ? sido : guGun1;
+
+            regionMap.putIfAbsent(sido, new HashMap<>());
+            Map<String, RegionResponseDto> guGunMap = regionMap.get(sido);
+
+            RegionResponseDto dto = RegionResponseDto.builder()
+                    .regionCode(region.getRegionCode())
+                    .sido(sido)
+                    .guGun(finalGuGun)
+                    .build();
+
+            if (guGunMap.containsKey(finalGuGun)) {
+                RegionResponseDto existingDto = guGunMap.get(finalGuGun);
+                if (region.getRegionCode() < existingDto.getRegionCode()) {
+                    guGunMap.put(finalGuGun, dto);
+                }
+            } else {
+                guGunMap.put(finalGuGun, dto);
+            }
+        }
+
+        return regionMap.values().stream()
+                .flatMap(guGunMap -> guGunMap.values().stream())
+                .sorted(Comparator.comparing(RegionResponseDto::getRegionCode))
+                .collect(Collectors.toList());
+    }
 
     // 최근 since 시점 이후(createdAt > since) 에 작성된 게시글 중,
     // 좋아요(likes) 수 기준 상위 10개를 내림차순으로 조회한다.
@@ -33,6 +75,7 @@ public class CommunityService {
                 .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
+
     public List<PostListDto> getCachedTop10ByPeriod(String period) {
         String key = switch (period.toLowerCase()) {
             case "week" -> "top10WeeklyPosts";
@@ -73,4 +116,6 @@ public class CommunityService {
         System.out.println(post);
         return PostDetailDto.from(post);
     }
+
+
 }

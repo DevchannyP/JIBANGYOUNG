@@ -37,9 +37,9 @@ build/
 
 # -----------------------------------
 # ⚙️ IDE 및 편집기 캐시
-.idea/              # 사용자별 설정 혼합 → 제외 권장
-*.iml               # IntelliJ module 파일
-*.swp               # Vim swap
+.idea/
+*.iml
+*.swp
 *.swo
 *.bak
 

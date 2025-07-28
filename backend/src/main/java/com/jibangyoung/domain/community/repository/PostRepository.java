@@ -3,6 +3,7 @@ package com.jibangyoung.domain.community.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.jibangyoung.domain.policy.entity.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,6 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     @Query("SELECT p FROM Posts p WHERE p.likes >= 10 ORDER BY p.id DESC")
     Page<Posts> findPopularPosts(Pageable pageable);
 
-    @Query("SELECT p FROM Posts p WHERE substring(cast(p.regionId as string), 1, 2) = :regionPrefix")
-    Page<Posts> findByRegionPrefix(@Param("regionPrefix") String regionPrefix, Pageable pageable);
+    @Query("SELECT p FROM Posts p WHERE p.regionId = :regionCode")
+    Page<Posts> findByRegionPrefix(@Param("regionCode") String regionCode, Pageable pageable);
 }
