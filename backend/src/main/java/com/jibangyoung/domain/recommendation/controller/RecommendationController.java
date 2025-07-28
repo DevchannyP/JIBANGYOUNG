@@ -2,7 +2,6 @@ package com.jibangyoung.domain.recommendation.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,15 +25,16 @@ public class RecommendationController {
         return recommendationService.generateRecommendations(userId, responseId);
     }
 
-    @GetMapping("/{userId}/{responseId}")
-    public List<Recommendation> getRecommendations(@PathVariable Long userId,
-            @PathVariable Long responseId) {
-        // 추천 결과 조회
-        List<Recommendation> recommendations = recommendationService.getRecommendations(userId, responseId);
+    // @GetMapping("/{userId}/{responseId}")
+    // public List<Recommendation> getRecommendations(@PathVariable Long userId,
+    // @PathVariable Long responseId) {
+    // // 추천 결과 조회
+    // List<Recommendation> recommendations =
+    // recommendationService.getRecommendations(userId, responseId);
 
-        // 조회 후 is_viewed = true로 업데이트
-        recommendationService.markAsViewed(userId, responseId);
+    // // 조회 후 is_viewed = true로 업데이트
+    // recommendationService.markAsViewed(userId, responseId);
 
-        return recommendations;
-    }
+    // return recommendations;
+    // }
 }

@@ -6,17 +6,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.jibangyoung.domain.recommendation.dto.PolicyScoreDto;
+import com.jibangyoung.domain.recommendation.dto.RecommendedRegionDto;
 import com.jibangyoung.domain.recommendation.entity.Recommendation;
 
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
-    List<Recommendation> findByUserIdAndResponseId(Long userId, Long responseId);
-
     // 전체 정책의 분석용 칼럼을 담은 PolicyScoreDto
-    @Query("SELECT new com.jibangyoung.domain.policy.dto.PolicyScoreDto(" +
-            "p.plcy_no, p.sprt_trgt_min_age, p.sprt_trgt_max_age, " +
-            "p.school_cd, p.s_biz_cd, p.mrg_stts_cd, p.job_cd, " +
-            "p.lclsf_nm, p.mclsf_nm) " +
+    @Query("SELECT new com.jibangyoung.domain.recommendation.dto.PolicyScoreDto(" +
+            "p.NO, p.zip_cd, p.sprt_trgt_min_age, p.sprt_trgt_max_age, p.school_cd, " +
+            "p.s_biz_cd, p.mrg_stts_cd, p.job_cd, p.lclsf_nm, p.mclsf_nm, 0.0) " + // 0.0은 더미 값
             "FROM Policy p")
     List<PolicyScoreDto> getAlgoColumn();
+
+    // 전체 인프라 등급 정보와 인프라 score 칼럼을 가진 RecommendedRegionDto
+    @Query("SELECT new com.jibangyoung.domain.recommendation.dto.RecommendedRegionDto(" +
+            "r.regionCode, r.medicalInfraGrade, r.accessibilityGroup, r.transportInfraGrade, " +
+            "r.housingPriceGroup, 0.0) " +
+            "FROM InfraData r")
+    List<RecommendedRegionDto> findAllInfraData();
 }

@@ -17,6 +17,6 @@ public interface SurveyAnswerRepository extends JpaRepository<SurveyAnswer, Long
     @Query("SELECT MAX(sa.responseId) FROM SurveyAnswer sa WHERE sa.userId = :userId")
     Optional<Long> findMaxResponseIdByUserId(@Param("user_id") Long userId);
 
-    @Query("Select * from SurveyAnswer sa where sa.userId = :userId and sa.responseId = :responseId")
-    List<SurveyAnswer> findByUserIdAndResponseId(@Param("user_id") Long userId, @Param("response_id") Long responseId);
+    // surveyAnswer 결과를 recommendationService로 전달
+    List<SurveyAnswer> findByUserIdAndResponseId(Long userId, Long responseId);
 }

@@ -6,9 +6,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PolicyScoreDto {
-    private String policyCode; // 정책 코드
-    private int minAge; // 최소나이
-    private int maxAge; // 최대 나이
+    private Integer policyCode; // 정책 코드
+    private String regionCode; // 지역코드
+    private Integer minAge; // 최소나이
+    private Integer maxAge; // 최대 나이
     private String schoolCode; // 정책학력코드
     private String bizCode; // 정책특화코드
     private String mrgCode; // 정책결혼코드
