@@ -65,28 +65,30 @@ async function getBoardData(searchParams: SearchParams) {
   const featuredPosts: PopularPost[] = [
     {
       id: 1,
-      title: "이건 하드 코딩입니다. 진짜 나 이거 왜이리 오래걸려 썅",
-      description: "나 오늘 뭐했니 진짜 이미지는 일단 올라갔는데",
+      title: "이건 하드 코딩입니다. 그냥 더미임",
+      description:
+        "dkh wlSWk alclrptsp 일단 이거 이미지 위에 겹쳐있어야해 근데 css는 그냥 나중에 해...",
       thumbnail: "/images/post1.jpg",
     },
     {
       id: 2,
-      title: "도대체 왜 ",
-      description: "3번 게시글은 뜨는데 103번은 왜 없을까??",
+      title: "눌러도 의미 1도 없음 ",
+      description:
+        "3번 게시글은 뜨는데 103번은 왜 없을까?? 게시글 삭제도 해야하는데 생각해보니까 삭제 여부로 표시해야하는 거였나? 아오 아니 근데 그러면 페이지네이션은 무효처리 하는 SQL문 있겟지 아 무조건 있찌 ㅋㅋ",
       thumbnail: "/images/post2.jpg",
     },
     {
       id: 3,
       title: "하 진짜 이건 모르겟다 ㅋㅋㅋ",
       description:
-        "아마도 페이지네이션 땜에 그런 것 같은데 하 이거는 언제 고쳐... 몰라 쫌 자고 일어나서해...",
+        "아마도 페이지네이션 땜에 그런 것 같은데 하 이거는 언제 고쳐... 몰라 쫌 자고 일어나서해... 아 그리고 이거 링크 카드형 다 묶어야한다 알지?",
       thumbnail: "/images/post3.jpg",
     },
     {
       id: 4,
-      title: "아니 근데 진짜 지역코드를 괜히 하드코딩해놔서...",
+      title: "아니 근데 진짜 지역코드를 왜 난 바보처럼 구현했을까",
       description:
-        "그냥 왠만한 연산은 백으로 넘겼어야했는데 진짜 미쳐 환장하겟네",
+        "오예록 진짜 빢 대가리 ㅋㅋㅋ 오 뺘ㄲ은 폰트 깨지네 ㅋㅋ 미친 돈벌레 지나감",
       thumbnail: "/images/post4.jpg",
     },
   ];
