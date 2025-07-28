@@ -8,21 +8,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="region")
+@Table(name = "region")
 @Getter
 @Setter
 public class Region {
-    
+
     @Id
     @Column(name = "region_code")
     private Integer regionCode;
 
-    @Column(name = "sido", length=15)
+    @Column(name = "sido", length = 15)
     private String sido;
 
-    @Column(name = "gu_gun_1", length=10)
+    @Column(name = "gu_gun_1", length = 10)
     private String guGun1;
 
-    @Column(name = "gu_gun_2", length=10)
+    @Column(name = "gu_gun_2", length = 10)
     private String guGun2;
 }

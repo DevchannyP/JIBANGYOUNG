@@ -3,6 +3,7 @@ package com.jibangyoung.domain.mypage.entity;
 import java.time.LocalDateTime;
 
 import com.jibangyoung.domain.auth.entity.User;
+import com.jibangyoung.domain.policy.entity.Region;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_activity_event")
 public class UserActivityEvent {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,8 +34,10 @@ public class UserActivityEvent {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "region_id", nullable = false)
-    private Long regionId;
+    // ✅ 수정: @ManyToOne으로 Region 객체 연결
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", nullable = false)
+    private Region region;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "action_type", nullable = false)
@@ -46,7 +50,7 @@ public class UserActivityEvent {
     private LocalDateTime createdAt;
 
     public enum ActionType {
-        POST, COMMENT, MENTORING, REPLY, POLICY_LIKE, POLICY_VOTE, REPORT, REVIEW, PROFILE_EDIT, LOGIN, ADMIN, SYSTEM,
-        ETC
+        POST, COMMENT, MENTORING, REPLY, POLICY_LIKE, POLICY_VOTE, REPORT, REVIEW,
+        PROFILE_EDIT, LOGIN, ADMIN, SYSTEM, ETC
     }
 }
