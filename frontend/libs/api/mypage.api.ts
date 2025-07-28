@@ -1,14 +1,12 @@
 import { api } from "../utils/api";
 
 // ---------- [1] ENUM/공통 타입 ----------
-
 export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
 export type PostCategory = "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
 
-
 // 마이페이지 탭 키
-type Tab =
+export type Tab =
   | "edit"
   | "score"
   | "posts"
@@ -17,8 +15,6 @@ type Tab =
   | "favorites"
   | "alerts"
   | "reports";
-
-export type { Tab };
 
 // Sidebar 메뉴 구조
 export interface SidebarMenuItem {
@@ -53,7 +49,7 @@ export type UserProfileDto = UserDto;
 export interface PostPreviewDto {
   id: number;
   title: string;
-  tag: string | null; // 반드시 null 허용!
+  tag: string | null;
   category: PostCategory;
   isNotice: boolean;
   isMentorOnly: boolean;
@@ -111,6 +107,7 @@ export interface RegionScoreDto {
 
 // ---------- [3] API 함수 ----------
 
+// [프로필]
 export async function getMyProfile(userId: number): Promise<UserProfileDto> {
   const res = await api.get(`/mypage/users/${userId}/profile`);
   return res.data.data;
@@ -123,6 +120,7 @@ export async function patchMyProfile(
   await api.patch(`/mypage/users/${userId}/profile`, input);
 }
 
+// [게시글]
 export interface GetMyPostsParams {
   userId: number;
   page?: number;
@@ -136,15 +134,13 @@ export async function getMyPosts(
   params: GetMyPostsParams
 ): Promise<GetMyPostsResponse> {
   const { userId, page = 1, size = 10 } = params;
-
-  // 쿼리스트링 조립 대신 params 옵션 사용(인코딩/가독성/캐싱키 일관성)
   const res = await api.get(`/mypage/users/${userId}/posts`, {
     params: { page, size },
   });
-
-  // 항상 { posts, totalCount } 구조 기대
   return res.data.data as GetMyPostsResponse;
 }
+
+// [댓글]
 export interface GetMyCommentsParams {
   userId: number;
   page?: number;
@@ -159,9 +155,11 @@ export async function getMyComments(
 ): Promise<GetMyCommentsResponse> {
   const { userId, page = 1, size = 10 } = params;
   const res = await api.get(
-    `/mypage/users/${userId}/comments?page=${page}&size=${size}`
+    `/mypage/users/${userId}/comments`, {
+      params: { page, size }
+    }
   );
-  return res.data.data;
+  return res.data.data as GetMyCommentsResponse;
 }
 
 export async function deleteMyComment(
@@ -171,6 +169,7 @@ export async function deleteMyComment(
   await api.delete(`/mypage/users/${userId}/comments/${commentId}`);
 }
 
+// [알림]
 export interface GetMyAlertsParams {
   userId: number;
   page?: number;
@@ -185,11 +184,14 @@ export async function getMyAlerts(
 ): Promise<GetMyAlertsResponse> {
   const { userId, page = 1, size = 10 } = params;
   const res = await api.get(
-    `/mypage/users/${userId}/alerts?page=${page}&size=${size}`
+    `/mypage/users/${userId}/alerts`, {
+      params: { page, size }
+    }
   );
-  return res.data.data;
+  return res.data.data as GetMyAlertsResponse;
 }
 
+// [설문 이력]
 export interface GetMySurveyHistoryParams {
   userId: number;
   page?: number;
@@ -205,11 +207,14 @@ export async function getMySurveyHistory(
 ): Promise<GetMySurveyHistoryResponse> {
   const { userId, page = 1, size = 10, sort = "recent" } = params;
   const res = await api.get(
-    `/mypage/users/${userId}/surveys?page=${page}&size=${size}&sort=${sort}`
+    `/mypage/users/${userId}/surveys`, {
+      params: { page, size, sort }
+    }
   );
-  return res.data.data;
+  return res.data.data as GetMySurveyHistoryResponse;
 }
 
+// [설문 즐겨찾기]
 export interface GetSurveyFavoritesParams {
   userId: number;
   page?: number;
@@ -225,12 +230,12 @@ export async function getSurveyFavorites(
 ): Promise<GetSurveyFavoritesResponse> {
   const { userId, page = 1, size = 10, sort = "recent" } = params;
   const res = await api.get(
-    `/mypage/surveys/favorites?page=${page}&size=${size}&sort=${sort}`,
-    {
+    `/mypage/surveys/favorites`, {
+      params: { page, size, sort },
       headers: { "X-User-Id": userId },
     }
   );
-  return res.data.data;
+  return res.data.data as GetSurveyFavoritesResponse;
 }
 
 export async function toggleSurveyFavorite(
@@ -242,7 +247,8 @@ export async function toggleSurveyFavorite(
   });
 }
 
+// [지역 점수]
 export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
   const res = await api.get(`/api/mypage/region-score/${regionId}`);
-  return res.data;
+  return res.data as RegionScoreDto;
 }

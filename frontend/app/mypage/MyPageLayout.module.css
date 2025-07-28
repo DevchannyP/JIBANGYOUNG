@@ -658,3 +658,16 @@
   }
 }
 
+.mypageListLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  transition: background 0.15s;
+}
+.mypageListLink:hover, .mypageListLink:focus-visible {
+  background: #f5f7fa;
+  text-decoration: none;
+}
