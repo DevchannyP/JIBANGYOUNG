@@ -118,7 +118,6 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
 
       const {userId, responseId} = await saveSurveyAnswers(payload);
 
-      alert('설문이 완료되었습니다.');
       window.location.href = `../recommendation/${userId}/${responseId}`;
     } catch (error) {
       console.error('설문 저장 오류:', error);

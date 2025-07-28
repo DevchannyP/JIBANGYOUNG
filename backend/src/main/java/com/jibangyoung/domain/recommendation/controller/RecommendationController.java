@@ -13,7 +13,7 @@ import com.jibangyoung.domain.recommendation.service.RecommendationAlgorithmServ
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/recommendations")
+@RequestMapping("/api/recommendation")
 @RequiredArgsConstructor
 public class RecommendationController {
 
