@@ -4,10 +4,7 @@ interface AdminSidebarProps {
   setSelectedMenu: (menu: string) => void;
 }
 
-export function AdminSidebar({
-  selectedMenu,
-  setSelectedMenu,
-}: AdminSidebarProps) {
+export function AdminSidebar({ selectedMenu, setSelectedMenu }: AdminSidebarProps) {
   return (
     <div className={styles.sidebar}>
       <ul>
