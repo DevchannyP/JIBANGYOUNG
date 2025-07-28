@@ -37,7 +37,7 @@ public class Recommendation {
     private String regionCode; // 추천된 지역 코드, 인프라 데이터 기반
 
     @Column(name = "policy_code", nullable = false, length = 50)
-    private String policyCode; // 추천된 정책 코드, policy 데이터 기반
+    private Integer policyCode; // 추천된 정책 코드, policy 데이터 기반
 
     @Column(name = "response_id", nullable = false)
     private Long responseId; // survey_answers 테이블의 response_id와 매핑
@@ -45,7 +45,7 @@ public class Recommendation {
     @Column(name = "user_id", nullable = false)
     private Long userId; // survey_answers 테이블의 userid와 매핑
 
-    @Column(name = "is_viewed", nullable = false)
-    private boolean isViewed = false; // 일회용 페이지로 만들기 위한 논리적 삭제
+    @Column(name = "is_viewed", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0") // 디폴트 : false
+    private boolean isViewed; // 일회용 페이지로 만들기 위한 논리적 삭제
 
 }
