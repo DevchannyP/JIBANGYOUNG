@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../AdminPage.module.css";
 import { CommonModal } from "../components/AdminModal";
+import { AdminReportTab } from "../components/AdminReportTab";
 import { Pagination } from "../components/Pagination";
-import { AdminReportTab } from "./AdminReportTab";
 import { AdminSearch } from "./AdminSearch";
 
 type StatusType = "blind" | "processing" | "reject";
@@ -178,9 +178,7 @@ export function AdminReportList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [searchResult, setSearchResult] = useState<Report[]>([]);
   const [selectedRegionCode, setSelectedRegionCode] = useState(0);
-  const [selectedType, setSelectedType] = useState<ReportType | "게시글">(
-    "게시글"
-  );
+  const [selectedType, setSelectedType] = useState<ReportType | "전체">("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -223,7 +221,7 @@ export function AdminReportList() {
   // 타입 선택
   const handleTypeChange = useCallback(
     (type: string) => {
-      setSelectedType(type as ReportType | "게시글");
+      setSelectedType(type as ReportType | "전체");
       filterData(selectedRegionCode, searchKeyword, type);
     },
     [filterData, selectedRegionCode, searchKeyword]
@@ -294,6 +292,11 @@ export function AdminReportList() {
   return (
     <div>
       <h1 className={styles.title}>신고 목록</h1>
+
+      {/* <AdminRegionTab
+        selectedRegionCode={selectedRegionCode}
+        onSelectRegion={handleRegionChange}
+      /> */}
 
       <AdminReportTab
         selectedType={selectedType}

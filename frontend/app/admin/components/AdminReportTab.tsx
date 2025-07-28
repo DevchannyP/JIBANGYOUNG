@@ -1,35 +1,30 @@
-import { REPORT_TAB_OPTIONS, ReportTabType } from "@/types/api/adMentorReport";
+import styles from "../AdminPage.module.css";
 
-interface AdminReportTabProps {
-  selectedType: ReportTabType;
-  onSelectType: (type: ReportTabType) => void;
+export interface AdminRegionTabProps {
+  regionOptions: { code: number; name: string }[];
+  selectedRegionCode: number;
+  onSelectRegion: (regionName: string, code: number) => void;
 }
 
-export function AdminReportTab({
-  selectedType,
-  onSelectType,
-}: AdminReportTabProps) {
+export function AdminRegionTab({
+  regionOptions,
+  selectedRegionCode,
+  onSelectRegion,
+}: AdminRegionTabProps) {
+  if (!regionOptions || regionOptions.length === 0)
+    return <div>지역 정보 없음</div>;
+
   return (
-    <div style={{ display: "flex", gap: "12px", marginBottom: "18px" }}>
-      {REPORT_TAB_OPTIONS.map((tab) => (
+    <div className={styles.regionTabs}>
+      {regionOptions.map((region) => (
         <button
-          key={tab}
-          onClick={() => onSelectType(tab)}
-          style={{
-            padding: "8px 22px",
-            borderRadius: "6px",
-            border: "none",
-            outline: "none",
-            background: selectedType === tab ? "#2563eb" : "#e5e7eb",
-            color: selectedType === tab ? "#fff" : "#222",
-            fontWeight: selectedType === tab ? "bold" : "normal",
-            fontSize: "16px",
-            cursor: "pointer",
-            boxShadow: selectedType === tab ? "0 2px 8px #2267ff22" : "none",
-            transition: "background 0.15s",
-          }}
+          key={region.code}
+          onClick={() => onSelectRegion(region.name, region.code)}
+          className={
+            selectedRegionCode === region.code ? styles.activeRegion : ""
+          }
         >
-          {tab}
+          {region.name}
         </button>
       ))}
     </div>
