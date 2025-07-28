@@ -1,9 +1,10 @@
-// app/board/page.tsx (서버 컴포넌트)
+import { fetchCommunityPostsByRegion } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
+import PaginationClient from "../components/PaginationClient";
 import RegionSelector from "../components/RegionSelector";
-import BoardContent from "./components/BoardContent";
 import BoardNavigation from "./components/BoardHeader";
 import styles from "./components/BoardList.module.css";
+import BoardTable from "./components/BoardTable";
 import PopularPostCards from "./components/PopularPostCards";
 import PopularPosts from "./components/PopularPosts";
 
@@ -31,212 +32,88 @@ interface SearchParams {
   searchType?: string;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+interface PageProps {
+  params: { regionCode: string };
+  searchParams: SearchParams;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { regionCode: string };
+}): Promise<Metadata> {
   return {
-    title: "서울 지역 게시판 - 협업 질문 및 모임 2025",
-    description:
-      "서울 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판입니다. 지역 정보와 경험을 공유하세요.",
-    keywords: "서울, 지역게시판, 커뮤니티, 협업, 모임, 질문답변",
+    title: `${params.regionCode} 지역 게시판 - 협업 질문 및 모임 2025`,
+    description: `${params.regionCode} 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판입니다.`,
+    keywords: `${params.regionCode}, 지역게시판, 커뮤니티, 협업, 모임, 질문답변`,
     openGraph: {
-      title: "서울 지역 게시판 - 협업 질문 및 모임 2025",
-      description: "서울 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판",
+      title: `${params.regionCode} 지역 게시판 - 협업 질문 및 모임 2025`,
+      description: `${params.regionCode} 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판`,
       type: "website",
-      url: "https://example.com/board",
+      url: `https://example.com/board/${params.regionCode}`,
     },
     robots: {
       index: true,
       follow: true,
     },
-    alternates: {
-      canonical: "https://example.com/board",
-    },
   };
 }
 
-// 데이터 fetching 함수 (서버에서 실행)
 async function getBoardData(searchParams: SearchParams) {
-  // 실제로는 데이터베이스나 API에서 데이터를 가져와야 합니다
   const page = parseInt(searchParams.page || "1");
-
-  const mockPosts: Post[] = [
-    {
-      id: 1,
-      title: "공지사항 입니다.공지사항 입니다.공지사항 입니다.",
-      author: "관리자",
-      date: "2025-07-06",
-      views: 15,
-      comments: 26,
-      category: "공지",
-    },
-    {
-      id: 2,
-      title: "금일 21시 부터 서버점검으로 인하여 홈페이지 이용제한..",
-      author: "관리자",
-      date: "2025-07-06",
-      views: 15,
-      comments: 26,
-      category: "공지",
-    },
-    ...Array.from({ length: 8 }, (_, i) => ({
-      id: i + 3,
-      title: "부산 인기글입니다.",
-      author: "남도일",
-      date: "2025-07-06",
-      views: 15,
-      comments: 26,
-    })),
-  ];
-
-  const popularPosts: Post[] = [
-    {
-      id: 1,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 2,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 3,
-      title: "오늘 10대들 물놀이소 1위",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 4,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 5,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 6,
-      title: "오늘 10대들 물놀이소 1위",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 7,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 8,
-      title: "오늘 10대들 물놀이소 1위",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 9,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-    {
-      id: 10,
-      title: "두번째 게시글 입니다...",
-      author: "",
-      date: "",
-      views: 0,
-      comments: 0,
-    },
-  ];
 
   const featuredPosts: PopularPost[] = [
     {
       id: 1,
-      title: "서울 지역 협업 질문 및 모임 2025...",
-      description: "여러분과 함께하는 클라이딩 일상의 멋진하실까...",
+      title: "이건 하드 코딩입니다. 진짜 나 이거 왜이리 오래걸려 썅",
+      description: "나 오늘 뭐했니 진짜 이미지는 일단 올라갔는데",
       thumbnail: "/images/post1.jpg",
     },
     {
       id: 2,
-      title: "서울 지역 협업 질문 및 모임 2025...",
-      description: "여러분과 함께하는 클라이딩 일상의 멋진하실까...",
+      title: "도대체 왜 ",
+      description: "3번 게시글은 뜨는데 103번은 왜 없을까??",
       thumbnail: "/images/post2.jpg",
     },
     {
       id: 3,
-      title: "서울 지역 협업 질문 및 모임 2025...",
-      description: "여러분과 함께하는 클라이딩 일상의 멋진하실까...",
+      title: "하 진짜 이건 모르겟다 ㅋㅋㅋ",
+      description:
+        "아마도 페이지네이션 땜에 그런 것 같은데 하 이거는 언제 고쳐... 몰라 쫌 자고 일어나서해...",
       thumbnail: "/images/post3.jpg",
     },
     {
       id: 4,
-      title: "서울 지역 협업 질문 및 모임 2025...",
-      description: "여러분과 함께하는 클라이딩 일상의 멋진하실까...",
+      title: "아니 근데 진짜 지역코드를 괜히 하드코딩해놔서...",
+      description:
+        "그냥 왠만한 연산은 백으로 넘겼어야했는데 진짜 미쳐 환장하겟네",
       thumbnail: "/images/post4.jpg",
     },
   ];
 
   return {
-    posts: mockPosts,
     totalPages: 10,
     currentPage: page,
-    popularPosts,
     featuredPosts,
   };
 }
 
-// 서버 컴포넌트 (메인 페이지)
-export default async function BoardPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
+export default async function BoardPage({ params, searchParams }: PageProps) {
   const data = await getBoardData(searchParams);
   const { regionCode } = await params;
+  const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
   return (
     <div className={styles.container}>
-      <RegionSelector />
-      {/* 서버에서 렌더링되는 인기글 카드 */}
+      <RegionSelector /> {/* regionCode 전달 안 함 */}
       <PopularPostCards posts={data.featuredPosts} />
-
-      {/* 클라이언트 컴포넌트 (인터랙션 필요) */}
       <BoardNavigation />
-
       <main className={styles.main}>
         <div className={styles.content}>
-          {/* 클라이언트 컴포넌트 (검색, 페이지네이션 등 인터랙션) */}
-          <BoardContent
-            regionCode={regionCode}
-            posts={data.posts}
-            currentPage={data.currentPage}
-            totalPages={data.totalPages}
-          />
+          <BoardTable posts={posts} />
+          <PaginationClient totalPages={totalPages} />
         </div>
-
         <aside className={styles.sidebar}>
-          {/* 서버에서 렌더링되는 인기글 목록 */}
-          <PopularPosts posts={data.popularPosts} />
+          <PopularPosts posts={posts} />
         </aside>
       </main>
     </div>

@@ -1,4 +1,3 @@
-// components/PopularPostCards.tsx (서버 컴포넌트)
 "use client";
 
 import Image from "next/image";
@@ -31,7 +30,6 @@ const PopularPostCards: React.FC<PopularPostCardsProps> = ({ posts }) => {
                 height={120}
                 className={styles.thumbnailImage}
                 onError={(e) => {
-                  // 이미지 로드 실패시 기본 배경색 표시
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />

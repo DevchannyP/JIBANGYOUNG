@@ -1,14 +1,17 @@
 // components/BoardNavigation.tsx (클라이언트 컴포넌트)
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import styles from "./BoardList.module.css";
 
 const BoardNavigation: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+
   const currentCategory = searchParams.get("category") || "all";
+  const regionCode = pathname.split("/")[2];
 
   const categories = [
     { id: "all", label: "전체글" },
@@ -28,9 +31,8 @@ const BoardNavigation: React.FC = () => {
     router.push(`/board?${params.toString()}`);
   };
 
-  const handleSearch = () => {
-    // 검색 모달이나 페이지로 이동
-    router.push("/board/search");
+  const handleWrite = () => {
+    router.push(`/community/write?regionCode=${regionCode}`);
   };
 
   return (
@@ -55,10 +57,9 @@ const BoardNavigation: React.FC = () => {
       <button
         className={styles.searchButton}
         type="button"
-        onClick={handleSearch}
-        aria-label="검색"
+        onClick={handleWrite}
       >
-        검색기
+        글작성
       </button>
     </nav>
   );

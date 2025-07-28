@@ -1,6 +1,6 @@
+import Link from "next/link";
 import React from "react";
 import styles from "../Community.module.css";
-import Link from "next/link";
 import { PostListDto } from "../types";
 
 interface PopularPostTableProps {
@@ -12,7 +12,7 @@ const RegionPostTable: React.FC<PopularPostTableProps> = ({ posts }) => {
     <table className={styles["posts-table"]}>
       <thead>
         <tr>
-          <th>NO</th>
+          <th>카테고리</th>
           <th>제목</th>
           <th>작성일</th>
           <th>조회</th>
@@ -21,15 +21,11 @@ const RegionPostTable: React.FC<PopularPostTableProps> = ({ posts }) => {
       </thead>
       <tbody>
         {posts.map((post) => {
-          // const isNotice = post.isNotice; // 공지 구분 필드가 있다면
-          const regionCode = String(post.regionId).slice(0, 2);
-          const postLink = `/community/${regionCode}/${post.id}`;
+          const postLink = `/community/${post.regionId}/${post.id}`;
 
           return (
             <tr key={post.id}>
-              <td>
-                {post.id}
-              </td>
+              <td>{post.id}</td>
               <td align="left">
                 <Link href={postLink} className={styles["full-cell-link"]}>
                   {post.title}

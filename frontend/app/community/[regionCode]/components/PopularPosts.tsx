@@ -1,43 +1,37 @@
 // components/PopularPosts.tsx
-import React from "react";
+import Link from "next/link";
+import { PostListDto } from "../../types";
 import styles from "./BoardList.module.css";
 
-interface Post {
-  id: number;
-  title: string;
-  author: string;
-  date: string;
-  views: number;
-  comments: number;
+interface Props {
+  posts: PostListDto[];
 }
 
-interface PopularPostsProps {
-  posts: Post[];
-}
-
-const PopularPosts: React.FC<PopularPostsProps> = ({ posts }) => {
+export default function PopularPosts({ title, posts }: Props) {
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h2 className={styles.title}>서울 주간 인기글</h2>
-        <button className={styles.shareButton} type="button">
-          📤
-        </button>
+    <div className={styles["popular-card"]}>
+      <div className={styles["popular-card-header"]}>
+        <h3>{title}</h3>
+        <span className={styles["icon"]}>👍</span>
       </div>
 
-      <ol className={styles.list}>
+      <ul className={styles["popular-list"]}>
         {posts.map((post, index) => (
-          <li key={post.id} className={styles.item}>
-            <span className={styles.rank}>{index + 1}.</span>
-            <a href={`/board/${post.id}`} className={styles.link}>
-              {post.title}
-            </a>
-            <span className={styles.indicator}>●</span>
+          <li key={post.id}>
+            <div className={styles["rank"]}>{index + 1}</div>
+            <div className={styles["title"]}>
+              <Link
+                href={`/community/${String(post.regionId).slice(0, 2)}/${post.id}`}
+              >
+                {post.title}
+              </Link>
+            </div>
+            <div className={styles["like-count"]}>
+              <span>👍 {post.likes}</span> <span>👁️ {post.views}</span>
+            </div>
           </li>
         ))}
-      </ol>
+      </ul>
     </div>
   );
-};
-
-export default PopularPosts;
+}

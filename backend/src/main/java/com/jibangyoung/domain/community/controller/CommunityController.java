@@ -44,7 +44,7 @@ public class CommunityController {
     public PostDetailDto getPostDetail(@PathVariable Long postId) {
         return communityService.getPostDetail(postId);
     }
-
+    // s3 이미지
     @PostMapping("/presign")
     public PresignedUrlResponse getPresignedUrl(@RequestBody PresignedUrlRequest request) {
         String fileName = "post-images/" + request.getFileName();
@@ -52,5 +52,9 @@ public class CommunityController {
         String publicUrl = presignedUrlService.getPublicUrl(fileName);
 
         return new PresignedUrlResponse(presignedUrl, publicUrl);
+    }
+    @PostMapping("/write")
+    public void writePost(@RequestBody PostCreateRequestDto request) {
+        communityService.write(request);
     }
 }

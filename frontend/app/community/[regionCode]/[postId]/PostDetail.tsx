@@ -14,7 +14,7 @@ export default function PostDetail({ detail }: Props) {
         <span>조회 {detail.views}</span>
         <span>추천 {detail.likes}</span>
       </div>
-      <div>{detail.content}</div>
+      <div dangerouslySetInnerHTML={{ __html: detail.content }} />
     </article>
   );
 }

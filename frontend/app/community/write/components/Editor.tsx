@@ -15,18 +15,20 @@ export default function CKEditorWithS3({
   onChange,
 }: EditorProps) {
   return (
-    <CKEditor
-      editor={ClassicEditor as any}
-      data={initialData}
-      onReady={(editor) => {
-        editor.plugins.get("FileRepository").createUploadAdapter = (
-          loader: any
-        ) => new S3UploadAdapter(loader, { getPresignedUrl });
-      }}
-      onChange={(_, editor) => {
-        const data = editor.getData();
-        onChange?.(data);
-      }}
-    />
+    <div>
+      <CKEditor
+        editor={ClassicEditor as any}
+        data={initialData}
+        onReady={(editor) => {
+          editor.plugins.get("FileRepository").createUploadAdapter = (
+            loader: any
+          ) => new S3UploadAdapter(loader, { getPresignedUrl });
+        }}
+        onChange={(_, editor) => {
+          const data = editor.getData();
+          onChange?.(data);
+        }}
+      />
+    </div>
   );
 }

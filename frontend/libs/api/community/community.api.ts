@@ -9,7 +9,7 @@ export async function fetchPopularPosts(
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/popular?page=${page}&size=${size}`,
     {
-      next: { revalidate: 60 }, // SSG 캐싱 (선택)
+      next: { revalidate: 300 },
     }
   );
 
@@ -31,7 +31,9 @@ export async function fetchCommunityPostsByRegion(
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/region/${regionCode}?page=${page}`,
-    { cache: "no-store" }
+    {
+      next: { revalidate: 3600 },
+    }
   );
 
   if (!res.ok) {
@@ -66,4 +68,33 @@ export async function fetchPostDetail(postId: string): Promise<DetailProps> {
     likes: data.likes,
     content: data.content,
   };
+}
+
+export interface CreatePostRequest {
+  title: string;
+  category: "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
+  content: string;
+  regionId: number;
+  userId: number;
+}
+
+export async function createCommunityPost(
+  payload: CreatePostRequest
+): Promise<void> {
+  console.log(payload);
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/write`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(`게시글 등록 실패: ${error}`);
+  }
 }

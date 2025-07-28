@@ -2,8 +2,11 @@ package com.jibangyoung.domain.community.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.RegionResponseDto;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
@@ -118,4 +121,17 @@ public class CommunityService {
     }
 
 
+    public void write(PostCreateRequestDto request) {
+        String content = request.getContent();
+        String thumbnailUrl  = "https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2025-07-19+171305.png";
+        if (content != null && !content.isBlank()) {
+            Pattern pattern = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?");
+            Matcher matcher = pattern.matcher(content);
+            if (matcher.find()) {
+                thumbnailUrl = matcher.group(1);
+            }
+        }
+        Posts post = request.toEntity(thumbnailUrl);
+        postRepository.save(post);
+    }
 }

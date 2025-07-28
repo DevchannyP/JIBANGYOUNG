@@ -1,10 +1,10 @@
-/* Community Page Styles */
-
 .rightAlign {
   text-align: center;
 }
 
-/* Container */
+/* ================================
+   메인 페이지 스타일
+   ================================ */
 .community-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -14,7 +14,9 @@
   background-color: #fdfdfd;
 }
 
-/* regionr-navigation */
+/* ================================
+   네비게이션 스타일
+   ================================ */
 .regionr-navigation {
   display: flex;
   width: 1400px;
@@ -62,6 +64,11 @@
   margin-bottom: 5px;
   flex-wrap: wrap;
 }
+
+/* ================================
+   인기글 카드 스타일
+   ================================ */
+
 .popular-card {
   flex: 0;
   width: 500px;
@@ -167,7 +174,9 @@
   border-radius: 12px;
 }
 
-/* RegionSelector specific styles */
+/* ================================
+   네비게이션 스타일
+   ================================ */
 .region-selector-container {
   margin-bottom: 20px;
   text-align: center; /* 중앙 정렬 */
@@ -235,7 +244,9 @@
   color: #ccc;
 }
 
-/* Posts Table */
+/* ================================
+   게시판 컨텐츠 스타일
+   ================================ */
 .posts-table {
   width: 1100px;
   border-collapse: collapse;
@@ -292,7 +303,9 @@
   background-color: #eff6ff;
 }
 
-/* Pagination */
+/* ================================
+   페이지네이션 스타일
+   ================================ */
 .pagination {
   display: flex;
   justify-content: center;

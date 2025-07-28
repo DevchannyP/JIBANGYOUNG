@@ -16,7 +16,6 @@ export default function RegionSelector() {
       try {
         const data = await getRegionsBoard();
         setRegions(data);
-        // 초기에는 아무것도 선택하지 않음 (빈 문자열로 설정)
       } catch (error) {
         console.error("Failed to fetch regions:", error);
       }
@@ -66,17 +65,17 @@ export default function RegionSelector() {
 
       {/* selectedSido가 있을 때만 구군 버튼들이 표시됨 */}
       {selectedSido && (
-        <div className={styles['region-gu-gun-links-container']}>
+        <div className={styles["region-gu-gun-links-container"]}>
           {filteredGuGuns.map((region, index) => (
             <span key={region.regionCode}>
               <a
                 href={`/community/${region.regionCode}`}
-                className={styles['region-gu-gun-link']}
+                className={styles["region-gu-gun-link"]}
               >
                 {region.guGun}
               </a>
               {index < filteredGuGuns.length - 1 && (
-                <span className={styles['region-gu-gun-separator']}>|</span>
+                <span className={styles["region-gu-gun-separator"]}>|</span>
               )}
             </span>
           ))}

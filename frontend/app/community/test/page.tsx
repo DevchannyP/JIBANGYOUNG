@@ -42,7 +42,6 @@ export async function generateMetadata({
 
 export default async function CommunityPage({ params }: PageProps) {
   const { regionCode } = await params;
-  const regionName = await getRegionName(regionCode);
 
   const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
   return (

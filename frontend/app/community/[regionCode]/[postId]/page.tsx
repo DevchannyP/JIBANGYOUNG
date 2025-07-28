@@ -1,5 +1,4 @@
 import { fetchPostDetail } from "@/libs/api/community/community.api";
-import { Metadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
@@ -12,26 +11,27 @@ interface PageProps {
   };
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
-  const { regionCode, postId } = await params;
+// export async function generateMetadata({
+//   params,
+// }: PageProps): Promise<Metadata> {
+//   const { regionCode } = params;
+//   const regionName = await getRegionName(regionCode);
 
-  return {
-    title: `${regionName} 커뮤니티 - 지방청년`,
-    description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
-    openGraph: {
-      title: `${regionName} 커뮤니티 - 지방청년`,
-      description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
-    },
-  };
-}
+//   return {
+//     title: `${regionName} 커뮤니티 - 지방청년`,
+//     description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+//     openGraph: {
+//       title: `${regionName} 커뮤니티 - 지방청년`,
+//       description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+//     },
+//   };
+// }
 
 export default async function CommunityPage({ params }: PageProps) {
-  const { regionCode, postId } = await params;
-  const regionName = getRegionName(regionCode);
+  const { regionCode, postId } = params;
 
   const detail: DetailProps = await fetchPostDetail(postId);
+
   return (
     <main className={styles["community-container"]}>
       <RegionSelector />
