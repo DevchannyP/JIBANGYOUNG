@@ -19,8 +19,6 @@ public class PresignedUrlService {
     private String bucket;
 
     public String generatePresignedUrl(String fileName, String contentType) {
-        System.out.println("fileName: " + fileName);
-        System.out.println("contentType: " + contentType);
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
