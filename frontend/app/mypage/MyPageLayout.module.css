@@ -1,515 +1,5 @@
 
 
-.mypageList {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.mypageListItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 0;
-  border-bottom: 1px solid #f0f0f0;
-  outline: none;
-  transition: background 0.18s;
-  position: relative;
-}
-.mypageListItem:focus {
-  background: #e6f0ff;
-}
-.mypageListTitle {
-  font-size: 15px;
-  color: #232425;
-  font-weight: 500;
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.mypageListTime {
-  font-size: 13px;
-  color: #a5a7af;
-  flex-shrink: 0;
-  margin-left: 6px;
-}
-.sectionTitle {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #24282d;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.surveySortSelect {
-  margin-left: auto;
-  font-size: 14px;
-  color: #476ed8;
-  border: 1px solid #dbe2f3;
-  border-radius: 6px;
-  background: #f8f9fb;
-  padding: 2px 14px;
-  height: 32px;
-}
-.surveyStarBtn {
-  font-size: 17px;
-  color: #ffc600;
-  background: none;
-  border: none;
-  margin-left: 3px;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-.surveyStarBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.mypageLoading {
-  padding: 24px 0;
-  text-align: center;
-  color: #898a94;
-  font-size: 15px;
-}
-.paginationNav {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-  margin-top: 12px;
-}
-.pageBtn {
-  padding: 3px 11px;
-  border: 1px solid #ecedf2;
-  border-radius: 6px;
-  background: #fff;
-  font-size: 14px;
-  color: #888a96;
-  cursor: pointer;
-  transition:
-    background 0.14s,
-    color 0.14s;
-}
-.pageBtn[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.pageBtnActive,
-.pageBtn:focus {
-  background: #306bff;
-  color: #fff;
-  border-color: #306bff;
-  font-weight: 700;
-}
-.pageEllipsis {
-  padding: 0 6px;
-  color: #bbb;
-  font-size: 14px;
-  font-weight: 600;
-  user-select: none;
-}
-
-.mypageLoading {
-  padding: 28px 0;
-  text-align: center;
-  color: #898a94;
-  font-size: 15px;
-  letter-spacing: 0.01em;
-}
-
-.mypageProfileCard {
-  display: flex;
-  align-items: center;
-  gap: 36px;
-  background: #fafdff;
-  border-radius: 18px;
-  box-shadow: 0 1px 6px 0 #e7eaf6;
-  padding: 34px 34px 28px 34px;
-  min-width: 320px;
-  margin-bottom: 20px;
-}
-.mypageProfileInfo {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-}
-.mypageProfileNickname {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 13px;
-  color: #1e2029;
-  letter-spacing: 0.03em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.mypageProfileRow {
-  font-size: 15px;
-  color: #232425;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 3px;
-}
-.mypageProfileStatus {
-  font-weight: 600;
-  margin-left: 3px;
-}
-.status_active {
-  color: #3ca04c;
-}
-.status_locked {
-  color: #ed5c33;
-}
-.status_deactivated {
-  color: #8b95a7;
-}
-.status_pending {
-  color: #ffc600;
-}
-.mypageProfileBear {
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e3e4e8;
-  background: #f3f4f9;
-  box-shadow: 0 0 0 2px #e6ebf5;
-}
-.profileEditInput {
-  font-size: 16px;
-  padding: 4px 10px;
-  border: 1px solid #e1e5f1;
-  border-radius: 6px;
-  background: #fafdff;
-  margin-right: 6px;
-  min-width: 80px;
-  transition: border-color 0.15s;
-}
-.profileEditInput:focus {
-  border-color: #3d7afe;
-  outline: none;
-}
-.profileEditSaveBtn {
-  margin-top: 8px;
-  padding: 6px 28px;
-  border-radius: 8px;
-  background: #3d7afe;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.profileEditSaveBtn:disabled {
-  background: #c8d6fa;
-  cursor: not-allowed;
-}
-.profileEditError {
-  color: #e84118;
-  font-size: 14px;
-  margin-top: 3px;
-}
-.profileSaveToast {
-  color: #39c43e;
-  font-size: 15px;
-  margin-left: 4px;
-  animation: fadeout 2.5s 1;
-}
-@keyframes fadeout {
-  0% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-.animate-pulse {
-  animation: pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-
-.mypageSectionTitle {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #24282d;
-}
-.mypageRegionScoreRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-.mypageSelect {
-  font-size: 15px;
-  border: 1px solid #dee3ef;
-  border-radius: 8px;
-  background: #fafbfc;
-  padding: 6px 17px;
-  color: #333f57;
-}
-.mypageScoreList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 16px 0;
-}
-.mypageScoreList li {
-  display: flex;
-  justify-content: space-between;
-  font-size: 15px;
-  margin-bottom: 4px;
-  color: #222;
-}
-.scoreValue {
-  color: #476ed8;
-  font-weight: 700;
-  margin-left: 7px;
-  font-size: 15px;
-}
-.mypageProgressBox {
-  background: #f7faff;
-  border-radius: 12px;
-  padding: 14px 18px;
-  margin-top: 10px;
-  font-size: 15px;
-}
-.mypageProgressBarWrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0 2px 0;
-}
-.mypageProgressBar {
-  flex: 1;
-  height: 13px;
-  background: #e3e9fb;
-  border-radius: 7px;
-  position: relative;
-  overflow: hidden;
-}
-.mypageProgressFill {
-  height: 100%;
-    background: #ffc600;
-  border-radius: 7px;
-  transition: width 0.35s;
-}
-.mypageProgressPercent {
-  color: #b17c00;
-  font-size: 14px;
-  font-weight: 700;
-  min-width: 36px;
-  text-align: right;
-}
-.mypageProgressInfo {
-  font-size: 15px;
-  margin-top: 3px;
-  color: #222;
-}
-.mypageRegionScoreSkeleton {
-  padding: 22px 0 12px 0;
-}
-.mypageNoRegion {
-  color: #aaa;
-  font-size: 16px;
-  margin: 22px 0;
-  text-align: center;
-}
-.mypageRegionScoreError {
-  color: #d53b32;
-  font-size: 15px;
-  padding: 30px 0;
-  text-align: center;
-}
-.mypageScoreHistoryTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 18px;
-  font-size: 14px;
-  background: #fff;
-}
-.mypageScoreHistoryCaption {
-  font-size: 15px;
-  color: #4168d6;
-  font-weight: 600;
-  margin-bottom: 3px;
-  text-align: left;
-  padding: 0 0 5px 0;
-}
-.mypageScoreHistoryTable th,
-.mypageScoreHistoryTable td {
-  padding: 7px 10px;
-  border: 1px solid #e4e6ec;
-  text-align: center;
-}
-.mypageScoreHistoryTable th {
-  background: #f4f7fd;
-  font-weight: 700;
-  color: #476ed8;
-}
-
-.mypageSidebar {
-  min-width: 192px;
-  background: #fafdff;
-  border-radius: 14px;
-  box-shadow: 0 1px 7px 0 #e7eaf6;
-  padding: 24px 0 18px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.sidebarQuicklinks {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
-  padding: 0 15px;
-}
-
-.mypageSidebarMenu {
-  list-style: none;
-  padding: 0 15px;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.mypageSidebarLink {
-  background: none;
-  color: #5a5e6b;
-  font-size: 15px;
-  font-weight: 500;
-  border: none;
-  text-align: left;
-  padding: 8px 6px 8px 10px;
-  border-radius: 7px;
-  transition:
-    background 0.15s,
-    color 0.15s;
-  cursor: pointer;
-  outline: none;
-}
-.mypageSidebarLink:hover,
-.mypageSidebarLink:focus {
-  background: #f1f4ff;
-  color: #305cfa;
-}
-.mypageSidebarLink.active {
-  background: #306bff;
-  color: #fff;
-  font-weight: 700;
-}
-
-.mypageGridLayout {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 34px;
-  max-width: 1200px;
-  min-height: 600px;
-  margin: 0 auto;
-  padding: 44px 14px 80px 14px;
-  background: #f5f9ff;
-  border-radius: 18px;
-  box-shadow: 0 2px 20px 0 #eaf2fd;
-}
-.mypageSidebarWrap {
-  grid-column: 1/2;
-  min-width: 180px;
-}
-
-.mypageLoading {
-  text-align: center;
-  color: #898a94;
-  font-size: 17px;
-  padding: 58px 0;
-}
-.sidebarSkeleton {
-  width: 100%;
-  height: 320px;
-  background: #eceffd;
-  border-radius: 13px;
-  margin-bottom: 18px;
-  animation: pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-.panelSkeleton {
-  width: 100%;
-  height: 450px;
-  background: #f4f7fd;
-  border-radius: 14px;
-  animation: pulse 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-.retryBtn {
-  margin-top: 14px;
-  background: #3d7afe;
-  color: #fff;
-  border-radius: 7px;
-  border: none;
-  padding: 9px 26px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.13s;
-}
-.retryBtn:hover {
-  background: #295cdb;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
-}
-/* 반응형 */
-@media (max-width: 950px) {
-  .mypageGridLayout {
-    grid-template-columns: 1fr;
-    padding: 20px 4px 56px 4px;
-    gap: 0;
-  }
-  .mypageSidebarWrap {
-    align-self: start;
-    min-width: 0;
-    margin-bottom: 14px;
-  }
-  .mypagePanelWrap {
-    padding: 18px 6px 24px 6px;
-    min-height: 410px;
-    border-radius: 10px;
-  }
-}
-/* 다크모드(확장) */
-/* 반응형 제거 또는 강제로 고정 유지 */
-@media (max-width: 950px) {
-  .mypageGridLayout {
-    grid-template-columns: 220px 1fr; /* 고정 유지 */
-    padding: 44px 14px 80px 14px;     /* 원래대로 */
-    gap: 34px;
-  }
-  .mypageSidebarWrap {
-    min-width: 180px;
-    margin-bottom: 0;
-  }
-  .mypagePanelWrap {
-    padding: 36px 36px 28px 36px;
-    min-height: 540px;
-    border-radius: 16px;
-  }
-}
-
-
 
 /* ============================= */
 /* 🎨 Mypage 사이드바 디자인: 옐로우 테마 */
@@ -676,3 +166,474 @@
 
 
 
+
+
+
+.sectionTitle {
+  font-size: 1.14rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.surveySortSelect {
+  border-radius: 7px;
+  font-size: 0.97em;
+  padding: 3px 8px;
+  border: 1.5px solid #eee;
+  background: #fafbfc;
+  color: #293955;
+  margin-left: 8px;
+}
+.mypageList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mypageListItem {
+  padding: 18px 18px 12px 18px;
+  border-bottom: 1px solid #eaeaea;
+  background: #fff;
+  border-radius: 9px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.16s;
+}
+.mypageListItem:focus-within,
+.mypageListItem:hover {
+  box-shadow: 0 4px 22px #e0eaf7;
+  background: #f5f9ff;
+}
+.mypageListTitle {
+  font-weight: 600;
+  font-size: 1em;
+  margin-bottom: 3px;
+  color: #2d3b55;
+}
+.questionId {
+  color: #224aff;
+  margin-right: 12px;
+}
+.answerText {
+  color: #333;
+  font-size: 0.99em;
+}
+.mypageListTime {
+  font-size: 0.93em;
+  color: #6a6e7a;
+  margin-left: 2px;
+}
+.mypageLoading {
+  padding: 90px 0;
+  text-align: center;
+  font-size: 1.17rem;
+  color: #667;
+}
+.paginationNav {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 16px 0 8px 0;
+}
+.pageBtn {
+  border: none;
+  background: #eaf2fd;
+  color: #234;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 13px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.18s;
+}
+.pageBtn[disabled] {
+  background: #f4f4f4;
+  color: #bbb;
+  cursor: not-allowed;
+}
+.pageBtnActive {
+  background: #224aff;
+  color: #fff;
+}
+.pageEllipsis {
+  color: #aaa;
+  padding: 0 4px;
+  font-size: 1.1em;
+}
+
+
+.tooltipWrapper {
+  position: relative;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 300px;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid #d9e0e9;
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.08);
+  font-size: 0.92rem;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.tooltip strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.tooltip ul {
+  padding-left: 1.1rem;
+  margin: 0;
+  color: #444;
+}
+
+.tooltip li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.more {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.tooltipWrapper:hover .tooltip {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* 댓글 리스트 제목 */
+.sectionTitle {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #27325a;
+  letter-spacing: -0.01em;
+  padding-left: 2px;
+}
+
+/* 날짜 + 게시글 제목 */
+.mypageListTime {
+  margin-top: 6px;
+  font-size: 0.97em;
+  color: #8291b2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* 댓글 삭제 버튼 */
+.commentDeleteBtn {
+  background: linear-gradient(90deg, #ffe0e0 50%, #fff4f4 100%);
+  color: #d43c3c;
+  border: none;
+  border-radius: 7px;
+  padding: 4.5px 18px;
+  font-size: 0.97em;
+  font-weight: 600;
+  margin-left: auto;
+  margin-top: 7px;
+  box-shadow: 0 1px 5px #f7d6d620;
+  transition: background 0.14s, color 0.14s, box-shadow 0.13s;
+  cursor: pointer;
+  outline: none;
+  display: inline-block;
+}
+
+.commentDeleteBtn:hover,
+.commentDeleteBtn:focus {
+  background: linear-gradient(90deg, #ffd4d4 60%, #ffeaea 100%);
+  color: #c42121;
+  box-shadow: 0 3px 14px #ffd6d640;
+}
+
+.commentDeleteBtn:disabled {
+  background: #f8f8f8;
+  color: #d1bcbc;
+  cursor: not-allowed;
+}
+
+/* 게시글 제목 링크 */
+.mypageCommentTarget {
+  color: #3a5fff;
+  font-weight: 600;
+  padding: 2px 7px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-right: 2px;
+  transition: background 0.14s, color 0.14s;
+}
+.mypageCommentTarget:hover,
+.mypageCommentTarget:focus {
+  background: #e2edff;
+  color: #1747b8;
+  text-decoration: underline;
+}
+
+
+/* 내 게시글 섹션 제목 */
+.sectionTitle {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #223166;
+  margin-bottom: 19px;
+  padding-left: 2px;
+  letter-spacing: -0.01em;
+}
+
+/* 게시글 제목(리스트용) */
+.mypageListTitle {
+  font-size: 1.07rem;
+  font-weight: 600;
+  color: #232e53;
+  margin-left: 7px;
+  margin-right: 3px;
+  letter-spacing: -0.01em;
+  line-height: 1.42;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 날짜 스타일 */
+.mypageListTime {
+  color: #8f9eb8;
+  background: #f4f7fa;
+  border-radius: 6px;
+  font-size: 0.98em;
+  padding: 3px 12px 3px 12px;
+  margin-left: 7px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  display: inline-block;
+}
+
+
+
+/* ========================== */
+/* 🎨 프로필 카드 - 옐로우 테마 */
+/* ========================== */
+
+.mypageProfileCard {
+  background: linear-gradient(120deg, #fffbe7 70%, #fff6b7 100%);
+  border-radius: 24px;
+  box-shadow: 0 3px 28px 0 #ffe39433, 0 1.5px 7px #ffe39a2b;
+  padding: 48px 44px 44px 44px;
+  margin: 0 auto 36px auto;
+  max-width: 720px;
+  min-width: 360px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 44px;
+  position: relative;
+  min-height: 280px;
+}
+
+.mypageProfileImgWrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 185px;
+  min-height: 185px;
+  padding-right: 8px;
+}
+
+.mypageProfileBear {
+  width: 160px !important;
+  height: 160px !important;
+  border-radius: 50%;
+  border: 5px solid #ffe36b;
+  background: #fffbe0;
+  box-shadow: 0 4px 24px #ffe48766, 0 1.5px 7px #ffe39a2b;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
+  transition: box-shadow 0.15s, border 0.14s;
+}
+
+.mypageProfileInfo {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 230px;
+  width: 100%;
+  gap: 0;
+  justify-content: center;
+}
+
+.mypageProfileNickname {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  font-size: 1.25rem;
+  width: 100%;
+}
+
+.profileEditInput {
+  font-size: 1.18rem;
+  background: #fffbe7;
+  border: none;
+  border-bottom: 2.5px solid #ffe26b;
+  padding: 8px 0 5px 0;
+  border-radius: 0;
+  font-weight: 700;
+  color: #534500;
+  outline: none;
+  width: 100%;
+  min-width: 130px;
+  max-width: 280px;
+  transition: border-color 0.18s;
+  box-sizing: border-box;
+}
+.profileEditInput:focus {
+  border-bottom: 2.8px solid #ffd600;
+  background: #fffcd6;
+}
+
+.mypageProfileRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 13px;
+  font-size: 1.08rem;
+  color: #654e01;
+  width: 100%;
+}
+.mypageProfileRow strong {
+  min-width: 68px;
+  color: #d1b000;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  font-size: 1.05em;
+}
+
+.mypageProfileStatus {
+  display: inline-block;
+  padding: 4px 17px;
+  font-size: 1.05em;
+  border-radius: 10px;
+  background: #fff5cb;
+  color: #a08000;
+  font-weight: 700;
+  border: 1.5px solid #ffe26b;
+  margin-left: 4px;
+}
+.status_active { background: #fff8e1; color: #b8a100; }
+.status_locked { background: #ffe3e3; color: #a08000; }
+.status_deactivated { background: #fcf1e2; color: #b0a800; }
+.status_pending { background: #fffbea; color: #a09800; }
+.status_unknown { background: #fff7de; color: #ccc; }
+
+.profileEditSaveBtn {
+  margin-top: 26px;
+  width: 100%;
+  padding: 16px 0;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(90deg, #ffe066 5%, #ffd53b 95%);
+  color: #514200;
+  font-size: 1.14rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #ffe89a45;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.14s, box-shadow 0.13s, color 0.13s;
+}
+.profileEditSaveBtn:active {
+  background: linear-gradient(90deg, #ffd53b 5%, #fffbe7 95%);
+  color: #b89900;
+  box-shadow: 0 1px 3px #ffd53b88;
+}
+.profileEditSaveBtn:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.profileSaveToast {
+  margin-left: 11px;
+  color: #ffb800;
+  font-weight: 600;
+  font-size: 1.06rem;
+  animation: toastAppear 0.7s;
+  vertical-align: middle;
+}
+@keyframes toastAppear {
+  from { opacity: 0; transform: translateY(-8px);}
+  to   { opacity: 1; transform: translateY(0);}
+}
+
+.profileEditError {
+  margin-top: 16px;
+  background: #fff2ec;
+  color: #e66040;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 1.09rem;
+  text-align: center;
+  font-weight: 500;
+  border: 1.4px solid #ffcd68;
+  letter-spacing: -0.2px;
+  box-shadow: 0 1px 8px #ffdf8c24;
+}
+
+/* Skeleton (로딩용) */
+.mypageProfileCard.animate-pulse {
+  opacity: 0.84;
+  filter: grayscale(0.11) blur(0.6px);
+}
+
+/* 📱 반응형 - 950px 이하 */
+@media (max-width: 950px) {
+  .mypageProfileCard {
+    flex-direction: column;
+    align-items: center;
+    max-width: 98vw;
+    gap: 22px;
+    padding: 38px 7vw 32px 7vw;
+    min-width: 0;
+  }
+  .mypageProfileImgWrap {
+    padding-right: 0;
+    min-width: 0;
+    min-height: 0;
+  }
+  .mypageProfileBear {
+    width: 128px !important;
+    height: 128px !important;
+  }
+  .mypageProfileInfo {
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .mypageProfileCard {
+    padding: 22px 3vw 22px 3vw;
+    border-radius: 13px;
+    gap: 14px;
+  }
+  .mypageProfileBear {
+    width: 92px !important;
+    height: 92px !important;
+  }
+}

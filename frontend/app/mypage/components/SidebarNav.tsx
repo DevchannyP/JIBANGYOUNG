@@ -4,16 +4,14 @@ import { SidebarMenuItem, Tab, UserRole } from "@/types/mypage";
 import { useRouter } from "next/navigation";
 import styles from "../MyPageLayout.module.css";
 
-// 메뉴 정의: key/label 일치 (관심지역 알림=alerts, 신고이력=reports)
+// ✅ "alerts" 항목 완전 제거!
 const SIDEBAR_MENU: SidebarMenuItem[] = [
   { key: "edit", label: "프로필 수정" },
   { key: "score", label: "지역별 점수" },
   { key: "posts", label: "내 게시글" },
   { key: "comments", label: "내 댓글보기" },
-  { key: "surveys", label: "내 설문 이력" },
-  { key: "favorites", label: "관심지역 즐겨찾기" },
-  { key: "alerts", label: "관심지역 알림" },
-  { key: "reports", label: "내 신고이력" }, // ★ 반드시 key/reports/label 일치!
+  { key: "surveys", label: "설문 응답" }, // label은 자유롭게
+  { key: "reports", label: "내 신고이력" },
 ];
 
 const QUICKLINKS: SidebarMenuItem[] = [
