@@ -1,9 +1,11 @@
 "use client";
 
-import { getMyReports, MyReportDto } from "@/libs/api/mypage.api";
 import { useQuery } from "@tanstack/react-query";
+import { getMyReports } from "@/libs/api/mypage.api";
+import type { MyReportDto } from "@/types/api/mypage.types";
 import { AlertCircle, Ban, CheckCircle2, Clock10, XCircle } from "lucide-react";
 import styles from "../MyPageLayout.module.css";
+
 
 // [상태별 라벨/색상/아이콘]
 const REVIEW_RESULT_MAP: Record<string, { label: string; color: string; icon: React.ReactNode }> = {

@@ -1,47 +1,89 @@
 package com.jibangyoung.domain.mypage.entity;
 
-import com.jibangyoung.domain.auth.entity.User;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 
-/**
- * [실무] 마이페이지-내 댓글 엔티티
- * - Slice/Page 성능 위한 인덱스 최적화
- * - 확장: Soft delete, 게시글 연관, 신고 등 확장성 보장
- */
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import com.jibangyoung.domain.auth.entity.User;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "comment", indexes = {
-    @Index(name = "idx_user_createdAt", columnList = "user_id, createdAt")
+        @Index(name = "idx_user_createdAt", columnList = "user_id, created_at")
 })
+@Where(clause = "is_deleted = false") // ✅ 전역 필터로 교체
+@SQLDelete(sql = "UPDATE comment SET is_deleted = true, updated_at = NOW() WHERE id = ?")
 public class Comment {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "target_post_id", nullable = false)
     private Long targetPostId;
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "target_post_title", nullable = false, length = 200)
     private String targetPostTitle;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
     @Builder
-    public Comment(User user, String content, Long targetPostId, String targetPostTitle) {
+    public Comment(User user, String content, Long targetPostId,
+            String targetPostTitle, Comment parent) {
         this.user = user;
         this.content = content;
         this.targetPostId = targetPostId;
         this.targetPostTitle = targetPostTitle;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+        this.parent = parent;
+    }
+
+    /** 소프트 삭제 */
+    public void softDelete() {
+        if (!isDeleted) {
+            this.isDeleted = true;
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
     }
 }

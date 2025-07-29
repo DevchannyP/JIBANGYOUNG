@@ -2,12 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import {
-  getRegionScore,
-  RegionScoreDto,
-  UserProfileDto,
-} from "../../../libs/api/mypage.api";
+import { getRegionScore } from "@/libs/api/mypage.api";
+import type { RegionScoreDto, UserProfileDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
+
 
 // region이 string or object or undefined 모두 지원하도록 안전화
 function normalizeRegionList(region: UserProfileDto["region"]): { id: number; name: string }[] {

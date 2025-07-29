@@ -2,6 +2,8 @@ package com.jibangyoung.domain.mypage.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jibangyoung.domain.mypage.dto.AlertInfoDto;
+import com.jibangyoung.domain.mypage.dto.CommentPreviewDto;
 import com.jibangyoung.domain.mypage.dto.MyReportDto;
 import com.jibangyoung.domain.mypage.service.AlertQueryService;
 import com.jibangyoung.domain.mypage.service.CommentService;
@@ -23,11 +26,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-/**
- * [마이페이지] API 컨트롤러
- * - CSR 최적화 (ReactQuery, Skeleton, 페이징 대응)
- * - 기능별 서비스 계층 위임
- */
 @Tag(name = "마이페이지", description = "마이페이지 관련 API")
 @RestController
 @RequestMapping("/api/mypage")
@@ -50,22 +48,31 @@ public class MyPageController {
     }
 
     // --- [2] 댓글 ---
-    @Operation(summary = "내 댓글 목록 조회 (페이징)")
-    @GetMapping("/users/{userId}/comments")
-    public ApiResponse<?> getMyComments(
+    // ⭐️ 내 댓글 목록 조회 (Dto 변환)
+    @GetMapping("/users/{userId}")
+    public Page<CommentPreviewDto> getMyComments(
             @PathVariable Long userId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ApiResponse.success(commentService.getMyComments(userId, page, size));
+            Pageable pageable) {
+        return commentService.getMyComments(userId, pageable)
+                .map(CommentPreviewDto::from);
     }
 
-    @Operation(summary = "내 댓글 삭제")
-    @DeleteMapping("/users/{userId}/comments/{commentId}")
-    public ApiResponse<?> deleteMyComment(
+    // 내 댓글 소프트딜리트
+    @DeleteMapping("/users/{userId}/{commentId}")
+    public ResponseEntity<Void> deleteMyComment(
             @PathVariable Long userId,
             @PathVariable Long commentId) {
         commentService.deleteMyComment(userId, commentId);
-        return ApiResponse.success("ok");
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{userId}/all")
+    public Page<CommentPreviewDto> getAllMyCommentsIncludeDeleted(
+            @PathVariable Long userId,
+            Pageable pageable) {
+        Page<CommentPreviewDto> page = commentService.getAllMyCommentsIncludeDeleted(userId, pageable)
+                .map(CommentPreviewDto::from);
+        return page;
     }
 
     // --- [3] 게시글 ---

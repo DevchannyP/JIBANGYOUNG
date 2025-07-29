@@ -3,7 +3,8 @@
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
-import { UserProfileDto, patchMyProfile } from "../../../libs/api/mypage.api";
+import { patchMyProfile } from "@/libs/api/mypage.api";
+import type { UserProfileDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
 
 // status 매핑

@@ -1,19 +1,21 @@
-// components/SidebarNav.tsx
 "use client";
-import { SidebarMenuItem, Tab, UserRole } from "@/types/mypage";
+
 import { useRouter } from "next/navigation";
+import type { SidebarMenuItem, Tab, UserRole } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
 
-// ✅ "alerts" 항목 완전 제거!
+
+// key는 Tab값만 (alerts 없음)
 const SIDEBAR_MENU: SidebarMenuItem[] = [
   { key: "edit", label: "프로필 수정" },
   { key: "score", label: "지역별 점수" },
   { key: "posts", label: "내 게시글" },
   { key: "comments", label: "내 댓글보기" },
-  { key: "surveys", label: "설문 응답" }, // label은 자유롭게
+  { key: "surveys", label: "설문 응답" },
   { key: "reports", label: "내 신고이력" },
 ];
 
+// 외부 대시보드 등은 string 허용
 const QUICKLINKS: SidebarMenuItem[] = [
   {
     key: "mentorDashboard",
@@ -69,36 +71,20 @@ export default function SidebarNav({
         ))}
       </div>
       <ul className={styles.mypageSidebarMenu}>
-        {SIDEBAR_MENU.filter(isAllowed).map((m) =>
-          m.external && m.path ? (
-            <li key={m.key}>
-              <button
-                className={styles.mypageSidebarLink}
-                onClick={() => router.push(m.path!)}
-                type="button"
-                tabIndex={0}
-              >
-                {m.label}
-              </button>
-            </li>
-          ) : (
-            <li key={m.key}>
-              <button
-                className={`${styles.mypageSidebarLink} ${tab === m.key ? styles.active : ""}`}
-                onClick={() => setTab(m.key as Tab)}
-                aria-current={tab === m.key ? "page" : undefined}
-                type="button"
-                tabIndex={0}
-              >
-                {m.label}
-              </button>
-            </li>
-          )
-        )}
+        {SIDEBAR_MENU.filter(isAllowed).map((m) => (
+          <li key={m.key}>
+            <button
+              className={`${styles.mypageSidebarLink} ${tab === m.key ? styles.active : ""}`}
+              onClick={() => setTab(m.key as Tab)}
+              aria-current={tab === m.key ? "page" : undefined}
+              type="button"
+              tabIndex={0}
+            >
+              {m.label}
+            </button>
+          </li>
+        ))}
       </ul>
     </nav>
   );
 }
-
-export type { Tab };
-

@@ -1,11 +1,13 @@
 "use client";
 
+import { getMyProfile } from "@/libs/api/mypage.api";
 import { useUserStore } from "@/store/userStore";
+import type { Tab, UserProfileDto } from "@/types/api/mypage.types";
 import { useEffect, useState } from "react";
-import { getMyProfile } from "../../libs/api/mypage.api";
 import styles from "./MyPageLayout.module.css";
 import PanelRouter from "./components/PanelRouter";
-import SidebarNav, { type Tab } from "./components/SidebarNav";
+import SidebarNav from "./components/SidebarNav";
+
 
 function MyPageSkeleton() {
   return (
@@ -36,10 +38,9 @@ export default function MyPageClient() {
   const [tab, setTab] = useState<Tab>("score");
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  // 1. userId의 초기값을 undefined로
   const [userId, setUserId] = useState<number | null | undefined>(undefined);
 
-  // 2. CSR에서만 localStorage에서 userId 읽기
+  // CSR에서 localStorage에서 userId 읽기
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("userId");
@@ -47,7 +48,7 @@ export default function MyPageClient() {
     }
   }, []);
 
-  // 3. userId 있을 때만 fetch
+  // userId 있을 때만 fetch
   useEffect(() => {
     if (!user && userId !== undefined && userId !== null) {
       setIsLoading(true);
@@ -67,7 +68,6 @@ export default function MyPageClient() {
     // eslint-disable-next-line
   }, [userId]);
 
-  // 재시도 핸들러
   const handleRetry = () => {
     if (!userId) return;
     setIsLoading(true);
@@ -84,22 +84,18 @@ export default function MyPageClient() {
       .finally(() => setIsLoading(false));
   };
 
-  // 4. hydration mismatch 방지: userId === undefined면 아무것도 렌더하지 않음
-  if (userId === undefined) return null; // 혹은 <MyPageSkeleton /> 등도 가능
+  if (userId === undefined) return null;
   if (userId === null) return <div>로그인이 필요합니다.</div>;
   if (isLoading) return <MyPageSkeleton />;
   if (isError || !user) return <MyPageError retry={handleRetry} />;
 
   return (
-    <div
-      className={styles.mypageGridLayout}
-      aria-label="마이페이지 전체 레이아웃"
-    >
+    <div className={styles.mypageGridLayout} aria-label="마이페이지 전체 레이아웃">
       <aside className={styles.mypageSidebarWrap}>
         <SidebarNav tab={tab} setTab={setTab} userRole={user.role} />
       </aside>
       <main className={styles.mypagePanelWrap} tabIndex={0}>
-        <PanelRouter tab={tab} user={user} />
+        <PanelRouter tab={tab} user={user as UserProfileDto} />
       </main>
     </div>
   );
