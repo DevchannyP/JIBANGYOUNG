@@ -2,7 +2,6 @@ package com.jibangyoung.domain.mypage.service;
 
 import java.util.List;
 
-import com.jibangyoung.domain.mypage.repository.MyPostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,7 @@ import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.repository.UserRepository;
 import com.jibangyoung.domain.mypage.dto.PostPreviewDto;
 import com.jibangyoung.domain.mypage.entity.Post;
-
+import com.jibangyoung.domain.mypage.repository.PostRepository;
 import com.jibangyoung.global.exception.ErrorCode;
 import com.jibangyoung.global.exception.NotFoundException;
 
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final MyPostRepository postRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
 
     /**
@@ -37,7 +36,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostListResponse getMyPosts(Long userId, int page, int size) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "게시글 주인 사용자 없음"));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "게시글 주인 사용자 없음"));
 
         Page<Post> postPage = postRepository.findByUserOrderByCreatedAtDesc(user, PageRequest.of(page - 1, size));
         List<PostPreviewDto> posts = postPage.map(PostPreviewDto::from).getContent();
@@ -49,5 +48,6 @@ public class PostService {
     /**
      * [내부] CSR/ReactQuery에 최적화된 totalCount+posts DTO
      */
-    public record PostListResponse(List<PostPreviewDto> posts, long totalCount) {}
+    public record PostListResponse(List<PostPreviewDto> posts, long totalCount) {
+    }
 }
