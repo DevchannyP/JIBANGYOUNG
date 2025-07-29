@@ -1,4 +1,5 @@
 // app/community/[regionCode]/[postId]/page.tsx
+
 import { fetchPostDetail } from "@/libs/api/community/community.api";
 import { Metadata, ResolvingMetadata } from "next";
 import styles from "../../Community.module.css";
@@ -14,10 +15,10 @@ interface PageProps {
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-// SEO 메타데이터 설정
+// ✅ SEO 메타데이터
 export async function generateMetadata(
-  { params }: { params: { regionCode: string } }, // 이게 중요!
-  parent: ResolvingMetadata
+  { params }: PageProps,
+  _parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { regionCode } = params;
 
@@ -31,7 +32,7 @@ export async function generateMetadata(
   };
 }
 
-// 상세 페이지 SSR
+// ✅ 게시글 상세 페이지
 export default async function CommunityPage({ params }: PageProps) {
   const { regionCode, postId } = params;
   const detail: DetailProps = await fetchPostDetail(postId);
