@@ -5,15 +5,16 @@ import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
 import PostDetail from "./PostDetail";
 
-type Props = {
+interface CommunityPageProps {
   params: {
     regionCode: string;
     postId: string;
   };
-};
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
 
 export async function generateMetadata(
-  { params }: Props,
+  { params }: CommunityPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { regionCode } = params;
@@ -27,7 +28,7 @@ export async function generateMetadata(
     },
   };
 }
-export default async function CommunityPage({ params }: Props) {
+export default async function CommunityPage({ params }: CommunityPageProps) {
   const { regionCode, postId } = params;
 
   const detail: DetailProps = await fetchPostDetail(postId);
