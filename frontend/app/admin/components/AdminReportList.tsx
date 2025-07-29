@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "../AdminPage.module.css";
 import { CommonModal } from "../components/AdminModal";
-import { AdminReportTab } from "../components/AdminReportTab";
 import { Pagination } from "../components/Pagination";
+import { AdminReportTab } from "./AdminReportTab";
 import { AdminSearch } from "./AdminSearch";
 
 type StatusType = "blind" | "processing" | "reject";
@@ -292,11 +292,6 @@ export function AdminReportList() {
   return (
     <div>
       <h1 className={styles.title}>신고 목록</h1>
-
-      {/* <AdminRegionTab
-        selectedRegionCode={selectedRegionCode}
-        onSelectRegion={handleRegionChange}
-      /> */}
 
       <AdminReportTab
         selectedType={selectedType}

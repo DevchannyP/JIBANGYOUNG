@@ -6,4 +6,5 @@ export interface AdminPost {
   region_id: number;
   views: number;
   likes: number;
+  nickname: string;
 }

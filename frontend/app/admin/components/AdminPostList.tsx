@@ -1,10 +1,11 @@
-import { deletePostById, featchAllPost } from "@/libs/api/admin/admin.api";
+import { featchAllPost } from "@/libs/api/admin/admin.api";
 import { AdminPost } from "@/types/api/adminPost";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../AdminPage.module.css";
 
 import { Pagination } from "../components/Pagination";
 import { useAdminRegion } from "../hooks/useAdminRegion";
+import { AdminPostRow } from "./AdminPostRow";
 import { AdminRegionTab } from "./AdminRegionTab";
 import { AdminSearch } from "./AdminSearch";
 
@@ -31,24 +32,35 @@ export function AdminPostList() {
       });
   }, []);
 
-  // 공통 필터 함수
+  // 게시글 지역 및 키워드로 필터링하는 함수
   const filterData = useCallback(
     (regionCode: number, keyword: string) => {
       const trimmed = keyword.trim().toLowerCase();
       const filtered = posts.filter((p) => {
-        const code2 = Number(String(p.region_id).slice(0, 2));
-        const matchRegion = regionCode === 0 || code2 === regionCode;
+        // 게시글의 지역 코드에서 앞 2자리만 추출하여 1000단위로 정규화 (예: 36110 → 36000)
+        const codePrefix = Math.floor(p.region_id / 1000) * 1000;
+
+        // 선택된 지역 코드도 동일하게 1000단위로 정규화
+        const normalizedRegionCode =
+          regionCode === 0 ? 0 : Math.floor(regionCode / 1000) * 1000;
+
+        // 지역 필터: 전체(0)이거나 지역코드 일치 여부 확인
+        const matchRegion =
+          normalizedRegionCode === 0 || codePrefix === normalizedRegionCode;
+
+        // 키워드 필터: 제목, 작성자ID, 작성일자에 포함 여부
         const matchKeyword =
           trimmed === "" ||
           p.title.toLowerCase().includes(trimmed) ||
-          p.id.toString().includes(trimmed) ||
+          p.nickname.toString().includes(trimmed) ||
           String(p.created_at).toLowerCase().includes(trimmed);
 
         return matchRegion && matchKeyword;
       });
 
+      // 결과 반영
       setSearchResult(filtered);
-      setCurrentPage(1);
+      setCurrentPage(1); // 페이지 초기화
     },
     [posts]
   );
@@ -72,20 +84,9 @@ export function AdminPostList() {
   );
 
   // 삭제 기능
-  const handleDelete = useCallback(
-    async (id: number) => {
-      try {
-        await deletePostById(id);
-        const updated = posts.filter((p) => p.id !== id);
-        setPosts(updated);
-        filterData(selectedRegionCode, searchKeyword);
-        alert("게시글이 삭제되었습니다.");
-      } catch (e: any) {
-        alert("게시글 삭제 실패: " + e.message);
-      }
-    },
-    [posts, filterData, selectedRegionCode, searchKeyword]
-  );
+  const handleDelete = async (id: number) => {
+    alert("게시글 삭제 실패");
+  };
 
   // 페이징
   const totalPages = Math.ceil(searchResult.length / ITEMS_PER_PAGE);
@@ -106,7 +107,7 @@ export function AdminPostList() {
         onSelectRegion={handleRegionChange}
       />
 
-      <AdminSearch placeholder="제목 검색" onSearch={handleSearch} />
+      <AdminSearch placeholder="제목, 작성자 검색" onSearch={handleSearch} />
 
       <div className={styles.tableWrapper}>
         <table className={styles.userTable}>
@@ -133,43 +134,18 @@ export function AdminPostList() {
                 </td>
               </tr>
             ) : (
-              paginatedData.map((p, index) => {
-                const code2 = Number(String(p.region_id).slice(0, 2));
-                const regionName =
-                  regionOptions.find((opt) => opt.code === code2)?.name ||
-                  p.region_id;
-
-                return (
-                  <tr key={p.id}>
-                    <td>
-                      {searchResult.length -
-                        ((currentPage - 1) * ITEMS_PER_PAGE + index)}
-                    </td>
-                    <td>{p.title}</td>
-                    <td>{p.user_id}</td>
-                    <td>{p.created_at}</td>
-                    <td>{p.views}</td>
-                    <td>{p.likes}</td>
-                    <td>{regionName}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className={styles.deleteBtn}
-                      >
-                        삭제
-                      </button>
-                      <a
-                        href={`/admin/posts/${p.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ marginLeft: "8px" }}
-                      >
-                        URL
-                      </a>
-                    </td>
-                  </tr>
-                );
-              })
+              paginatedData.map((p, index) => (
+                <AdminPostRow
+                  key={p.id}
+                  post={p}
+                  index={index}
+                  searchResultLength={searchResult.length}
+                  currentPage={currentPage}
+                  ITEMS_PER_PAGE={ITEMS_PER_PAGE}
+                  regionOptions={regionOptions}
+                  onDelete={handleDelete}
+                />
+              ))
             )}
           </tbody>
         </table>

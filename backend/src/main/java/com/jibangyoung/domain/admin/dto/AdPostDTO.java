@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.admin.dto;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +13,9 @@ public class AdPostDTO {
     private Long id;
     private String title;
     private Long user_id;
-    private LocalDate created_at;
+    private LocalDateTime created_at;
     private Long region_id;
     private int views;
     private int likes;
+    private String nickname;
 }
