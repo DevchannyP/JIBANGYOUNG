@@ -33,6 +33,9 @@ public class PostListDto {
     private Long regionId;
     private String regionName;
 
+    // 썸네일
+    private String thumbnailUrl;
+
     public static PostListDto from(Posts posts) {
         String regionName = RegionSidoMapper.getRegionName(posts.getRegionId());
         return PostListDto.builder()
@@ -40,6 +43,7 @@ public class PostListDto {
                 .title(posts.getTitle())
                 .category(posts.getCategory().name())
                 .likes(posts.getLikes())
+                .thumbnailUrl(posts.getThumbnailUrl())
                 .views(posts.getViews())
                 .createdAt(posts.getCreatedAt())
                 .userId(posts.getUserId())

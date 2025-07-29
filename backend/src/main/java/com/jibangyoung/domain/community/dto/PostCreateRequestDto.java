@@ -23,10 +23,10 @@ public class PostCreateRequestDto {
     private boolean isNotice;
     private boolean isMentorOnly;
 
-    public Posts toEntity(String thumbnailUrl) {
+    public Posts toEntity(String thumbnailUrl, String updatedContent) {
         return Posts.builder()
                 .title(title)
-                .content(content)
+                .content(updatedContent)
                 .tag(tag)
                 .category(Posts.PostCategory.valueOf(category)) // enum 변환
                 .userId(userId)

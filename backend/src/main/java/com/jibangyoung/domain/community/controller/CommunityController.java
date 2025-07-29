@@ -17,6 +17,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
     private final PresignedUrlService presignedUrlService;
+    private String publicUrl;
 
     @GetMapping("/region")
     public List<RegionResponseDto> getRegionCodes() {
@@ -47,7 +48,7 @@ public class CommunityController {
     // s3 이미지
     @PostMapping("/presign")
     public PresignedUrlResponse getPresignedUrl(@RequestBody PresignedUrlRequest request) {
-        String fileName = "post-images/" + request.getFileName();
+        String fileName = "temp/" + request.getFileName();
         String presignedUrl = presignedUrlService.generatePresignedUrl(fileName, request.getContentType());
         String publicUrl = presignedUrlService.getPublicUrl(fileName);
 

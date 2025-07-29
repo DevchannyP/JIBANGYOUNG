@@ -42,6 +42,7 @@ public class Posts {
     @Column(name = "category", nullable = false, length = 30)
     private PostCategory category;
 
+    // 썸네일
     @Column(name = "thumbnail_url", length = 500)
     private String thumbnailUrl;
 

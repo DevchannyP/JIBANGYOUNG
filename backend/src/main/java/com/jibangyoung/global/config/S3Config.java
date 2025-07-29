@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 @Configuration
@@ -23,7 +24,22 @@ public class S3Config {
     private String region;
 
     private S3Presigner presigner;
+    private S3Client s3Client;
 
+    // S3 Client
+    @Bean
+    public S3Client s3Client() {
+        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+        );
+        this.s3Client = S3Client.builder()
+                .region(Region.of(region))
+                .credentialsProvider(credentialsProvider)
+                .build();
+        return this.s3Client;
+    }
+
+    // Presigned URL
     @Bean
     public S3Presigner s3Presigner() {
         if (this.presigner == null) {
@@ -42,6 +58,9 @@ public class S3Config {
     public void shutdown() {
         if (this.presigner != null) {
             this.presigner.close();
+        }
+        if (this.s3Client != null) {
+            this.s3Client.close();
         }
     }
 }

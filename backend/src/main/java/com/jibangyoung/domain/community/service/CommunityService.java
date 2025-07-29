@@ -2,12 +2,11 @@ package com.jibangyoung.domain.community.service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.RegionResponseDto;
+import com.jibangyoung.domain.community.support.S3ImageManager;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
 import org.springframework.data.domain.Page;
@@ -31,6 +30,7 @@ public class CommunityService {
     private final RegionRepository regionRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final S3ImageManager s3ImageManager;
 
     // 지역 코드
     // 지역 시도
@@ -113,6 +113,7 @@ public class CommunityService {
         Page<Posts> postPage = postRepository.findByRegionPrefix(regionCode, pageable);
         return postPage.map(PostListDto::from);
     }
+
     public PostDetailDto getPostDetail(Long postId) {
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
@@ -120,18 +121,45 @@ public class CommunityService {
         return PostDetailDto.from(post);
     }
 
-
     public void write(PostCreateRequestDto request) {
         String content = request.getContent();
-        String thumbnailUrl  = "https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2025-07-19+171305.png";
-        if (content != null && !content.isBlank()) {
-            Pattern pattern = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?");
-            Matcher matcher = pattern.matcher(content);
-            if (matcher.find()) {
-                thumbnailUrl = matcher.group(1);
-            }
+
+        // 1. 본문에서 사용된 temp 이미지 key 추출
+        List<String> usedTempKeys = s3ImageManager.extractUsedTempImageKeys(content);
+
+        // 2. 모든 temp/ 이미지 key 조회
+        List<String> allTempKeys = s3ImageManager.getAllTempImageKeys();
+
+        // 3. 사용된 temp 이미지 → post-images/로 복사 + 경로 치환
+        Map<String, String> urlMapping = new HashMap<>();
+        for (String tempKey : usedTempKeys) {
+            String newKey = tempKey.replace("temp/", "post-images/");
+            s3ImageManager.copyObject(tempKey, newKey);
+            s3ImageManager.deleteObject(tempKey);
+
+            String oldUrl = s3ImageManager.getPublicUrl(tempKey);
+            String newUrl = s3ImageManager.getPublicUrl(newKey);
+            urlMapping.put(oldUrl, newUrl);
         }
-        Posts post = request.toEntity(thumbnailUrl);
+
+        // 4. content 내 temp 이미지 URL → post-images/ URL로 변경
+        for (Map.Entry<String, String> entry : urlMapping.entrySet()) {
+            content = content.replace(entry.getKey(), entry.getValue());
+        }
+
+        // 5. 사용되지 않은 temp 이미지 삭제
+        allTempKeys.stream()
+                .filter(key -> !usedTempKeys.contains(key))
+                .forEach(s3ImageManager::deleteObject);
+
+        // 6. 썸네일 재추출 (post-images로 치환된 content 기준)
+        String thumbnailUrl = Optional.ofNullable(
+                s3ImageManager.extractFirstImageUrl(content)
+        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/default-thumbnail.png");
+
+        // 7. 게시글 저장
+        Posts post = request.toEntity(thumbnailUrl, content);
         postRepository.save(post);
     }
+
 }

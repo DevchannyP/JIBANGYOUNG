@@ -51,7 +51,7 @@ build/
 # ✅ 모든 설정·보안 파일 포함
 # .env, .env.local, application.yml 등은 전부 Git에 포함
 # 따라서 아래는 주석 처리하거나 삭제
-# .env
+.env
 # .env.local
 # application.yml
 # infra/.env
