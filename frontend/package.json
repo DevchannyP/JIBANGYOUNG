@@ -36,6 +36,7 @@
     "react-hook-form": "^7.51.5",
     "react-joyride": "^2.6.1",
     "react-loading-skeleton": "^3.3.1",
+    "sharp": "^0.34.3",
     "zod": "^3.22.4",
     "zustand": "^5.0.6"
   },
