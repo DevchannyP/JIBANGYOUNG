@@ -6,7 +6,7 @@
    메인 페이지 스타일
    ================================ */
 .community-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 10px 10px;
   font-family: "SCDream", sans-serif;
@@ -19,7 +19,7 @@
    ================================ */
 .regionr-navigation {
   display: flex;
-  width: 1400px;
+  width: 1200px;
   justify-content: center;
   gap: 5px;
   margin: 0;

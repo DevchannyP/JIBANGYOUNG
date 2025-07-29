@@ -23,7 +23,11 @@ const SearchSection: React.FC<SearchSectionProps> = ({
 
   return (
     <form className={styles.searchForm} onSubmit={handleSubmit}>
+      <label htmlFor="searchTypeSelect" className={styles.searchLabel}>
+        검색 조건
+      </label>
       <select
+        id="searchTypeSelect"
         className={styles.searchSelect}
         value={searchType}
         onChange={(e) => onSearchTypeChange(e.target.value)}

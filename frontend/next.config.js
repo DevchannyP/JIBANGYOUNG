@@ -23,6 +23,11 @@ const nextConfig = {
       //   hostname: 'images.unsplash.com',
       //   pathname: '/**',
       // },
+      {
+      protocol: 'https',
+      hostname: 'jibangyoung-s3.s3.ap-northeast-2.amazonaws.com',
+      pathname: '/**',
+      },
     ],
   },
 

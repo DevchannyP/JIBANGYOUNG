@@ -92,6 +92,9 @@ public class Posts {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void increaseViews() {
+        this.views += 1;
+    }
     // 내부 enum으로 카테고리 정의
     @Getter
     public enum PostCategory {

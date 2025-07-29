@@ -7,11 +7,11 @@ interface Props {
   posts: PostListDto[];
 }
 
-export default function PopularPosts({ title, posts }: Props) {
+export default function PopularPosts({ posts }: Props) {
   return (
     <div className={styles["popular-card"]}>
       <div className={styles["popular-card-header"]}>
-        <h3>{title}</h3>
+        <h3>주간 인기순</h3>
         <span className={styles["icon"]}>👍</span>
       </div>
 
@@ -20,9 +20,7 @@ export default function PopularPosts({ title, posts }: Props) {
           <li key={post.id}>
             <div className={styles["rank"]}>{index + 1}</div>
             <div className={styles["title"]}>
-              <Link
-                href={`/community/${String(post.regionId).slice(0, 2)}/${post.id}`}
-              >
+              <Link href={`/community/${post.regionId}/${post.id}`}>
                 {post.title}
               </Link>
             </div>

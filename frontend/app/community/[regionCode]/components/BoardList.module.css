@@ -2,7 +2,7 @@
    메인 페이지 스타일
    ================================ */
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 10px 10px;
   font-family: "SCDream", sans-serif;
@@ -14,18 +14,19 @@
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  align-items: flex-start;
+  flex-direction: row;
 }
 
 .content {
-  flex: 1;
+
   background: white;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .sidebar {
-  width: 280px;
-  flex-shrink: 0;
+  flex: 1; /* 사이드바 영역이 적은 공간을 차지하도록 설정 */
 }
 
 /* ================================
@@ -37,86 +38,81 @@
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 290px); /* 고정 너비 4칸 */
+  gap: 8px; /* 카드 사이 여백 */
+  justify-content: center; /* 가운데 정렬 (선택 사항) */
 }
 
 .card {
+  width: 290px;
+  height: 200px;
   background: white;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-/* .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-} */
-
-.thumbnail {
   position: relative;
-  width: 100%;
-  height: 120px;
-  overflow: hidden;
+  cursor: pointer;
 }
 
-.thumbnailImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* 새로운 오버레이 카드 스타일 - 기존 카드 스타일과 분리 */
+.cardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
-.thumbnailFallback {
+.cardBackground {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.backgroundImage {
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0000009a;
+  z-index: 2;
+}
+
+.overlayContent {
+  position: relative;
+  z-index: 3;
   height: 100%;
-  background: rgb(182, 14, 14);
+  padding: 10px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-end;
   color: white;
-  font-size: 24px;
-  font-weight: bold;
 }
 
-.thumbnailFallback::before {
-  content: "📝";
-}
-
-.cardContent {
-  padding: 16px;
-}
-
-.cardTitle {
-  margin: 0 0 8px 0;
-  font-size: 14px;
+.overlayTitle {
+  font-size: 16px;
   font-weight: 600;
-  line-height: 1.4;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.cardTitle a {
-  color: #333;
-  text-decoration: none;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.cardTitle a:hover {
-  color: #007bff;
-}
-
-.cardDescription {
-  margin: 0;
-  color: #666;
+.overlayDescription {
   font-size: 12px;
+  margin: 0;
   line-height: 1.4;
+  opacity: 0.9;
   display: -webkit-box;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* ================================
@@ -218,7 +214,7 @@
 }
 
 .table {
-  width: 100%;
+  width: 875px;
   border-collapse: collapse;
   font-size: 14px;
 }
@@ -444,7 +440,6 @@
 
 .navButton {
   font-weight: bold;
-  user-select: none;
 }
 
 /* ================================
@@ -453,8 +448,8 @@
 
 .popular-card {
   flex: 0;
-  width: 500px;
-  height: 515px;
+  width: 300px;
+  height: 500px;
   background-color: #fff;
   border: 1px solid #19191928;
   border-radius: 0.5rem;
@@ -554,125 +549,4 @@
   background-color: #f0f0f0;
   padding: 2px 6px;
   border-radius: 12px;
-}
-
-/* ================================
-   반응형 미디어 쿼리
-   ================================ */
-@media (max-width: 1024px) {
-  .cardsGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .main {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-  }
-  
-  .cardsGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-  
-  .cardContent {
-    padding: 12px;
-  }
-  
-  .cardTitle {
-    font-size: 13px;
-  }
-  
-  .cardDescription {
-    font-size: 11px;
-  }
-  
-  .navigation {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  
-  .navButton,
-  .searchButton {
-    font-size: 12px;
-    padding: 8px 12px;
-  }
-  
-  .boardHeader {
-    padding: 16px;
-  }
-  
-  .boardTitle {
-    font-size: 16px;
-  }
-  
-  .writeButton {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-  
-  .bottomSection {
-    flex-direction: column;
-    gap: 20px;
-    padding: 16px;
-  }
-  
-  .table {
-    font-size: 12px;
-  }
-  
-  .headerRow th,
-  .tableRow td {
-    padding: 8px 4px;
-  }
-  
-  .noColumn {
-    width: 50px;
-  }
-  
-  .authorColumn,
-  .dateColumn {
-    width: 80px;
-  }
-  
-  .viewsColumn,
-  .commentsColumn {
-    width: 40px;
-  }
-  
-  .titleCell {
-    padding-left: 8px !important;
-  }
-  
-  .searchForm {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .searchInput {
-    width: 100%;
-  }
-  
-  .sidebarContainer {
-    padding: 16px;
-  }
-  
-  .sidebarTitle {
-    font-size: 14px;
-  }
-  
-  .sidebarLink {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .cardsGrid {
-    grid-template-columns: 1fr;
-  }
 }

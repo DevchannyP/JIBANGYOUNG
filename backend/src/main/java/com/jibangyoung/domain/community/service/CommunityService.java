@@ -9,6 +9,7 @@ import com.jibangyoung.domain.community.dto.RegionResponseDto;
 import com.jibangyoung.domain.community.support.S3ImageManager;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -114,10 +115,11 @@ public class CommunityService {
         return postPage.map(PostListDto::from);
     }
 
+    @Transactional
     public PostDetailDto getPostDetail(Long postId) {
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        System.out.println(post);
+        post.increaseViews();
         return PostDetailDto.from(post);
     }
 

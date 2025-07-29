@@ -54,7 +54,7 @@ build/
 .env
 backend/.env
 # .env.local
-# application.yml
+application.yml
 # infra/.env
 
 # -----------------------------------
