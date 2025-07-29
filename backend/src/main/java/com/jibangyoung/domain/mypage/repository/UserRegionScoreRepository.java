@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.mypage.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,6 @@ public interface UserRegionScoreRepository extends JpaRepository<UserRegionScore
     List<UserRegionScore> findByUserId(Long userId);
 
     List<UserRegionScore> findByRegionIdOrderByTotalScoreDesc(Integer regionId);
+
+    Optional<UserRegionScore> findByUserIdAndRegionId(Long userId, Integer regionId);
 }

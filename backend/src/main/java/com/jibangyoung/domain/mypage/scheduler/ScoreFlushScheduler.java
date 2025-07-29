@@ -20,6 +20,6 @@ public class ScoreFlushScheduler {
     // 10분마다 Redis→DB 점수 동기화
     @Scheduled(cron = "0 */10 * * * *")
     public void flushScoreJob() {
-        flushScoreService.flushAllScoresToDb();
+        flushScoreService.flushAllScoresToDB();
     }
 }

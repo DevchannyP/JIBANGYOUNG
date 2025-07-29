@@ -1,38 +1,19 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { getRegionScore } from "@/libs/api/mypage.api";
+import { useRegionScore } from "@/libs/hooks/useRegionScore";
 import type { RegionScoreDto, UserProfileDto } from "@/types/api/mypage.types";
+import { useMemo, useState } from "react";
 import styles from "../MyPageLayout.module.css";
 
-
-// region이 string or object or undefined 모두 지원하도록 안전화
+// region(관심지역) 안전 정규화: {id, name}[] 변환
 function normalizeRegionList(region: UserProfileDto["region"]): { id: number; name: string }[] {
   if (!region) return [];
-  // 이미 객체 배열(서버 리팩토링 후) 케이스
   if (Array.isArray(region) && typeof region[0] === "object") return region as any;
-  // 문자열 배열 케이스 (구 서버)
   if (Array.isArray(region)) return region.map((name, i) => ({ id: i + 1, name }));
-  // 단일 문자열 케이스
   return [{ id: 1, name: region as string }];
 }
 
-function RegionScoreSkeleton() {
-  return (
-    <section className={styles.mypageRegionScoreSkeleton} aria-busy="true">
-      <div className={styles.mypageSectionTitle} style={{ width: 120 }} />
-      <div className={styles.mypageRegionScoreRow} style={{ height: 38 }} />
-      <ul className={styles.mypageScoreList}>
-        {[...Array(3)].map((_, i) => (
-          <li key={i} style={{ width: 220, height: 21, marginBottom: 8 }} />
-        ))}
-      </ul>
-      <div className={styles.mypageProgressBox} style={{ height: 50 }} />
-    </section>
-  );
-}
-
+// 점수 이력 테이블(내부)
 function ScoreHistoryTable({ history }: { history?: RegionScoreDto["scoreHistory"] }) {
   if (!history?.length) return null;
   return (
@@ -61,18 +42,32 @@ function ScoreHistoryTable({ history }: { history?: RegionScoreDto["scoreHistory
   );
 }
 
+// 로딩 스켈레톤
+function RegionScoreSkeleton() {
+  return (
+    <section className={styles.mypageRegionScoreSkeleton} aria-busy="true">
+      <div className={styles.mypageSectionTitle} style={{ width: 120 }} />
+      <div className={styles.mypageRegionScoreRow} style={{ height: 38 }} />
+      <ul className={styles.mypageScoreList}>
+        {[...Array(3)].map((_, i) => (
+          <li key={i} style={{ width: 220, height: 21, marginBottom: 8 }} />
+        ))}
+      </ul>
+      <div className={styles.mypageProgressBox} style={{ height: 50 }} />
+    </section>
+  );
+}
+
+// 메인 패널
 export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
-  // regionList는 항상 [{id, name}, ...] 형식 보장
+  // 1. region 정규화 → [{id, name}, ...]
   const regionList = useMemo(() => normalizeRegionList(user.region), [user.region]);
   const [regionId, setRegionId] = useState(regionList[0]?.id ?? null);
 
-  const { data, isLoading, isError, refetch } = useQuery<RegionScoreDto>({
-    queryKey: ["region-score", regionId],
-    queryFn: () => getRegionScore(regionId!),
-    enabled: !!regionId,
-    staleTime: 1000 * 60 * 5,
-  });
+  // 2. 점수 데이터 fetch (React Query)
+  const { data, isLoading, isError, refetch } = useRegionScore(regionId ?? undefined);
 
+  // 3. 관심지역 없는 케이스
   if (!regionList.length || !regionId) {
     return (
       <section>
@@ -88,6 +83,7 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
     );
   }
 
+  // 4. 로딩/에러 처리
   if (isLoading) return <RegionScoreSkeleton />;
   if (isError || !data)
     return (
@@ -97,6 +93,7 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
       </div>
     );
 
+  // 5. 메인 UI + 이력테이블
   return (
     <section aria-labelledby="region-score-title">
       <div className={styles.mypageSectionTitle} id="region-score-title">
@@ -108,9 +105,9 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
           id="regionSelect"
           className={styles.mypageSelect}
           value={regionId ?? ""}
-          onChange={(e) => setRegionId(Number(e.target.value))}
+          onChange={e => setRegionId(Number(e.target.value))}
         >
-          {regionList.map((r) => (
+          {regionList.map(r => (
             <option key={r.id} value={r.id}>
               {r.name}
             </option>

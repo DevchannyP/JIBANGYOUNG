@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @IdClass(UserRegionScoreId.class)
 @Table(name = "user_region_score")
 public class UserRegionScore {
-
     @Id
     private Long userId;
 
@@ -41,6 +40,11 @@ public class UserRegionScore {
 
     public void addScore(long delta) {
         this.totalScore += delta;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void setTotalScore(Long totalScore) {
+        this.totalScore = totalScore;
         this.updatedAt = LocalDateTime.now();
     }
 }
