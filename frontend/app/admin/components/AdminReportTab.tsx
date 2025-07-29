@@ -1,30 +1,24 @@
 import styles from "../AdminPage.module.css";
 
-export interface AdminRegionTabProps {
-  regionOptions: { code: number; name: string }[];
-  selectedRegionCode: number;
-  onSelectRegion: (regionName: string, code: number) => void;
+type ReportType = "게시글" | "댓글" | "전체";
+
+interface Props {
+  selectedType: ReportType;
+  onSelectType: (type: ReportType) => void;
 }
 
-export function AdminRegionTab({
-  regionOptions,
-  selectedRegionCode,
-  onSelectRegion,
-}: AdminRegionTabProps) {
-  if (!regionOptions || regionOptions.length === 0)
-    return <div>지역 정보 없음</div>;
+const types: ReportType[] = ["전체", "게시글", "댓글"];
 
+export function AdminReportTab({ selectedType, onSelectType }: Props) {
   return (
-    <div className={styles.regionTabs}>
-      {regionOptions.map((region) => (
+    <div className={styles.tabWrapper}>
+      {types.map((type) => (
         <button
-          key={region.code}
-          onClick={() => onSelectRegion(region.name, region.code)}
-          className={
-            selectedRegionCode === region.code ? styles.activeRegion : ""
-          }
+          key={type}
+          onClick={() => onSelectType(type)}
+          className={`${styles.tabButton} ${selectedType === type ? styles.active : ""}`}
         >
-          {region.name}
+          {type}
         </button>
       ))}
     </div>
