@@ -1,8 +1,8 @@
+// com.jibangyoung.domain.mypage.dto.RegionScoreDto.java
 package com.jibangyoung.domain.mypage.dto;
 
 import java.util.List;
 
-// 정의
 public record RegionScoreDto(
         int regionId,
         String regionName,

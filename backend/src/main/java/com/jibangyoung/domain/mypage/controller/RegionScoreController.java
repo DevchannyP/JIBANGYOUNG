@@ -1,3 +1,4 @@
+// com.jibangyoung.domain.mypage.controller.RegionScoreController.java
 package com.jibangyoung.domain.mypage.controller;
 
 import java.util.List;
@@ -32,7 +33,10 @@ public class RegionScoreController {
 
     @Operation(summary = "특정 지역의 단일 점수 요약", description = "regionId로 해당 지역의 내 점수 상세 조회")
     @GetMapping("/{regionId}")
-    public ApiResponse<?> getRegionScore(@RequestParam Long userId, @PathVariable int regionId) {
+    public ApiResponse<RegionScoreDto> getRegionScore(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
+            @PathVariable int regionId) {
+        Long userId = userPrincipal.getId();
         return ApiResponse.success(scoreService.getRegionScore(userId, regionId));
     }
 
@@ -44,11 +48,12 @@ public class RegionScoreController {
         return ApiResponse.success(scoreService.getTopRankByRegion(regionId, size));
     }
 
-    @Operation(summary = "내 지역별 점수", description = "JWT 인증을 통해 로그인한 사용자의 모든 지역 점수 반환")
+    // ✅ [추가] 내 모든 지역별 점수 조회 (JWT 인증 필요)
+    @Operation(summary = "내 모든 지역별 점수", description = "JWT 인증을 통해 로그인한 사용자의 모든 지역 점수 반환")
     @GetMapping("/my")
     public ApiResponse<List<MyRegionScoreDto>> getMyRegionScores(
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
-        Long userId = userPrincipal.getId(); // ✅ JWT → SecurityContext → Principal ID 추출
+        Long userId = userPrincipal.getId();
         return ApiResponse.success(scoreService.getUserRegionScores(userId));
     }
 
@@ -58,4 +63,5 @@ public class RegionScoreController {
         scoreService.recordUserActivity(dto);
         return ApiResponse.success(null);
     }
+
 }
