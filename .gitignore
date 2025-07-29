@@ -52,6 +52,7 @@ build/
 # .env, .env.local, application.yml 등은 전부 Git에 포함
 # 따라서 아래는 주석 처리하거나 삭제
 .env
+backend/.env
 # .env.local
 # application.yml
 # infra/.env
