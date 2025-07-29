@@ -1,10 +1,12 @@
 "use client";
 
-import { getMyPosts, PostPreviewDto } from "@/libs/api/mypage.api";
-import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useUserStore } from "@/store/userStore";
+import { getMyPosts } from "@/libs/api/mypage.api";
+import type { PostPreviewDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
+
 
 // 카테고리 문자열 → 숫자 매핑 (필요시 수정)
 const CATEGORY_MAP: Record<string, number> = {

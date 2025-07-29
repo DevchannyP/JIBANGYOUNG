@@ -1,10 +1,7 @@
 "use client";
 
-import {
-  CommentPreviewDto,
-  deleteMyComment,
-  getMyComments,
-} from "@/libs/api/mypage.api";
+import { deleteMyComment, getMyComments } from "@/libs/api/mypage.api";
+import type { CommentPreviewDto } from "@/types/api/mypage.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import styles from "../MyPageLayout.module.css";
@@ -19,7 +16,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-// Skeleton
+// Skeleton UI
 function CommentListSkeleton() {
   return (
     <ul className={styles.mypageList} aria-busy="true">
@@ -50,7 +47,7 @@ function CommentListSkeleton() {
   );
 }
 
-// 페이지네이션 (불변)
+// Pagination: Spring Page 기반 페이징
 function Pagination({
   page,
   totalPages,
@@ -112,7 +109,7 @@ function Pagination({
   );
 }
 
-// ⭐ 반드시 userId를 props로!
+// ----- Main Component -----
 interface MyCommentListProps {
   userId: number;
 }
@@ -120,19 +117,17 @@ interface MyCommentListProps {
 export default function MyCommentList({ userId }: MyCommentListProps) {
   const [page, setPage] = useState(1);
   const size = 10;
-
   const queryClient = useQueryClient();
 
+  // Spring Page<CommentPreviewDto> 사용!
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: ["user", userId, "comments", { page, size }],
-    // 반드시 userId 포함해서 전달!
     queryFn: () => getMyComments({ userId, page, size }),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
 
-  // 반드시 (userId, commentId)
   const { mutate: handleDelete, isPending } = useMutation({
     mutationFn: (commentId: number) => deleteMyComment(userId, commentId),
     onSuccess: () => {
@@ -140,8 +135,10 @@ export default function MyCommentList({ userId }: MyCommentListProps) {
     },
   });
 
-  const totalCount = data?.totalCount ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalCount / size));
+  // Spring Page: 0-base 반환, 프론트는 1-base 유지
+  const content: CommentPreviewDto[] = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 1;
+  const currentPage = (data?.number ?? 0) + 1;
 
   if (isLoading || isFetching) return <CommentListSkeleton />;
   if (isError)
@@ -151,7 +148,7 @@ export default function MyCommentList({ userId }: MyCommentListProps) {
         <button onClick={() => refetch()}>다시 시도</button>
       </div>
     );
-  if (!data?.comments?.length) return <div>댓글이 없습니다.</div>;
+  if (!content.length) return <div>댓글이 없습니다.</div>;
 
   return (
     <section aria-labelledby="my-comments-title">
@@ -159,7 +156,7 @@ export default function MyCommentList({ userId }: MyCommentListProps) {
         내 댓글
       </div>
       <ul className={styles.mypageList}>
-        {data.comments.map((c: CommentPreviewDto) => (
+        {content.map((c: CommentPreviewDto) => (
           <li
             key={c.id}
             className={styles.mypageListItem}
@@ -191,7 +188,7 @@ export default function MyCommentList({ userId }: MyCommentListProps) {
           </li>
         ))}
       </ul>
-      <Pagination page={page} totalPages={totalPages} setPage={setPage} />
+      <Pagination page={currentPage} totalPages={totalPages} setPage={setPage} />
     </section>
   );
 }

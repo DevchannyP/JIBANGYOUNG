@@ -1,10 +1,12 @@
 "use client";
 
-import { getSurveyResponseGroups, SurveyResponseGroupDto } from "@/libs/api/mypage.api";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import { getSurveyResponseGroups } from "@/libs/api/mypage.api";
+import type { SurveyResponseGroupDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
+
 
 interface MySurveyResponseGroupListProps {
   userId?: number;
