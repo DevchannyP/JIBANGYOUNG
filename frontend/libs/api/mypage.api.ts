@@ -1,3 +1,4 @@
+// libs/api/mypage.api.ts
 import type {
   ActivityEventDto,
   CommentPreviewDto,
@@ -62,6 +63,7 @@ export async function getMyComments(
   params: GetMyCommentsParams
 ): Promise<PageResponse<CommentPreviewDto>> {
   const { userId, page = 1, size = 10 } = params;
+  // ✅ 이전 방식 복구: /mypage/users/${userId} (comments 아님)
   const res = await api.get(`/mypage/users/${userId}`, {
     params: { page: page - 1, size }, // Spring pageable 0-base!
   });
@@ -72,6 +74,7 @@ export async function deleteMyComment(
   userId: number,
   commentId: number
 ): Promise<void> {
+  // ✅ 이전 방식 복구: /mypage/users/${userId}/${commentId}
   await api.delete(`/mypage/users/${userId}/${commentId}`);
 }
 
@@ -107,25 +110,25 @@ export async function getSurveyResultRecommendRegion(
 }
 
 // ----------- [지역 점수/랭킹/내 점수/이벤트] -----------
-// ✅ 지역 점수 상세 조회
-export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
-  const res = await api.get(`/mypage/region-score/${regionId}`);
-  return res.data as RegionScoreDto;
-}
-
-// ✅ 내 모든 지역별 점수 리스트
-export async function getMyRegionScores(userId: number): Promise<MyRegionScoreDto[]> {
-  const res = await api.get("/mypage/region-score/my", { params: { userId } });
+export async function getMyRegionScores(): Promise<MyRegionScoreDto[]> {
+  // userId는 JWT에서 추출(백엔드 @AuthenticationPrincipal 사용)
+  const res = await api.get("/mypage/region-score/my");
   return res.data.data as MyRegionScoreDto[];
 }
 
-// ✅ 특정 지역 랭킹(TOP-N)
-export async function getRegionRanking(regionId: number, size = 10): Promise<RegionScoreRankingDto[]> {
+export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
+  const res = await api.get(`/mypage/region-score/${regionId}`);
+  return res.data.data as RegionScoreDto;
+}
+
+export async function getRegionRanking(
+  regionId: number,
+  size: number = 10
+): Promise<RegionScoreRankingDto[]> {
   const res = await api.get("/mypage/region-score/ranking", { params: { regionId, size } });
   return res.data.data as RegionScoreRankingDto[];
 }
 
-// ✅ 활동 이벤트 기록
 export async function postActivityEvent(dto: ActivityEventDto): Promise<void> {
   await api.post("/mypage/region-score/activity", dto);
 }

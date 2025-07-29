@@ -88,6 +88,7 @@ export interface RecommendRegionResultDto {
 }
 
 // ---------- [3] 지역 점수/랭킹/이벤트 DTO (추가) ----------
+// /types/api/mypage.types.ts
 export interface RegionScoreDto {
   regionId: number;
   regionName: string;
@@ -103,6 +104,7 @@ export interface RegionScoreDto {
     reason: string;
   }[];
 }
+
 
 // 내 모든 지역별 점수 (MyRegionScoreDto)
 export interface MyRegionScoreDto {

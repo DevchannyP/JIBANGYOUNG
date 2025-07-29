@@ -4,6 +4,7 @@ import type { Tab, UserProfileDto } from "@/types/api/mypage.types"; // ✅ 타�
 import { Suspense, lazy } from "react";
 import styles from "../MyPageLayout.module.css";
 
+
 // 동적 import (파일명은 실제 구조에 맞게)
 const ProfileEditPanel = lazy(() => import("./ProfileEditPanel"));
 const RegionScorePanel = lazy(() => import("./RegionScorePanel"));
