@@ -1,35 +1,33 @@
 import { fetchPostDetail } from "@/libs/api/community/community.api";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
 import PostDetail from "./PostDetail";
 
-interface PageProps {
+type Props = {
   params: {
     regionCode: string;
     postId: string;
   };
-}
+};
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { regionCode: string; postId: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   const { regionCode } = params;
-  const regionName = regionCode; // getRegionName(regionCode); 사용 시 await 붙이기
-
+  // regionName 조회시 await 등 사용 가능
   return {
-    title: `${regionName} 커뮤니티 - 지방청년`,
-    description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+    title: `${regionCode} 커뮤니티 - 지방청년`,
+    description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
     openGraph: {
-      title: `${regionName} 커뮤니티 - 지방청년`,
-      description: `${regionName} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+      title: `${regionCode} 커뮤니티 - 지방청년`,
+      description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
     },
   };
 }
-export default async function CommunityPage({ params }: PageProps) {
+export default async function CommunityPage({ params }: Props) {
   const { regionCode, postId } = params;
 
   const detail: DetailProps = await fetchPostDetail(postId);
