@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdRegionDTO {
-    private Long region_code;
+    private Integer region_code;
     private String sido; 
 }

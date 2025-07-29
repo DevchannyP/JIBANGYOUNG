@@ -22,7 +22,7 @@ async function safeFetch(
   }
 }
 
-// 사용자 리스트 조회 API
+// 관리자 데시보드_사용자 리스트 조회 API
 export async function fetchAllUsers(): Promise<AdminUser[]> {
   const response = await safeFetch("http://localhost:8080/api/admin/users", {
     method: "GET",
@@ -47,12 +47,12 @@ export async function fetchAllUsers(): Promise<AdminUser[]> {
   return response.json();
 }
 
-// 사용자 권한 변경 API
+// 관리자 데시보드_사용자 권한 변경 API
 export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
   const response = await safeFetch(
     "http://localhost:8080/api/admin/users/roles",
     {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -74,7 +74,7 @@ export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
   }
 }
 
-// 게시글 리스트 조회 API
+// 관리자 데시보드_게시글 리스트 조회 API
 export async function featchAllPost(): Promise<AdminPost[]> {
   const response = await safeFetch("http://localhost:8080/api/admin/posts", {
     method: "GET",
@@ -98,7 +98,7 @@ export async function featchAllPost(): Promise<AdminPost[]> {
   return response.json();
 }
 
-// 게시글 삭제 API
+// 관리자 데시보드_게시글 삭제 API
 export async function deletePostById(id: number): Promise<void> {
   const response = await safeFetch(
     "http://localhost:8080/api/admin/posts/${id}",
@@ -124,9 +124,9 @@ export async function deletePostById(id: number): Promise<void> {
   }
 }
 
-// 시/도 리스트 조회 API
+// 관리자 데시보드_시/도 리스트 조회 API
 export async function fetchAdminRegion(): Promise<AdminRegion[]> {
-  const response = await safeFetch("http://localhost:8080/api/admin/region", {
+  const response = await safeFetch("http://localhost:8080/api/mentor/region", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -145,3 +145,5 @@ export async function fetchAdminRegion(): Promise<AdminRegion[]> {
   }
   return response.json();
 }
+
+// 멘토 데시보드_유저 상태제어 리스트 API

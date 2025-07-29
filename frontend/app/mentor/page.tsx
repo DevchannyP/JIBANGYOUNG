@@ -1,3 +1,5 @@
-export default function HelloPage() {
-  return <h1>Hello, World!</h1>;
+import MentorShell from "./MentorShell";
+
+export default function Page() {
+  return <MentorShell />;
 }
