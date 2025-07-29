@@ -1,19 +1,17 @@
 "use client";
 
-import type { UserProfileDto } from "@/libs/api/mypage.api";
+import type { Tab, UserProfileDto } from "@/libs/api/mypage.api";
 import { Suspense, lazy } from "react";
 import styles from "../MyPageLayout.module.css";
-import type { Tab } from "./SidebarNav";
 
-// 패널 동적 import (SSR 미포함)
+// 패널 동적 import
 const ProfileEditPanel = lazy(() => import("./ProfileEditPanel"));
 const RegionScorePanel = lazy(() => import("./RegionScorePanel"));
 const MyPostList = lazy(() => import("./MyPostList"));
 const MyCommentList = lazy(() => import("./MyCommentList"));
-const MySurveyHistoryList = lazy(() => import("./MySurveyHistoryList"));
-const SurveyFavoritesPanel = lazy(() => import("./SurveyFavoritesPanel"));
-const MyAlertList = lazy(() => import("./MyAlertList"));
-const MyReportList = lazy(() => import("./MyReportList")); // ✅ 추가!
+const MySurveyAnswerList = lazy(() => import("./MySurveyAnswerList"));
+const MyReportList = lazy(() => import("./MyReportList"));
+// ✅ MyAlertList, alerts case 제거!
 
 interface PanelRouterProps {
   tab: Tab;
@@ -32,12 +30,8 @@ export default function PanelRouter({ tab, user }: PanelRouterProps) {
       case "comments":
         return <MyCommentList userId={user.id} />;
       case "surveys":
-        return <MySurveyHistoryList />;
-      case "favorites":
-        return <SurveyFavoritesPanel />;
-      case "alerts":
-        return <MyAlertList userId={user.id} />;
-      case "reports": // ✅ 추가!
+        return <MySurveyAnswerList userId={user.id} />;
+      case "reports":
         return <MyReportList userId={user.id} />;
       default:
         return (

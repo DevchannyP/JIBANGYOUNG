@@ -5,15 +5,14 @@ export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
 export type PostCategory = "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
 
+// ✅ "alerts" 탭 완전히 제거!
 export type Tab =
   | "edit"
   | "score"
   | "posts"
   | "comments"
   | "surveys"
-  | "favorites"
-  | "alerts"
-  | "reports"; // 반드시 포함!
+  | "reports"; // "alerts" 없음!
 
 // Sidebar 메뉴 구조
 export interface SidebarMenuItem {
@@ -42,7 +41,6 @@ export interface UserDto {
   createdAt: string;
   updatedAt: string;
 }
-
 export type UserProfileDto = UserDto;
 
 export interface PostPreviewDto {
@@ -73,19 +71,37 @@ export interface AlertInfoDto {
   isRead: boolean;
 }
 
-export interface SurveyHistoryDto {
-  id: number;
-  title: string;
-  participatedAt: string;
-  resultUrl?: string;
-  isFavorite: boolean;
+// ✅ [설문 응답: 응답 묶음/상세]
+export interface SurveyAnswerDto {
+  answerId: number;       // PK
+  responseId: number;     // 설문 1회 제출 묶음
+  userId: number;
+  questionId: string;
+  optionCode: string;
+  answerText: string;
+  answerWeight: number;
+  submittedAt: string;
 }
 
-export interface SurveyFavoriteDto {
-  id: number;
-  title: string;
-  isFavorite: boolean;
-  participatedAt?: string;
+// 묶음 그룹(1회 설문 제출)
+export interface SurveyResponseGroupDto {
+  responseId: number;
+  userId: number;
+  answerCount: number; // 해당 묶음의 답변 갯수
+  submittedAt: string;
+}
+
+// 설문 응답 묶음 리스트(페이지네이션)
+export interface SurveyResponseGroupsResponse {
+  responses: SurveyResponseGroupDto[];
+  totalCount: number;
+}
+
+// 추천 결과 DTO
+export interface RecommendRegionResultDto {
+  regionName: string;
+  score: number;
+  reason: string;
 }
 
 export interface RegionScoreDto {
@@ -104,7 +120,6 @@ export interface RegionScoreDto {
   }[];
 }
 
-
 export interface MyReportDto {
   id: number;
   targetType: string;         // POST | COMMENT | USER | POLICY
@@ -113,9 +128,7 @@ export interface MyReportDto {
   reasonDetail: string | null;
   createdAt: string;
   reviewResultCode: string;   // PENDING | APPROVED 등
-  // reviewedAt?: string;     // 필요시 확장
 }
-
 
 // ---------- [3] API 함수 ----------
 
@@ -203,60 +216,38 @@ export async function getMyAlerts(
   return res.data.data as GetMyAlertsResponse;
 }
 
-// [설문 이력]
-export interface GetMySurveyHistoryParams {
+// ✅ [설문 응답 묶음/상세/추천]
+export interface GetSurveyResponseGroupsParams {
   userId: number;
   page?: number;
   size?: number;
-  sort?: "recent" | "favorite";
 }
-export interface GetMySurveyHistoryResponse {
-  surveys: SurveyHistoryDto[];
-  totalCount: number;
-}
-export async function getMySurveyHistory(
-  params: GetMySurveyHistoryParams
-): Promise<GetMySurveyHistoryResponse> {
-  const { userId, page = 1, size = 10, sort = "recent" } = params;
-  const res = await api.get(
-    `/mypage/users/${userId}/surveys`, {
-      params: { page, size, sort }
-    }
-  );
-  return res.data.data as GetMySurveyHistoryResponse;
-}
-
-// [설문 즐겨찾기]
-export interface GetSurveyFavoritesParams {
-  userId: number;
-  page?: number;
-  size?: number;
-  sort?: "recent" | "title";
-}
-export interface GetSurveyFavoritesResponse {
-  favorites: SurveyFavoriteDto[];
-  totalCount: number;
-}
-export async function getSurveyFavorites(
-  params: GetSurveyFavoritesParams
-): Promise<GetSurveyFavoritesResponse> {
-  const { userId, page = 1, size = 10, sort = "recent" } = params;
-  const res = await api.get(
-    `/mypage/surveys/favorites`, {
-      params: { page, size, sort },
-      headers: { "X-User-Id": userId },
-    }
-  );
-  return res.data.data as GetSurveyFavoritesResponse;
-}
-
-export async function toggleSurveyFavorite(
-  userId: number,
-  favoriteId: number
-): Promise<void> {
-  await api.post(`/mypage/surveys/favorites/${favoriteId}/toggle`, null, {
-    headers: { "X-User-Id": userId },
+// 설문 응답 "묶음" 리스트
+export async function getSurveyResponseGroups({
+  userId,
+  page = 1,
+  size = 10,
+}: GetSurveyResponseGroupsParams): Promise<SurveyResponseGroupsResponse> {
+  const { data } = await api.get("/mypage/survey-response-groups", {
+    params: { userId, page, size }
   });
+  return data.data;
+}
+
+// 응답 묶음(responseId)별 문항 상세
+export async function getSurveyAnswersByResponseId(
+  responseId: number
+): Promise<SurveyAnswerDto[]> {
+  const { data } = await api.get(`/mypage/survey-responses/${responseId}/answers`);
+  return data.data; // SurveyAnswerDto[]
+}
+
+// 추천 결과 (responseId 기준)
+export async function getSurveyResultRecommendRegion(
+  responseId: number
+): Promise<RecommendRegionResultDto> {
+  const { data } = await api.get(`/mypage/survey-responses/${responseId}/recommend-region`);
+  return data.data;
 }
 
 // [지역 점수]
@@ -265,12 +256,10 @@ export async function getRegionScore(regionId: number): Promise<RegionScoreDto> 
   return res.data as RegionScoreDto;
 }
 
-// [신고 이력] -- 🆕 내 신고이력 API 통합 (envelope 패턴 없을 때 안전하게)
+// [신고 이력]
 export async function getMyReports(userId: number): Promise<MyReportDto[]> {
   if (!userId) throw new Error("로그인 정보가 필요합니다");
-  // ✅ baseURL이 "/api"라면 URL에 중복 prefix 없이!
   const res = await api.get("/mypage/reports", { params: { userId } });
-  // ✅ envelope 패턴/배열 모두 대응
   const reports = Array.isArray(res.data) ? res.data : res.data.data;
   if (!Array.isArray(reports)) throw new Error("신고내역 데이터 오류");
   return reports as MyReportDto[];

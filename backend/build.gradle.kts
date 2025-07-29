@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("application")
-    id("org.springframework.boot") version "3.5.3" // ✅ 최신 버전
+    id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.4"
 }
 
@@ -38,8 +38,8 @@ dependencies {
     }
 
     // --- Bean Validation (오류 해결용) ---
-    implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final") // ✅ 추가됨
-    implementation("jakarta.validation:jakarta.validation-api:3.0.2")         // ✅ 추가됨
+    implementation("org.hibernate.validator:hibernate-validator:8.0.1.Final")
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
 
     // --- OAuth2 ---
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
@@ -81,6 +81,22 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// === QueryDSL Q클래스 생성 디렉토리 추가 설정 ===
+val querydslDir = "build/generated/querydsl"
+
+sourceSets {
+    main {
+        java.srcDir(querydslDir)
+    }
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-parameters"))
+    options.generatedSourceOutputDirectory = file(querydslDir)
+    options.annotationProcessorPath = configurations.annotationProcessor.get()
+}
+
 // === 애플리케이션 엔트리포인트 설정 ===
 val mainClassFqcn = "com.jibangyoung.JibangyoungApplication"
 
@@ -90,12 +106,6 @@ application {
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
     mainClass.set(mainClassFqcn)
-}
-
-// === 컴파일러 설정 ===
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-parameters"))
 }
 
 // === 테스트 플랫폼 설정 ===

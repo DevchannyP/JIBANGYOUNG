@@ -13,7 +13,6 @@ export type Tab =
   | "posts"
   | "comments"
   | "surveys"
-  | "favorites"
   | "alerts"
   | "reports"; // ← 포함 OK
 
