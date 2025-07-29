@@ -1,3 +1,4 @@
+// com.jibangyoung.domain.mypage.service.ScoreService.java
 package com.jibangyoung.domain.mypage.service;
 
 import java.util.List;
@@ -23,20 +24,22 @@ public class ScoreService {
 
     private final UserActivityEventRepository activityRepo;
     private final UserRegionScoreRepository scoreRepo;
+    private final UserRegionScoreRepository userRegionScoreRepository;
+    // TODO: 게시글/댓글/멘토링 등 Repository 추가 주입 필요
 
-    /** 1. 단일 지역 점수 상세 조회 */
     @Transactional(readOnly = true)
     public RegionScoreDto getRegionScore(Long userId, int regionId) {
-        // region/user별 누적 점수 조회
+        // 점수 엔티티 조회
         UserRegionScore score = scoreRepo.findByUserIdAndRegionId(userId, regionId)
                 .orElse(new UserRegionScore(userId, regionId, 0L, null));
 
-        int postCount = getPostCount(userId, regionId);
-        int commentCount = getCommentCount(userId, regionId);
-        int mentoringCount = getMentoringCount(userId, regionId);
+        int postCount = getPostCount(userId, regionId); // 실제 구현 필요
+        int commentCount = getCommentCount(userId, regionId); // 실제 구현 필요
+        int mentoringCount = getMentoringCount(userId, regionId); // 실제 구현 필요
+
         int totalScore = score.getTotalScore() == null ? 0 : score.getTotalScore().intValue();
         double progress = Math.min(1.0, totalScore / 100.0);
-        int daysToMentor = 7; // TODO: 실제 계산
+        int daysToMentor = 7; // TODO: 실제 로직 적용
 
         List<ScoreHistoryItem> history = activityRepo
                 .findTop30ByUserIdAndRegionIdOrderByCreatedAtDesc(userId, regionId)
@@ -50,58 +53,14 @@ public class ScoreService {
         String regionName = getRegionName(regionId);
 
         return new RegionScoreDto(
-                regionId,
-                regionName,
-                postCount,
-                commentCount,
-                mentoringCount,
-                totalScore,
-                progress,
-                daysToMentor,
-                history);
+                regionId, regionName, postCount, commentCount, mentoringCount,
+                totalScore, progress, daysToMentor, history);
     }
 
-    /** 2. 지역별 TOP-N 랭킹 */
-    @Transactional(readOnly = true)
-    public List<RegionScoreDto> getTopRankByRegion(int regionId, int size) {
-        List<UserRegionScore> rank = scoreRepo.findByRegionIdOrderByTotalScoreDesc(regionId);
-        return rank.stream()
-                .limit(size)
-                .map(rs -> new RegionScoreDto(
-                        rs.getRegionId(),
-                        getRegionName(rs.getRegionId()),
-                        0, 0, 0,
-                        rs.getTotalScore() == null ? 0 : rs.getTotalScore().intValue(),
-                        0.0, 0,
-                        List.of()))
-                .collect(Collectors.toList());
-    }
-
-    /** 3. 내 모든 지역별 점수 */
-    @Transactional(readOnly = true)
-    public List<MyRegionScoreDto> getUserRegionScores(Long userId) {
-        return scoreRepo.findByUserId(userId).stream()
-                .map(r -> new MyRegionScoreDto(r.getRegionId(),
-                        r.getTotalScore() == null ? 0 : r.getTotalScore().intValue()))
-                .collect(Collectors.toList());
-    }
-
-    /** 4. 최근 활동 이력(점수 변동) 30건 */
-    @Transactional(readOnly = true)
-    public List<ScoreHistoryItem> getScoreHistory(Long userId, Integer regionId) {
-        return activityRepo.findTop30ByUserIdAndRegionIdOrderByCreatedAtDesc(userId, regionId)
-                .stream()
-                .map(ev -> new ScoreHistoryItem(
-                        ev.getCreatedAt() != null ? ev.getCreatedAt().toLocalDate().toString() : null,
-                        ev.getScoreDelta() == null ? 0 : ev.getScoreDelta(),
-                        ev.getActionType() == null ? "" : ev.getActionType()))
-                .collect(Collectors.toList());
-    }
-
-    /** 5. 활동 이벤트 기록 */
     @Transactional
     public void recordUserActivity(ActivityEventDto dto) {
-        activityRepo.save(UserActivityEvent.builder()
+        // UserActivityEvent 엔티티 생성 및 저장 (예시, 실제 필드 매칭 필요)
+        UserActivityEvent event = UserActivityEvent.builder()
                 .userId(dto.userId())
                 .regionId(dto.regionId())
                 .actionType(dto.actionType())
@@ -118,24 +77,47 @@ public class ScoreService {
                 .memo(dto.memo())
                 .createdAt(dto.createdAt())
                 .updatedAt(dto.updatedAt())
-                .build());
-        // TODO: Redis/ZSET 반영 등 실시간 동기화 필요시 추가
+                .build();
+        activityRepo.save(event);
     }
 
-    // --- 내부 통계용 (더미) 메소드 ---
+    @Transactional(readOnly = true)
+    public List<RegionScoreDto> getTopRankByRegion(int regionId, int size) {
+        List<UserRegionScore> rank = scoreRepo.findByRegionIdOrderByTotalScoreDesc(regionId);
+        return rank.stream()
+                .limit(size)
+                .map(rs -> new RegionScoreDto(
+                        rs.getRegionId(),
+                        getRegionName(rs.getRegionId()),
+                        0, 0, 0,
+                        rs.getTotalScore() == null ? 0 : rs.getTotalScore().intValue(),
+                        0.0, 0,
+                        List.of()))
+                .collect(Collectors.toList());
+    }
+
+    // ✅ [추가] 내 모든 지역별 점수 조회
+    public List<MyRegionScoreDto> getUserRegionScores(Long userId) {
+        return userRegionScoreRepository.findByUserId(userId)
+                .stream()
+                .map(entity -> new MyRegionScoreDto(entity.getRegionId(), entity.getTotalScore().intValue()))
+                .collect(Collectors.toList());
+    }
+
+    // ---- 실제 쿼리 구현 필요 (임시 더미) ----
     private int getPostCount(Long userId, int regionId) {
-        return 10;
+        return 0;
     }
 
     private int getCommentCount(Long userId, int regionId) {
-        return 8;
+        return 0;
     }
 
     private int getMentoringCount(Long userId, int regionId) {
-        return 2;
+        return 0;
     }
 
-    // --- regionId → regionName 예시 ---
+    // ---- regionId → regionName 매핑 ----
     private String getRegionName(int regionId) {
         return switch (regionId) {
             case 30123 -> "경기";
@@ -147,4 +129,5 @@ public class ScoreService {
             default -> "기타";
         };
     }
+
 }

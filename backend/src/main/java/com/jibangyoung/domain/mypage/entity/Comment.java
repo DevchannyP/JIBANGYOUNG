@@ -3,7 +3,6 @@ package com.jibangyoung.domain.mypage.entity;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.jibangyoung.domain.auth.entity.User;
 
@@ -28,8 +27,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "comment", indexes = {
         @Index(name = "idx_user_createdAt", columnList = "user_id, created_at")
 })
-@Where(clause = "is_deleted = false") // ✅ 전역 필터로 교체
 @SQLDelete(sql = "UPDATE comment SET is_deleted = true, updated_at = NOW() WHERE id = ?")
+// ✅ @Where(clause = "is_deleted = false") 제거
 public class Comment {
 
     @Id
