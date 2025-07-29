@@ -91,7 +91,7 @@ export default function Header() {
           지방청년
         </Link>
         <nav className="header-nav" aria-label="주요 메뉴">
-          <Link href="/community" className="header-nav-link">
+          <Link href="/community/main" className="header-nav-link">
             커뮤니티
           </Link>
           <Link href="/recommendation" className="header-nav-link">
