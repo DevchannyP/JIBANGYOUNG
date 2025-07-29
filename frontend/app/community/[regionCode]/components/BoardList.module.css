@@ -10,9 +10,8 @@
   background-color: #fdfdfd;
 }
 
-  .main {
-    flex-direction: column;
-  }
+.main {
+  flex-direction: column;
   display: flex;
   gap: 20px;
   margin-top: 20px;
