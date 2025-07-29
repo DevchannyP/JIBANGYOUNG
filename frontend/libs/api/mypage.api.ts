@@ -1,10 +1,12 @@
-// mypage.api.ts
 import type {
+  ActivityEventDto,
   CommentPreviewDto,
   GetMyPostsResponse,
+  MyRegionScoreDto,
   MyReportDto,
   RecommendRegionResultDto,
   RegionScoreDto,
+  RegionScoreRankingDto,
   SurveyAnswerDto,
   SurveyResponseGroupsResponse,
   UserProfileDto
@@ -56,7 +58,6 @@ export interface PageResponse<T> {
   // ...기타 Spring Page 필드
 }
 
-
 export async function getMyComments(
   params: GetMyCommentsParams
 ): Promise<PageResponse<CommentPreviewDto>> {
@@ -105,10 +106,28 @@ export async function getSurveyResultRecommendRegion(
   return data.data;
 }
 
-// ----------- [지역 점수] -----------
+// ----------- [지역 점수/랭킹/내 점수/이벤트] -----------
+// ✅ 지역 점수 상세 조회
 export async function getRegionScore(regionId: number): Promise<RegionScoreDto> {
-  const res = await api.get(`/api/mypage/region-score/${regionId}`);
+  const res = await api.get(`/mypage/region-score/${regionId}`);
   return res.data as RegionScoreDto;
+}
+
+// ✅ 내 모든 지역별 점수 리스트
+export async function getMyRegionScores(userId: number): Promise<MyRegionScoreDto[]> {
+  const res = await api.get("/mypage/region-score/my", { params: { userId } });
+  return res.data.data as MyRegionScoreDto[];
+}
+
+// ✅ 특정 지역 랭킹(TOP-N)
+export async function getRegionRanking(regionId: number, size = 10): Promise<RegionScoreRankingDto[]> {
+  const res = await api.get("/mypage/region-score/ranking", { params: { regionId, size } });
+  return res.data.data as RegionScoreRankingDto[];
+}
+
+// ✅ 활동 이벤트 기록
+export async function postActivityEvent(dto: ActivityEventDto): Promise<void> {
+  await api.post("/mypage/region-score/activity", dto);
 }
 
 // ----------- [신고 이력] -----------
@@ -119,4 +138,3 @@ export async function getMyReports(userId: number): Promise<MyReportDto[]> {
   if (!Array.isArray(reports)) throw new Error("신고내역 데이터 오류");
   return reports as MyReportDto[];
 }
-

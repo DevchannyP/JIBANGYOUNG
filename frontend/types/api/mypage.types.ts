@@ -1,5 +1,3 @@
-// mypage.types.ts
-
 // ---------- [1] ENUM/공통 타입 ----------
 export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
@@ -89,6 +87,7 @@ export interface RecommendRegionResultDto {
   reason: string;
 }
 
+// ---------- [3] 지역 점수/랭킹/이벤트 DTO (추가) ----------
 export interface RegionScoreDto {
   regionId: number;
   regionName: string;
@@ -96,13 +95,40 @@ export interface RegionScoreDto {
   commentCount: number;
   mentoringCount: number;
   score: number;
-  promotionProgress: number;
+  promotionProgress: number; // 0~1
   daysToMentor: number;
   scoreHistory: {
     date: string;
     delta: number;
     reason: string;
   }[];
+}
+
+// 내 모든 지역별 점수 (MyRegionScoreDto)
+export interface MyRegionScoreDto {
+  regionId: number;
+  score: number;
+}
+
+// TOP-N 랭킹 DTO
+export interface RegionScoreRankingDto {
+  userId: number;
+  nickname?: string;
+  regionId: number;
+  regionName: string;
+  score: number;
+}
+
+// 활동 이벤트 기록 DTO
+export interface ActivityEventDto {
+  userId: number;
+  regionId: number;
+  actionType: string;
+  refId?: number;
+  scoreDelta?: number;
+  ipAddr?: string;
+  userAgent?: string;
+  createdAt?: string;
 }
 
 export interface MyReportDto {
@@ -125,7 +151,6 @@ export interface GetMyCommentsResponse {
   comments: CommentPreviewDto[]; // ← page.content
   totalCount: number;            // ← page.totalElements
 }
-
 
 // ---------- [AlertInfoDto 타입 추가] ----------
 export interface AlertInfoDto {

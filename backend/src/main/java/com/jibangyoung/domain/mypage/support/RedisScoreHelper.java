@@ -1,5 +1,6 @@
 package com.jibangyoung.domain.mypage.support;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.jibangyoung.domain.mypage.dto.MyRegionScoreDto;
-import com.jibangyoung.domain.mypage.dto.RegionScoreDto;
+import com.jibangyoung.domain.mypage.dto.RegionScoreRankingDto;
 
-/**
- * Redis 점수 누적/랭킹 관리 Helper
- * - ZSET: region:score:{regionId} (userId→score)
- * - HASH: user:{userId}:region:scores (regionId→score)
- */
 @Component
 public class RedisScoreHelper {
 
@@ -34,35 +30,39 @@ public class RedisScoreHelper {
         redisTemplate.opsForHash().increment(hashKey, regionId.toString(), scoreDelta);
     }
 
-    // 지역별 TOP-N 랭킹
-    public List<RegionScoreDto> getTopRank(Integer regionId, int size) {
+    // ✅ 지역별 랭킹(TOP-N) 조회 - 랭킹은 전용 DTO로 반환
+    public List<RegionScoreRankingDto> getTopRank(Integer regionId, int size) {
         String zsetKey = "region:score:" + regionId;
         Set<org.springframework.data.redis.core.ZSetOperations.TypedTuple<Object>> topSet = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(zsetKey, 0, size - 1);
         if (topSet == null)
-            return List.of();
+            return Collections.emptyList();
+
         return topSet.stream()
-                .map(tuple -> new RegionScoreDto(Long.parseLong(tuple.getValue().toString()),
-                        tuple.getScore().intValue()))
+                .map(tuple -> new RegionScoreRankingDto(
+                        Long.parseLong(tuple.getValue().toString()), // userId
+                        tuple.getScore().intValue() // score
+                ))
                 .collect(Collectors.toList());
     }
 
-    // 내 지역별 점수 모두 조회
+    // 한 유저의 모든 지역별 점수 조회
     public List<MyRegionScoreDto> getUserRegionScores(Long userId) {
         String hashKey = "user:" + userId + ":region:scores";
         Map<Object, Object> all = redisTemplate.opsForHash().entries(hashKey);
         if (all == null)
-            return List.of();
+            return Collections.emptyList();
+
         return all.entrySet().stream()
-                .map(e -> new MyRegionScoreDto(Integer.parseInt(e.getKey().toString()),
-                        Integer.parseInt(e.getValue().toString())))
+                .map(e -> new MyRegionScoreDto(
+                        Integer.parseInt(e.getKey().toString()), // regionId
+                        Integer.parseInt(e.getValue().toString()) // score
+                ))
                 .collect(Collectors.toList());
     }
 
-    // 모든 지역별 전체 유저 점수 Map (배치용)
+    // [배치/통계용] 전체 지역별 유저 점수 Map
     public Map<Integer, Map<Long, Long>> getAllRegionScores() {
-        // 실제 운영에서는 scan/keys 대신 별도 집계 테이블, Redis SCAN 활용 권장
-        // 여기는 예시: region:score:* 모두 순회
         Map<Integer, Map<Long, Long>> result = new HashMap<>();
         Set<String> regionKeys = redisTemplate.keys("region:score:*");
         if (regionKeys != null) {
@@ -73,6 +73,7 @@ public class RedisScoreHelper {
                         .opsForZSet().rangeWithScores(zsetKey, 0, -1);
                 if (all == null)
                     continue;
+
                 Map<Long, Long> userScoreMap = all.stream()
                         .collect(Collectors.toMap(
                                 t -> Long.parseLong(t.getValue().toString()),

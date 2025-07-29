@@ -1,12 +1,21 @@
 package com.jibangyoung.domain.mypage.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
-/**
- * 지역별 랭킹/점수 DTO (Projection 최적화)
- */
-@Schema(description = "지역별 유저 점수 정보")
+// 정의
 public record RegionScoreDto(
-        @Schema(description = "유저 ID") Long userId,
-        @Schema(description = "점수") int score) {
+        int regionId,
+        String regionName,
+        int postCount,
+        int commentCount,
+        int mentoringCount,
+        int score,
+        double promotionProgress,
+        int daysToMentor,
+        List<RegionScoreDto.ScoreHistoryItem> scoreHistory) {
+    public record ScoreHistoryItem(
+            String date,
+            int delta,
+            String reason) {
+    }
 }
