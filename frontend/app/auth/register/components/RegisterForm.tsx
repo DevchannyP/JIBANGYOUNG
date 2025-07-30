@@ -29,7 +29,7 @@ function PasswordRules({ password, visible }: { password: string; visible: boole
         <li
           key={i}
           className={rule.check ? styles.rulePass : styles.ruleFail}
-          aria-checked={rule.check}
+          // aria-checked 제거: li에서는 미지원! (경고 발생)
         >
           {rule.text}
         </li>
@@ -127,14 +127,14 @@ export default function RegisterForm() {
         setIsUsernameValid(false);
       }
     }, 500),
-    []
+    [] // lint 경고 없이 안전 (함수 불변)
   );
   useEffect(() => {
     setIsUsernameValid(false);
     if (form.username.length >= 3) debouncedCheckUsername(form.username);
     else setUsernameMsg(null);
     return () => debouncedCheckUsername.cancel();
-  }, [form.username]);
+  }, [form.username]); // debouncedCheckUsername을 deps에 넣지 않음 (lint 경고X)
 
   // --- Debounced Email ---
   const debouncedCheckEmail = useCallback(
@@ -171,7 +171,7 @@ export default function RegisterForm() {
     if (form.email.includes("@")) debouncedCheckEmail(form.email);
     else setEmailMsg(null);
     return () => debouncedCheckEmail.cancel();
-  }, [form.email]);
+  }, [form.email]); // debouncedCheckEmail을 deps에 넣지 않음 (lint 경고X)
 
   // --- 인증코드 발송 ---
   const handleSendCode = useCallback(async () => {
@@ -193,7 +193,7 @@ export default function RegisterForm() {
     } catch (e: any) {
       setCodeMsg({ type: "error", text: e?.message || "발송 실패(서버 오류)" });
     }
-  }, [form.email, isEmailValid]);
+  }, [form.email, isEmailValid, sendCodeMut]);
 
   // --- 인증코드 확인 ---
   const handleVerifyCode = useCallback(async () => {
@@ -215,7 +215,7 @@ export default function RegisterForm() {
     } catch (e: any) {
       setCodeMsg({ type: "error", text: e?.message || "인증 실패(서버 오류)" });
     }
-  }, [form.email, form.code]);
+  }, [form.email, form.code, verifyCodeMut]);
 
   // --- 비밀번호 실시간 체크 ---
   useEffect(() => {
@@ -502,25 +502,25 @@ export default function RegisterForm() {
           {renderMsg(pwMsg)}
 
           {/* 2단계: 코드발송 후 추가필드 */}
-<AnimatePresence>
-  {showNext && (
-    <motion.div
-      key="step2"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 32 }}
-      transition={{ type: "spring", stiffness: 250, damping: 30 }}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "18px", // innerForm gap과 통일
-        margin: 0,
-        padding: 0,
-        background: "none",
-        borderRadius: 0,
-        boxShadow: "none",
-      }}
-    >
+          <AnimatePresence>
+            {showNext && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 32 }}
+                transition={{ type: "spring", stiffness: 250, damping: 30 }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "18px",
+                  margin: 0,
+                  padding: 0,
+                  background: "none",
+                  borderRadius: 0,
+                  boxShadow: "none",
+                }}
+              >
                 {/* 닉네임 */}
                 <div className={styles.formRow}>
                   <input
@@ -537,7 +537,6 @@ export default function RegisterForm() {
                     aria-label="닉네임"
                   />
                 </div>
-                {/* 이하 동일 */}
                 <div className={styles.formRow}>
                   <input
                     name="phone"
