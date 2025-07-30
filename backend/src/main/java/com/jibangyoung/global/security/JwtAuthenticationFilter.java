@@ -60,7 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return uri.startsWith("/api/auth/")
                 || uri.startsWith("/api/public/")
                 || uri.startsWith("/api/admin/")
-                || uri.startsWith("/api/mentor/")
+                // 멘토 테스트
+                // || uri.startsWith("/api/mentor/")
                 || uri.startsWith("/api/community/")
                 || uri.startsWith("/api/survey/")
                 || uri.startsWith("/api/dashboard/");

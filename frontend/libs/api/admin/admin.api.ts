@@ -1,5 +1,6 @@
 // libs/api/admin.api.ts
 
+import { AdMentorUser } from "@/types/api/adMentorUser";
 import { AdminPost } from "@/types/api/adminPost";
 import { AdminRegion } from "@/types/api/adminRegion";
 import { AdminUser } from "@/types/api/adminUser";
@@ -126,7 +127,7 @@ export async function deletePostById(id: number): Promise<void> {
 
 // 관리자 데시보드_시/도 리스트 조회 API
 export async function fetchAdminRegion(): Promise<AdminRegion[]> {
-  const response = await safeFetch("http://localhost:8080/api/mentor/region", {
+  const response = await safeFetch("http://localhost:8080/api/admin/region", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -146,4 +147,26 @@ export async function fetchAdminRegion(): Promise<AdminRegion[]> {
   return response.json();
 }
 
-// 멘토 데시보드_유저 상태제어 리스트 API
+// 멘토 데시보드_내 지역멘토 리스트 API
+export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
+  const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
+
+  const response = await safeFetch("http://localhost:8080/api/mentor/local", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    // credentials: "include", // JWT가 헤더로만 쓸 때는 굳이 필요 X
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "멘토 지역 유저 목록 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {}
+    throw new Error(apiError.message || "멘토 지역 유저 목록 조회 실패");
+  }
+
+  return response.json();
+}

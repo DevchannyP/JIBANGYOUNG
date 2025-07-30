@@ -45,7 +45,4 @@ public class MentorTest {
 
     @Column(name = "user_id")
     private Long userId; // BIGINT
-
-    @Column(name = "level_code", length = 30)
-    private String levelCode; // VARCHAR(30)
 }
