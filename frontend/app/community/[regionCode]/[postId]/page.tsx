@@ -1,3 +1,5 @@
+// app/community/[regionCode]/[postId]/page.tsx
+
 import { fetchPostDetail } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
 import styles from "../../Community.module.css";
