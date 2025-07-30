@@ -1,10 +1,6 @@
 // app/policy-survey/page.tsx
-import { Suspense } from 'react';
-import RecommendedSection from './components/RecommendedSection';
-import RelatedPoliciesSection from './components/RelatedPoliciesSection';
-import PolicySurveyClient from './policyResultClient';
-import TopCitiesSection from './components/TopCitiesSection';
 import './poli_cardnews.css';
+import PolicyResultClient from './policyResultClient';
 
 // SSR로 처리할 정적 데이터 - 간소화
 const getTopCitiesData = async () => {
@@ -86,22 +82,16 @@ const getRecommendedData = async () => {
     }
   ];
 };
+interface PageProps {
+  params: {
+    userId: string;
+    responseId: string;
+  };
+}
 
-export default async function PolicySurveyPage() {
-  const [topCitiesData, recommendedData] = await Promise.all([
-    getTopCitiesData(),
-    getRecommendedData()
-  ]);
+export default function PolicyResultPage({ params }: PageProps) {
+  const userId = Number(params.userId);
+  const responseId = Number(params.responseId);
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <TopCitiesSection data={topCitiesData} />
-      <RecommendedSection data={recommendedData} />
-      <RelatedPoliciesSection />
-      
-      <Suspense fallback={<div className="loading">Loading...</div>}>
-        <PolicySurveyClient />
-      </Suspense>
-    </div>
-  );
+  return <PolicyResultClient userId={userId} responseId={responseId} />;
 }

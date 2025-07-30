@@ -1,5 +1,6 @@
 'use client';
 
+import { createRecommendations } from '@/libs/api/recommendation.api';
 import { saveSurveyAnswers } from '@/libs/api/survey/surveyAnswer';
 import { useEffect, useState } from 'react';
 import NavigationButtons from './components/NavigationButtons';
@@ -117,6 +118,9 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
       console.log('전송 payload:', payload);
 
       const {userId, responseId} = await saveSurveyAnswers(payload);
+
+      // 설문 저장 후 추천 생성
+      await createRecommendations(userId, responseId);
 
       window.location.href = `../recommendation/${userId}/${responseId}`;
     } catch (error) {
