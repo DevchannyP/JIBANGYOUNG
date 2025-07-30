@@ -1,5 +1,5 @@
 // /libs/store/userStore.ts
-import { UserDto } from "@/libs/api/mypage.api"; // ✅ 타입 일원화된 곳에서 import
+import type { UserDto } from "@/types/api/mypage.types"; // ← 타입 전용 파일에서 import로 수정!
 import { create } from "zustand";
 
 interface UserStore {
