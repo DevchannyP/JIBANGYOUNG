@@ -93,7 +93,8 @@ async function getBoardData(searchParams: SearchParams) {
 export default async function BoardPage({ params, searchParams }: PageProps) {
   const { regionCode } = await params;
   const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
-  const data = await getBoardData(searchParams);
+  const searchData = await searchParams;
+  const data = await getBoardData(searchData);
 
   return (
     <div className={styles.container}>
