@@ -19,7 +19,7 @@ interface SearchParams {
 
 interface PageProps {
   params: Promise<{ regionCode: string }>;
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
 interface PopularPost {

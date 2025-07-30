@@ -12,7 +12,7 @@ interface PageProps {
     regionCode: string;
     postId: string;
   }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // ✅ SEO 메타데이터 (Next.js 15 기준, 반드시 await params)
