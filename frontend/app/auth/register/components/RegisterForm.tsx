@@ -29,7 +29,6 @@ function PasswordRules({ password, visible }: { password: string; visible: boole
         <li
           key={i}
           className={rule.check ? styles.rulePass : styles.ruleFail}
-          // aria-checked 제거: li에서는 미지원! (경고 발생)
         >
           {rule.text}
         </li>
@@ -104,9 +103,10 @@ export default function RegisterForm() {
   const verifyCodeMut = useVerifyCode();
   const signupMut = useSignup();
 
-  // --- Debounced Username ---
-  const debouncedCheckUsername = useCallback(
-    debounce(async (username: string) => {
+  // --- Debounced Username (useRef로 함수 저장, deps/ESLint 문제 해결) ---
+  const debouncedCheckUsernameRef = useRef<(username: string) => void>();
+  useEffect(() => {
+    debouncedCheckUsernameRef.current = debounce(async (username: string) => {
       if (!username || username.length < 3) {
         setUsernameMsg(null);
         setIsUsernameValid(false);
@@ -126,19 +126,26 @@ export default function RegisterForm() {
         setUsernameMsg({ type: "error", text: e?.message || "서버 오류" });
         setIsUsernameValid(false);
       }
-    }, 500),
-    [] // lint 경고 없이 안전 (함수 불변)
-  );
+    }, 500);
+    return () => {
+      debouncedCheckUsernameRef.current?.cancel?.();
+    };
+  }, [checkUsernameMut]);
+
   useEffect(() => {
     setIsUsernameValid(false);
-    if (form.username.length >= 3) debouncedCheckUsername(form.username);
-    else setUsernameMsg(null);
-    return () => debouncedCheckUsername.cancel();
-  }, [form.username]); // debouncedCheckUsername을 deps에 넣지 않음 (lint 경고X)
+    if (form.username.length >= 3 && debouncedCheckUsernameRef.current) {
+      debouncedCheckUsernameRef.current(form.username);
+    } else {
+      setUsernameMsg(null);
+    }
+    // no need to add debouncedCheckUsernameRef to deps (solves lint)
+  }, [form.username]);
 
-  // --- Debounced Email ---
-  const debouncedCheckEmail = useCallback(
-    debounce(async (email: string) => {
+  // --- Debounced Email (useRef로 함수 저장) ---
+  const debouncedCheckEmailRef = useRef<(email: string) => void>();
+  useEffect(() => {
+    debouncedCheckEmailRef.current = debounce(async (email: string) => {
       if (!email || !email.includes("@")) {
         setEmailMsg(null);
         setIsEmailValid(false);
@@ -158,9 +165,12 @@ export default function RegisterForm() {
         setEmailMsg({ type: "error", text: e?.message || "서버 오류" });
         setIsEmailValid(false);
       }
-    }, 500),
-    []
-  );
+    }, 500);
+    return () => {
+      debouncedCheckEmailRef.current?.cancel?.();
+    };
+  }, [checkEmailMut]);
+
   useEffect(() => {
     setIsEmailValid(false);
     setCodeSent(false);
@@ -168,10 +178,13 @@ export default function RegisterForm() {
     setCodeInputVisible(false);
     setShowNext(false);
     setCodeMsg(null);
-    if (form.email.includes("@")) debouncedCheckEmail(form.email);
-    else setEmailMsg(null);
-    return () => debouncedCheckEmail.cancel();
-  }, [form.email]); // debouncedCheckEmail을 deps에 넣지 않음 (lint 경고X)
+    if (form.email.includes("@") && debouncedCheckEmailRef.current) {
+      debouncedCheckEmailRef.current(form.email);
+    } else {
+      setEmailMsg(null);
+    }
+    // no need to add debouncedCheckEmailRef to deps (solves lint)
+  }, [form.email]);
 
   // --- 인증코드 발송 ---
   const handleSendCode = useCallback(async () => {
