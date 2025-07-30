@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jibangyoung.domain.recommendation.dto.RecommendationResultDto;
-import com.jibangyoung.domain.recommendation.entity.Recommendation;
 import com.jibangyoung.domain.recommendation.service.RecommendationAlgorithmService;
 import com.jibangyoung.domain.recommendation.service.RecommendationService;
 
@@ -35,13 +34,12 @@ public class RecommendationController {
 
     // 추천 결과 조회 (새로고침 시에도 안전)
     @GetMapping("/{userId}/{responseId}")
-    public ResponseEntity<List<Recommendation>> getRecommendations(
+    public ResponseEntity<List<RecommendationResultDto>> getRecommendations(
             @PathVariable Long userId,
             @PathVariable Long responseId) {
-        List<RecommendationResultDto> recommendations = recommendationResultService
-                .getRankedRecommendationsGroupedByRegion(
-                        userId,
-                        responseId);
-        return ResponseEntity.ok(recommendations);
+        List<RecommendationResultDto> result = recommendationResultService.getRankedRecommendationsGroupedByRegion(
+                userId,
+                responseId);
+        return ResponseEntity.ok(result);
     }
 }

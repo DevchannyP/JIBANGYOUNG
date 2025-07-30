@@ -1,7 +1,7 @@
-import { memo, useMemo, useCallback } from 'react';
-import PolicyCard from './PolicyCard';
-import styles from '../../total_policy.module.css';
 import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
+import { memo, useCallback, useMemo } from 'react';
+import styles from '../../total_policy.module.css';
+import PolicyCard from './PolicyCard';
 
 interface PolicyCardListProps {
   policies: PolicyCardType[];
@@ -107,12 +107,6 @@ const PolicyCardList = memo<PolicyCardListProps>(({
             </div>
           );
         })}
-      </div>
-      
-      {/* 스크린 리더를 위한 추가 정보 */}
-      <div className={styles.srOnly}>
-        총 {policies.length}개의 정책이 표시되고 있습니다.
-        {currentPage > 1 && ` 현재 ${currentPage}페이지입니다.`}
       </div>
     </section>
   );
