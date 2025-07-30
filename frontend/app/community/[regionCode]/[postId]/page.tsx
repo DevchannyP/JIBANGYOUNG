@@ -8,10 +8,10 @@ import { DetailProps } from "../../types";
 import PostDetail from "./PostDetail";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     regionCode: string;
     postId: string;
-  };
+  }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 

@@ -18,7 +18,7 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: { regionCode: string };
+  params: Promise<{ regionCode: string }>;
   searchParams: SearchParams;
 }
 
