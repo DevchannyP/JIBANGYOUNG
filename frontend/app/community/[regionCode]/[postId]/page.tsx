@@ -1,5 +1,3 @@
-// app/community/[regionCode]/[postId]/page.tsx
-
 import { fetchPostDetail } from "@/libs/api/community/community.api";
 import { Metadata, ResolvingMetadata } from "next";
 import styles from "../../Community.module.css";
@@ -20,7 +18,8 @@ export async function generateMetadata(
   { params }: PageProps,
   _parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const { regionCode } = params;
+  const awaitedParams = await params;         // 🔶 비동기 해제
+  const { regionCode } = awaitedParams;
 
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
@@ -34,7 +33,8 @@ export async function generateMetadata(
 
 // ✅ 게시글 상세 페이지
 export default async function CommunityPage({ params }: PageProps) {
-  const { regionCode, postId } = params;
+  const awaitedParams = await params;         // 🔶 비동기 해제
+  const { regionCode, postId } = awaitedParams;
   const detail: DetailProps = await fetchPostDetail(postId);
 
   return (

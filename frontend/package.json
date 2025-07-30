@@ -15,12 +15,11 @@
     "cy:open": "cypress open"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-build-classic": "^39.0.2",
     "@ckeditor/ckeditor5-react": "^11.0.0",
     "@radix-ui/react-dialog": "^1.0.6",
     "@tanstack/react-query": "^5.81.5",
     "axios": "^1.6.8",
-    "ckeditor5": "^46.0.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.10",
     "framer-motion": "^12.1.6",
@@ -41,7 +40,6 @@
     "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
     "@tanstack/react-query-devtools": "^5.81.5",
     "@testing-library/react": "^15.0.0",
     "@types/lodash.debounce": "^4.0.8",
@@ -53,7 +51,6 @@
     "eslint-config-next": "^15.3.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.11",
