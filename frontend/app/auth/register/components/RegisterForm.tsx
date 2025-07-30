@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import type { DebouncedFunc } from "lodash";
 import debounce from "lodash.debounce";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -103,8 +104,8 @@ export default function RegisterForm() {
   const verifyCodeMut = useVerifyCode();
   const signupMut = useSignup();
 
-  // --- Debounced Username (useRef로 함수 저장, deps/ESLint 문제 해결) ---
-  const debouncedCheckUsernameRef = useRef<(username: string) => void>();
+  // --- Debounced Username (cancel 타입 안전!) ---
+  const debouncedCheckUsernameRef = useRef<DebouncedFunc<(username: string) => void>>();
   useEffect(() => {
     debouncedCheckUsernameRef.current = debounce(async (username: string) => {
       if (!username || username.length < 3) {
@@ -128,7 +129,7 @@ export default function RegisterForm() {
       }
     }, 500);
     return () => {
-      debouncedCheckUsernameRef.current?.cancel?.();
+      debouncedCheckUsernameRef.current?.cancel();
     };
   }, [checkUsernameMut]);
 
@@ -139,11 +140,10 @@ export default function RegisterForm() {
     } else {
       setUsernameMsg(null);
     }
-    // no need to add debouncedCheckUsernameRef to deps (solves lint)
   }, [form.username]);
 
-  // --- Debounced Email (useRef로 함수 저장) ---
-  const debouncedCheckEmailRef = useRef<(email: string) => void>();
+  // --- Debounced Email (cancel 타입 안전!) ---
+  const debouncedCheckEmailRef = useRef<DebouncedFunc<(email: string) => void>>();
   useEffect(() => {
     debouncedCheckEmailRef.current = debounce(async (email: string) => {
       if (!email || !email.includes("@")) {
@@ -167,7 +167,7 @@ export default function RegisterForm() {
       }
     }, 500);
     return () => {
-      debouncedCheckEmailRef.current?.cancel?.();
+      debouncedCheckEmailRef.current?.cancel();
     };
   }, [checkEmailMut]);
 
@@ -183,7 +183,6 @@ export default function RegisterForm() {
     } else {
       setEmailMsg(null);
     }
-    // no need to add debouncedCheckEmailRef to deps (solves lint)
   }, [form.email]);
 
   // --- 인증코드 발송 ---
