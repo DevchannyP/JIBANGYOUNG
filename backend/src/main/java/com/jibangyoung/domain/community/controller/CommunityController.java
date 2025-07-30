@@ -28,6 +28,7 @@ public class CommunityController {
     public List<PostListDto> getTopLikedByPeriod(@RequestParam(defaultValue = "today") String period) {
         return communityService.getCachedTop10ByPeriod(period);
     }
+    // TODO : 최신 인기글
     @GetMapping("/popular")
     public Page<PostListDto> getPopularPosts(
             @RequestParam(defaultValue = "1") int page,

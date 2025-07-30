@@ -1,29 +1,86 @@
-import styles from "../MainSection.module.css";
+"use client";
 
-export default function Top10Card() {
+import { useRouter } from "next/navigation";
+import styles from "../MainSection.module.css";
+import type { PostListDto } from "@/app/community/types";
+
+const rankEmoji = ["🥇", "🥈", "🥉", "", "", "", "", "", "", ""];
+
+interface Props {
+  posts: PostListDto[];
+  isLoading: boolean;
+  isError: boolean;
+  error?: any;
+  currIdx: number;
+  onListHover?: (idx: number) => void;
+}
+
+export default function Top10Card({ posts, isLoading, isError, currIdx, onListHover }: Props) {
+  const router = useRouter();
+
+  if (isLoading)
+    return (
+      <section className={styles.top10Box} aria-busy="true">
+        <ul className={styles.top10ListBox}>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <li key={i} className={styles.top10ListItem}>
+              <span className={styles.top10ListRank}>{i + 1}</span>
+              <span className={styles.top10ListTitle}>로딩 중...</span>
+              <span className={styles.top10ListEmoji}>⏳</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+
+  if (isError)
+    return (
+      <section className={styles.top10Box}>
+        <ul className={styles.top10ListBox}>
+          <li className={styles.top10ListItem}>
+            <span className={styles.top10ListTitle}>인기글을 불러오지 못했습니다 😢</span>
+          </li>
+        </ul>
+      </section>
+    );
+
+  if (!posts.length)
+    return (
+      <section className={styles.top10Box}>
+        <ul className={styles.top10ListBox}>
+          <li className={styles.top10ListItem}>
+            <span className={styles.top10ListTitle}>등록된 인기글이 없습니다</span>
+          </li>
+        </ul>
+      </section>
+    );
+
   return (
-    <section className={styles.top10Card}>
-      <div className={styles.top10Header}>
-        주간 인기글 TOP10
-        <span className={styles.top10Icon}>👍</span>
-      </div>
-      <ol className={styles.top10List}>
-        <li>
-          <span className={styles.rank2}>2. 두번째 게시글 입니다...</span>{" "}
-          <span className={styles.emoji}>😊</span>
-        </li>
-        <li>
-          <span className={styles.rank3}>3. 요즘 10대들 행복요소 1위</span>{" "}
-          <span className={styles.emoji}>😊</span>
-        </li>
-        <li>4. 두번째 게시글 입니다...</li>
-        <li>5. 두번째 게시글 입니다...</li>
-        <li>6. 요즘 10대들 행복요소 1위</li>
-        <li>7. 두번째 게시글 입니다...</li>
-        <li>8. 두번째 게시글 입니다...</li>
-        <li>9. 두번째 게시글 입니다...</li>
-        <li>10. 두번째 게시글 입니다...</li>
-      </ol>
+    <section className={styles.top10Box} aria-label="주간 인기글 TOP10">
+      <ul className={styles.top10ListBox}>
+        {posts.slice(0, 10).map((post, idx) => (
+          <li
+            key={post.id || idx}
+            tabIndex={0}
+            className={
+              styles.top10ListItem +
+              (idx === currIdx ? ` ${styles.top10ListItemActive}` : "")
+            }
+            aria-label={`${idx + 1}위 ${post.title}`}
+            title={post.title}
+            onClick={() => router.push(`/community/post/${post.id}`)}
+            onKeyDown={e => ["Enter", " "].includes(e.key) && router.push(`/community/post/${post.id}`)}
+            onMouseEnter={() => onListHover?.(idx)}
+            onFocus={() => onListHover?.(idx)}
+          >
+            <span className={styles.top10ListRank}>{idx + 1}</span>
+            <span className={styles.top10ListTitle}>
+              {post.title?.length > 36 ? post.title.slice(0, 36) + "..." : post.title}
+            </span>
+            <span className={styles.top10ListEmoji}>{rankEmoji[idx] ?? "⭐"}</span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
