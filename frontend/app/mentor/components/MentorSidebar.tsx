@@ -23,16 +23,16 @@ export function MentorSidebar({
           </a>
         </li>
         <li
+          className={selectedMenu === "MentorList" ? styles.active : ""}
+          onClick={() => setSelectedMenu("MentorList")}
+        >
+          멘토 신청목록
+        </li>
+        <li
           className={selectedMenu === "mentorReport" ? styles.active : ""}
           onClick={() => setSelectedMenu("mentorReport")}
         >
           신고목록
-        </li>
-        <li
-          className={selectedMenu === "mentorStatus" ? styles.active : ""}
-          onClick={() => setSelectedMenu("mentorStatus")}
-        >
-          유저 상태 제어
         </li>
         <li
           className={selectedMenu === "mentorLocal" ? styles.active : ""}

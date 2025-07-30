@@ -2,22 +2,23 @@
 
 import { useState } from "react";
 import styles from "../admin/AdminPage.module.css";
+
+import { MentorList } from "./components/MentorList";
 import { MentorLocalList } from "./components/MentorLocalList";
 import { MentorLogList } from "./components/MentorLogList";
 import { MentorReportList } from "./components/MentorReportList";
 import { MentorSidebar } from "./components/MentorSidebar";
 import { MentorStatsList } from "./components/MentorStatsList";
-import { MentorStatusList } from "./components/MentorStatusList";
 
 export default function MentorShellPage() {
-  const [selectedMenu, setSelectedMenu] = useState("mentorReport"); // 기본 메뉴
+  const [selectedMenu, setSelectedMenu] = useState("MentorList"); // 기본 메뉴
 
   const renderContent = () => {
     switch (selectedMenu) {
+      case "MentorList":
+        return <MentorList />;
       case "mentorReport":
         return <MentorReportList />;
-      case "mentorStatus":
-        return <MentorStatusList />;
       case "mentorLocal":
         return <MentorLocalList />;
       case "mentorStats":

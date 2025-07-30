@@ -20,13 +20,15 @@ public class AdMentorUserController {
 
     private final AdMentorUserService adMentorUserService;
 
-    // 멘토 데시보드_유저 상태제어 리스트(동일 지역유저)
-    @GetMapping("/region")
+    // 멘토 데시보드_내 지역 멘토 리스트
+    @GetMapping("/local")
     public List<AdMentorUserDTO> getUsersByMentorRegion(
             @AuthenticationPrincipal CustomUserPrincipal loginUser
     ) {
-        // principal에서 로그인 한 유저 id 추출
+        System.out.println("[성공] 로그인 유저: id=" + loginUser.getId());
+
         Long userId = loginUser.getId();
         return adMentorUserService.getAdMentorId(userId);
     }
+
 }
