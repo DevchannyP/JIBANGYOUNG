@@ -70,14 +70,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
+#오예록
+#테스트 용도
       - name: 🧹 Clean TS & Next cache
         working-directory: frontend
         run: |
           rm -rf .next
           rm -rf node_modules/.cache
           rm -f tsconfig.tsbuildinfo
-          
+
+      - name: 🧪 Debug .next/types 존재 여부
+        working-directory: frontend
+        run: find .next/types || echo "No .next/types found"
+
+# 여기까지
       - name: 📦 Install Dependencies
         working-directory: frontend
         run: npm ci
