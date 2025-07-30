@@ -1,5 +1,6 @@
 'use client';
-import { fetchRecommendations } from '@/libs/api/recommendation.api';
+
+import { fetchRecommendationResults } from '@/libs/api/recommendation.api';
 import { useEffect, useState } from 'react';
 
 export default function PolicyResultClient({ userId, responseId }: { userId: number; responseId: number }) {
@@ -9,10 +10,10 @@ export default function PolicyResultClient({ userId, responseId }: { userId: num
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchRecommendations(userId, responseId); // POST 호출
+        const data = await fetchRecommendationResults(userId, responseId);
         setRecommendations(data);
       } catch (err) {
-        console.error('추천 생성 오류:', err);
+        console.error('추천 결과 조회 오류:', err);
       } finally {
         setLoading(false);
       }
@@ -22,23 +23,21 @@ export default function PolicyResultClient({ userId, responseId }: { userId: num
   }, [userId, responseId]);
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-4 p-6 animate-pulse">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-20 bg-gray-200 rounded-lg" />
-        ))}
-      </div>
-    );
+    return <div>로딩 중...</div>;
   }
 
   return (
-    <div className="p-6">
-      {recommendations.map((rec, idx) => (
-        <div key={idx} className="p-4 mb-4 border rounded-lg">
-          <h2 className="font-bold">{rec.policyName}</h2>
-          <p>{rec.description}</p>
-        </div>
-      ))}
+    <div>
+      {recommendations.length === 0 ? (
+        <p>추천 결과가 없습니다.</p>
+      ) : (
+        recommendations.map((rec, idx) => (
+          <div key={idx} className="p-4 mb-4 border rounded-lg">
+            <h2 className="font-bold">{rec.policyName}</h2>
+            <p>{rec.description}</p>
+          </div>
+        ))
+      )}
     </div>
   );
 }
