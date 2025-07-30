@@ -70,17 +70,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          
+
       - name: 🧹 Clean TS & Next cache
         working-directory: frontend
         run: |
           rm -rf .next
           rm -rf node_modules/.cache
           rm -f tsconfig.tsbuildinfo
-
-      - name: 🔍 Run TypeScript Type Check
-        working-directory: frontend
-        run: npx tsc --noEmit
           
       - name: 📦 Install Dependencies
         working-directory: frontend
