@@ -11,7 +11,7 @@ export async function generateMetadata({
 }: {
   params: { regionCode: string };
 }): Promise<Metadata> {
-  const { regionCode } = params;
+  const { regionCode } = await params;
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
     description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
@@ -28,7 +28,7 @@ export default async function CommunityPage({
 }: {
   params: { regionCode: string; postId: string };
 }) {
-  const { regionCode, postId } = params;
+  const { regionCode, postId } = await params;
   const detail: DetailProps = await fetchPostDetail(postId);
 
   return (
