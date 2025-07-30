@@ -97,7 +97,7 @@ export default async function BoardPage({ params, searchParams }: PageProps) {
 
   return (
     <div className={styles.container}>
-      <RegionSelector regionCode={regionCode} />
+      <RegionSelector/>
       <PopularPostCards posts={data.featuredPosts} />
       <BoardNavigation />
       <main className={styles.main}>

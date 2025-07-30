@@ -77,7 +77,7 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
         <label htmlFor="regionSelect" className={styles.regionSelectLabel}>
           지역 선택
         </label>
-        <select
+        {/* <select
           id="regionSelect"
           className={styles.regionSelect}
           value={regionId ?? ""}
@@ -89,7 +89,21 @@ export default function RegionScorePanel({ user }: { user: UserProfileDto }) {
               {`🌍 ${r.regionName} (${r.score}점)`}
             </option>
           ))}
-        </select>
+        </select> */}
+        <select
+  id="regionSelect"
+  className={styles.regionSelect}
+  value={regionId ?? ""}
+  onChange={e => setRegionId(Number(e.target.value))}
+  aria-label="내 점수 지역 선택"
+>
+  {regionList.map(r => (
+    <option key={r.regionId} value={r.regionId}>
+      {/* regionName이 없으므로 임시로 regionId로 표기 */}
+      {`🌍 지역ID ${r.regionId} (${r.score}점)`}
+    </option>
+  ))}
+</select>
       </div>
 
       {/* 상세 영역: Fade+Slide 트랜지션 */}

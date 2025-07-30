@@ -4,7 +4,6 @@ import styles from "../Community.module.css";
 import PaginationClient from "../components/PaginationClient";
 import PopularPostsByPeriod from "../components/PopularPostsByPeriod";
 import PopularPostTable from "../components/PopularPostTable";
-import RegionBoardNavigation from "../components/RegionBoardNavigation";
 import RegionSelector from "../components/RegionSelector"; // RegionSelector 임포트
 
 interface PageProps {
