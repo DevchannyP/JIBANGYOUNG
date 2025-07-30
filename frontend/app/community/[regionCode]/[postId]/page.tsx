@@ -1,5 +1,3 @@
-// app/community/[regionCode]/[postId]/page.tsx
-
 import { fetchPostDetail } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
 import styles from "../../Community.module.css";
@@ -20,10 +18,14 @@ interface PageProps {
 export async function generateMetadata(props: {
   params: { regionCode: string };
 }): Promise<Metadata> {
-  const { regionCode } = props.params;
+  const { regionCode } = params;
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
     description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+    openGraph: {
+      title: `${regionCode} 커뮤니티 - 지방청년`,
+      description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+    },
   };
 }
 export default async function CommunityPage({ params }: PageProps) {
