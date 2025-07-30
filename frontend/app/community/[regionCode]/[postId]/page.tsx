@@ -1,17 +1,26 @@
+// app/community/[regionCode]/[postId]/page.tsx
+
 import { fetchPostDetail } from "@/libs/api/community/community.api";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
 import PostDetail from "./PostDetail";
 
-// ✅ SEO 메타데이터 - 구조 분해 + 인라인 타입
-export async function generateMetadata({
-  params,
-}: {
-  params: { regionCode: string };
-}): Promise<Metadata> {
-  const { regionCode } = await params;
+interface PageProps {
+  params: {
+    regionCode: string;
+    postId: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+// ✅ SEO 메타데이터 (Next.js 15 기준, 반드시 await params)
+export async function generateMetadata(
+  { params }: PageProps,
+  _parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { regionCode } = await params; // ← 반드시 await!
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
     description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
@@ -22,13 +31,9 @@ export async function generateMetadata({
   };
 }
 
-// ✅ 게시글 상세 페이지 - 구조 분해 + 인라인 타입
-export default async function CommunityPage({
-  params,
-}: {
-  params: { regionCode: string; postId: string };
-}) {
-  const { regionCode, postId } = await params;
+// ✅ 게시글 상세 페이지 (Next.js 15 기준, 반드시 await params)
+export default async function CommunityPage({ params }: PageProps) {
+  const { regionCode, postId } = await params; // ← 반드시 await!
   const detail: DetailProps = await fetchPostDetail(postId);
 
   return (

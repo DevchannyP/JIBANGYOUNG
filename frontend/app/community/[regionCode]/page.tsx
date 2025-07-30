@@ -33,7 +33,7 @@ interface PopularPost {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { regionCode } = params;
+  const { regionCode } = await params;
 
   return {
     title: `${regionCode} 지역 게시판 - 협업 질문 및 모임 2025`,
@@ -91,7 +91,7 @@ async function getBoardData(searchParams: SearchParams) {
 
 // ✅ 메인 렌더링
 export default async function BoardPage({ params, searchParams }: PageProps) {
-  const { regionCode } = params;
+  const { regionCode } = await params;
   const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
   const data = await getBoardData(searchParams);
 
