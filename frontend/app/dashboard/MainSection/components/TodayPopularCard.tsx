@@ -2,7 +2,7 @@
 "use client";
 import type { PostListDto as _PostListDto } from "@/app/community/types";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "../MainSection.module.css";
 import { usePopularPostsQuery } from "./usePopularPostsQuery";
 
@@ -14,7 +14,8 @@ const FALLBACK = "/default-profile.webp";
 
 export default function TodayPopularCard() {
   const { data, isLoading, isError } = usePopularPostsQuery();
-  const posts: PostListDto[] = data?.posts ?? [];
+  // ✅ posts를 useMemo로!
+  const posts: PostListDto[] = useMemo(() => data?.posts ?? [], [data]);
 
   // UI 상태
   const [open, setOpen] = useState(false);
