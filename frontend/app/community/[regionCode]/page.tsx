@@ -18,8 +18,8 @@ interface SearchParams {
 }
 
 interface PageProps {
-  params: { regionCode: string };
-  searchParams: SearchParams;
+  params: Promise<{ regionCode: string }>;
+  searchParams: Promise<SearchParams>;
 }
 
 interface PopularPost {
@@ -33,7 +33,7 @@ interface PopularPost {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { regionCode } = params;
+  const { regionCode } = await params;
 
   return {
     title: `${regionCode} 지역 게시판 - 협업 질문 및 모임 2025`,
@@ -91,13 +91,14 @@ async function getBoardData(searchParams: SearchParams) {
 
 // ✅ 메인 렌더링
 export default async function BoardPage({ params, searchParams }: PageProps) {
-  const { regionCode } = params;
+  const { regionCode } = await params;
   const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
-  const data = await getBoardData(searchParams);
+  const searchData = await searchParams;
+  const data = await getBoardData(searchData);
 
   return (
     <div className={styles.container}>
-      <RegionSelector/>
+      <RegionSelector />
       <PopularPostCards posts={data.featuredPosts} />
       <BoardNavigation />
       <main className={styles.main}>
