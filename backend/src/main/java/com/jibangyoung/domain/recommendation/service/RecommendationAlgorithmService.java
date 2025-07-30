@@ -30,6 +30,7 @@ public class RecommendationAlgorithmService {
 
     @Transactional
     public List<Recommendation> generateRecommendations(Long userId, Long responseId) {
+        // 중복 체크
         // 1. 설문 응답 조회 (Map<questionId, optionCode>)
         Map<String, String> answers = loadSurveyAnswers(userId, responseId);
         System.out.println("======설문 응답 결과중 두 코드만 반환");

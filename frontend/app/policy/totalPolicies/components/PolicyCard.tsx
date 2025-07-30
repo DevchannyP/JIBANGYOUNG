@@ -1,6 +1,6 @@
+import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
 import React, { memo } from 'react';
 import styles from '../../total_policy.module.css';
-import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
 
 interface PolicyCardProps {
   policy: PolicyCardType;
@@ -11,7 +11,7 @@ interface PolicyCardProps {
 
 // D-Day 계산 함수
 const calculateDDay = (deadline: string): { text: string; isUrgent: boolean } => {
-  if (deadline === '2099-12-31') {
+  if (deadline === '2099-12-31' || deadline==='9999-12-31') {
     return { text: '상시', isUrgent: false };
   }
 

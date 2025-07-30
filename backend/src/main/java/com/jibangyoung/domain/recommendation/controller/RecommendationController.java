@@ -2,13 +2,17 @@ package com.jibangyoung.domain.recommendation.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jibangyoung.domain.recommendation.dto.RecommendationResultDto;
 import com.jibangyoung.domain.recommendation.entity.Recommendation;
 import com.jibangyoung.domain.recommendation.service.RecommendationAlgorithmService;
+import com.jibangyoung.domain.recommendation.service.RecommendationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,23 +22,26 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationController {
 
     private final RecommendationAlgorithmService recommendationService;
+    private final RecommendationService recommendationResultService;
 
+    // 추천 생성 (설문 제출 시 최초 한 번만 실행)
     @PostMapping("/{userId}/{responseId}")
-    public List<Recommendation> createRecommendations(@PathVariable Long userId,
+    public ResponseEntity<Void> createRecommendations(
+            @PathVariable Long userId,
             @PathVariable Long responseId) {
-        return recommendationService.generateRecommendations(userId, responseId);
+        recommendationService.generateRecommendations(userId, responseId);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    // @GetMapping("/{userId}/{responseId}")
-    // public List<Recommendation> getRecommendations(@PathVariable Long userId,
-    // @PathVariable Long responseId) {
-    // // 추천 결과 조회
-    // List<Recommendation> recommendations =
-    // recommendationService.getRecommendations(userId, responseId);
-
-    // // 조회 후 is_viewed = true로 업데이트
-    // recommendationService.markAsViewed(userId, responseId);
-
-    // return recommendations;
-    // }
+    // 추천 결과 조회 (새로고침 시에도 안전)
+    @GetMapping("/{userId}/{responseId}")
+    public ResponseEntity<List<Recommendation>> getRecommendations(
+            @PathVariable Long userId,
+            @PathVariable Long responseId) {
+        List<RecommendationResultDto> recommendations = recommendationResultService
+                .getRankedRecommendationsGroupedByRegion(
+                        userId,
+                        responseId);
+        return ResponseEntity.ok(recommendations);
+    }
 }
