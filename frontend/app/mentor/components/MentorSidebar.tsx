@@ -38,7 +38,7 @@ export function MentorSidebar({
           className={selectedMenu === "mentorLocal" ? styles.active : ""}
           onClick={() => setSelectedMenu("mentorLocal")}
         >
-          내 지역 멘토 목록
+          내 지역 멘토목록
         </li>
         <li
           className={selectedMenu === "mentorStats" ? styles.active : ""}

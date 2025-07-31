@@ -93,7 +93,7 @@ export function MentorLocalList() {
 
   return (
     <div>
-      <h1 className={styles.title}>내 지역 멘토 리스트</h1>
+      <h1 className={styles.title}>내 지역 멘토목록</h1>
 
       <AdminRegionTab
         regionOptions={regionOptions}

@@ -1,7 +1,7 @@
-import { MentorLog } from "./MentorLogList";
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
 
 interface MentorLogRowProps {
-  log: MentorLog;
+  log: AdMentorLogList;
   index: number;
   ITEMS_PER_PAGE: number;
   currentPage: number;
@@ -15,9 +15,15 @@ export function MentorLogRow({
 }: MentorLogRowProps) {
   return (
     <tr>
-      <td>{log.id.toString().padStart(2, "0")}</td>
-      <td>{log.level}</td>
-      <td>{log.region}</td>
+      {/* NO 컬럼: 전체순번 */}
+      <td>
+        {(ITEMS_PER_PAGE * (currentPage - 1) + index + 1)
+          .toString()
+          .padStart(2, "0")}
+      </td>
+      <td>{log.nickname}</td>
+      <td>{log.role}</td>
+      <td>{log.regionId ? log.regionId : log.regionId}</td>
       <td>{log.postCount}</td>
       <td>{log.commentCount}</td>
       <td>{log.reportProcessed}</td>
