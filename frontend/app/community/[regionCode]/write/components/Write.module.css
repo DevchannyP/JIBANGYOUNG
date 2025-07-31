@@ -1,6 +1,0 @@
-.ckeditorContainer {
-    height: 1000px;
-    width: 1400px;
-    min-height: 300px; /* 편집 영역의 최소 높이 */
-    max-height: 600px;
-}
