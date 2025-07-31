@@ -23,4 +23,6 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
 
     @Query("SELECT p FROM Posts p WHERE p.regionId = :regionCode ORDER BY p.createdAt DESC")
     Page<Posts> findByRegionPrefix(@Param("regionCode") String regionCode, Pageable pageable);
+
+
 }

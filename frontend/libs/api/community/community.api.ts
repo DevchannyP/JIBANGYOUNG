@@ -1,17 +1,14 @@
 import type { DetailProps } from "@/app/community/types";
 import { PostListDto } from "@/app/community/types";
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 // 최신 인기글 리스트 /api/community/popular?page=${page}&size=${size}
 export async function fetchPopularPosts(
-  page: number,
-  size: number = 10
+  page: number
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/popular?page=${page}&size=${size}`,
-    {
-      next: { revalidate: 300 },
-    }
-  );
+  const res = await fetch(`${BASE}/api/community/popular?page=${page}`, {
+    next: { revalidate: 300 },
+  });
 
   if (!res.ok) {
     throw new Error("인기글 데이터를 불러오지 못했습니다");
@@ -24,13 +21,27 @@ export async function fetchPopularPosts(
     totalPages: data.totalPages,
   };
 }
-//
-export async function fetchCommunityPostsByRegion(
+
+export async function fetchPopularPostsByPeriod(
+  period: "today" | "week" | "month"
+): Promise<PostListDto[]> {
+  const res = await fetch(`${BASE}/api/community/top-liked?period=${period}`, {
+    // 서버 컴포넌트에서 최신 데이터 가져오기 위해 사용
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`API 요청 실패: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json();
+}
+export async function fetchPostsByRegion(
   regionCode: string,
-  page: number = 1
+  page: number
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/region/${regionCode}?page=${page}`,
+    `${BASE}/api/community/region/${regionCode}?page=${page}`,
     {
       next: { revalidate: 3 },
     }
@@ -49,10 +60,9 @@ export async function fetchCommunityPostsByRegion(
 }
 
 export async function fetchPostDetail(postId: string): Promise<DetailProps> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/post/${postId}`,
-    { cache: "no-store" }
-  );
+  const res = await fetch(`${BASE}/api/community/post/${postId}`, {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     throw new Error("게시글 상세 정보를 불러오지 못했습니다");
@@ -82,19 +92,17 @@ export async function createCommunityPost(
   payload: CreatePostRequest
 ): Promise<void> {
   console.log(payload);
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/community/write`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
+  const res = await fetch(`${BASE}/api/community/write`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
   if (!res.ok) {
-    const error = await res.text();
-    throw new Error(`게시글 등록 실패: ${error}`);
+    const errorData = await res.json();
+    alert(errorData[0].defaultMessage);
+    throw new Error(errorData[0].defaultMessage);
   }
 }

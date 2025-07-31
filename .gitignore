@@ -18,7 +18,7 @@ pnpm-debug.log*
 # ☕ Java/Gradle 캐시 (백엔드)
 .gradle/
 build/
-*/build/
+*/build/            
 *.class
 
 # Gradle wrapper는 예외적으로 포함

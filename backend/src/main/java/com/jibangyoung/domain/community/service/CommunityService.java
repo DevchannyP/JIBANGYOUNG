@@ -41,11 +41,16 @@ public class CommunityService {
 
         Map<String, Map<String, RegionResponseDto>> regionMap = new LinkedHashMap<>();
 
+        // 시도 , 군구1 + 군구2 데이터 통합
+        // 시도 : 경기도
+        // 군구 : 수원시 팔달구
         for (Region region : regions) {
+            if (region.getRegionCode() == 99999) {continue;}
             String sido = region.getSido();
             String guGun1 = region.getGuGun1();
 
             String finalGuGun = (guGun1 == null || guGun1.trim().isEmpty()) ? sido : guGun1;
+            finalGuGun += (region.getGuGun2() == null || region.getGuGun2().trim().isEmpty()) ? "" : " " + region.getGuGun2();
 
             regionMap.putIfAbsent(sido, new HashMap<>());
             Map<String, RegionResponseDto> guGunMap = regionMap.get(sido);
@@ -55,15 +60,7 @@ public class CommunityService {
                     .sido(sido)
                     .guGun(finalGuGun)
                     .build();
-
-            if (guGunMap.containsKey(finalGuGun)) {
-                RegionResponseDto existingDto = guGunMap.get(finalGuGun);
-                if (region.getRegionCode() < existingDto.getRegionCode()) {
-                    guGunMap.put(finalGuGun, dto);
-                }
-            } else {
-                guGunMap.put(finalGuGun, dto);
-            }
+            guGunMap.put(finalGuGun, dto);
         }
 
         return regionMap.values().stream()
@@ -126,13 +123,13 @@ public class CommunityService {
     public void write(PostCreateRequestDto request) {
         String content = request.getContent();
 
-        // 1. 본문에서 사용된 temp 이미지 key 추출
+        // 본문에서 사용된 temp 이미지 key 추출
         List<String> usedTempKeys = s3ImageManager.extractUsedTempImageKeys(content);
 
-        // 2. 모든 temp/ 이미지 key 조회
+        // 모든 temp/ 이미지 key 조회
         List<String> allTempKeys = s3ImageManager.getAllTempImageKeys();
 
-        // 3. 사용된 temp 이미지 → post-images/로 복사 + 경로 치환
+        // 사용된 temp 이미지 post-images/로 복사
         Map<String, String> urlMapping = new HashMap<>();
         for (String tempKey : usedTempKeys) {
             String newKey = tempKey.replace("temp/", "post-images/");
@@ -144,24 +141,23 @@ public class CommunityService {
             urlMapping.put(oldUrl, newUrl);
         }
 
-        // 4. content 내 temp 이미지 URL → post-images/ URL로 변경
+        // 4. content temp 이미지 URL, post-images/ URL로 변경
         for (Map.Entry<String, String> entry : urlMapping.entrySet()) {
             content = content.replace(entry.getKey(), entry.getValue());
         }
 
-        // 5. 사용되지 않은 temp 이미지 삭제
+        // 사용되지 않은 temp 이미지 삭제
         allTempKeys.stream()
                 .filter(key -> !usedTempKeys.contains(key))
                 .forEach(s3ImageManager::deleteObject);
 
-        // 6. 썸네일 재추출 (post-images로 치환된 content 기준)
+        // 썸네일 재추출 (post-images로 치환된 content 기준)
         String thumbnailUrl = Optional.ofNullable(
                 s3ImageManager.extractFirstImageUrl(content)
         ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/default-thumbnail.png");
 
-        // 7. 게시글 저장
+        // 게시글 저장
         Posts post = request.toEntity(thumbnailUrl, content);
         postRepository.save(post);
     }
-
 }

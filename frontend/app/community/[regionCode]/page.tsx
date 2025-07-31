@@ -1,6 +1,6 @@
 // app/community/[regionCode]/page.tsx
 
-import { fetchCommunityPostsByRegion } from "@/libs/api/community/community.api";
+import { fetchPostsByRegion } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
 import PaginationClient from "../components/PaginationClient";
 import RegionSelector from "../components/RegionSelector";
@@ -29,7 +29,6 @@ interface PopularPost {
   thumbnail: string;
 }
 
-// ✅ SEO 메타데이터
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -42,8 +41,6 @@ export async function generateMetadata({
     openGraph: {
       title: `${regionCode} 지역 게시판 - 협업 질문 및 모임 2025`,
       description: `${regionCode} 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판`,
-      type: "website",
-      url: `https://example.com/board/${regionCode}`,
     },
     robots: {
       index: true,
@@ -52,7 +49,6 @@ export async function generateMetadata({
   };
 }
 
-// ✅ SSR fetch (검색 등 향후 확장 가능)
 async function getBoardData(searchParams: SearchParams) {
   const page = parseInt(searchParams.page || "1");
 
@@ -89,10 +85,16 @@ async function getBoardData(searchParams: SearchParams) {
   };
 }
 
-// ✅ 메인 렌더링
 export default async function BoardPage({ params, searchParams }: PageProps) {
+  const pageParam = (await searchParams).page ?? "1";
+  const currentPage = parseInt(pageParam, 10);
+
+  console.log(currentPage);
   const { regionCode } = await params;
-  const { posts, totalPages } = await fetchCommunityPostsByRegion(regionCode);
+  const { posts, totalPages } = await fetchPostsByRegion(
+    regionCode,
+    currentPage
+  );
   const searchData = await searchParams;
   const data = await getBoardData(searchData);
 
