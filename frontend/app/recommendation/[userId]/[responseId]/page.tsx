@@ -7,8 +7,9 @@ interface PageProps {
   };
 }
 
-const Page = ({ params }: PageProps) => {
-  const userId = Number(params.userId); // ✅ "123" → 123
+// ✅ 여기를 async function으로 변경
+const Page = async ({ params }: PageProps) => {
+  const userId = Number(params.userId);
   const responseId = Number(params.responseId);
 
   if (isNaN(userId) || isNaN(responseId)) {
