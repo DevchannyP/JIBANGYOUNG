@@ -45,12 +45,15 @@ public class CommunityService {
         // 시도 : 경기도
         // 군구 : 수원시 팔달구
         for (Region region : regions) {
-            if (region.getRegionCode() == 99999) {continue;}
+            if (region.getRegionCode() == 99999) {
+                continue;
+            }
             String sido = region.getSido();
             String guGun1 = region.getGuGun1();
 
             String finalGuGun = (guGun1 == null || guGun1.trim().isEmpty()) ? sido : guGun1;
-            finalGuGun += (region.getGuGun2() == null || region.getGuGun2().trim().isEmpty()) ? "" : " " + region.getGuGun2();
+            finalGuGun += (region.getGuGun2() == null || region.getGuGun2().trim().isEmpty()) ? ""
+                    : " " + region.getGuGun2();
 
             regionMap.putIfAbsent(sido, new HashMap<>());
             Map<String, RegionResponseDto> guGunMap = regionMap.get(sido);
@@ -73,12 +76,21 @@ public class CommunityService {
     // 추천 수 기준 상위 10개를 내림차 순 조회.
     public List<PostListDto> getTopReviews() {
         return postRepository
-                .findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory.REVIEW)
+                .findTop10ByCategoryAndIsDeletedFalseOrderByLikesDesc(Posts.PostCategory.SETTLEMENT_REVIEW)
                 .stream()
                 .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
 
+    // 카테고리가 정착후기인 게시글 중,
+    // 추천 수 기준 상위 10개를 내림차 순 조회.
+    public List<PostListDto> getTopReviews() {
+        return postRepository
+                .findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory.REVIEW)
+                .stream()
+                .map(PostListDto::from)
+                .collect(Collectors.toList());
+    }
 
     // 최근 since 시점 이후 작성된 게시글 중,
     // 추천 수 기준 상위 10개를 내림차 순 조회.
@@ -164,8 +176,8 @@ public class CommunityService {
 
         // 썸네일 재추출 (post-images로 치환된 content 기준)
         String thumbnailUrl = Optional.ofNullable(
-                s3ImageManager.extractFirstImageUrl(content)
-        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/main/%ED%9B%84%EB%8B%88.png");
+                s3ImageManager.extractFirstImageUrl(content))
+                .orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/main/%ED%9B%84%EB%8B%88.png");
 
         // 게시글 저장
         Posts post = request.toEntity(thumbnailUrl, content);
@@ -175,7 +187,8 @@ public class CommunityService {
     public Page<PostListDto> getPostsByRegionPopular(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
-        Page<Posts> postPage = postRepository.findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(Long.valueOf(regionCode), 10 , pageable);
+        Page<Posts> postPage = postRepository
+                .findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(Long.valueOf(regionCode), 10, pageable);
         return postPage.map(PostListDto::from);
     }
 

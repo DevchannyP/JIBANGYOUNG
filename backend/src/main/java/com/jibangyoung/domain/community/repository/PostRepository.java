@@ -30,4 +30,5 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     // Category 추천수 이상 글 목록
     List<Posts> findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory postCategory);
 
+    List<Posts> findTop10ByCategoryAndIsDeletedFalseOrderByLikesDesc(Posts.PostCategory postCategory);
 }
