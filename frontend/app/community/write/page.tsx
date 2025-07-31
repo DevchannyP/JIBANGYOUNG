@@ -1,5 +1,5 @@
 "use client";
-
+// TODO : 서버컴포넌트 마킹
 import { createCommunityPost } from "@/libs/api/community/community.api";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
