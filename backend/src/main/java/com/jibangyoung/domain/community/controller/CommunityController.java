@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.jibangyoung.domain.community.dto.*;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ public class CommunityController {
     private final PresignedUrlService presignedUrlService;
     private String publicUrl;
 
+    //지역 코드
     @GetMapping("/region")
     public List<RegionResponseDto> getRegionCodes() {
         return communityService.getAllRegionsBoard();
@@ -35,6 +37,7 @@ public class CommunityController {
             @RequestParam(defaultValue = "10") int size) {
         return communityService.getPopularPostsPage(page, size);
     }
+    // 지역 게시판
     @GetMapping("/region/{regionCode}")
     public Page<PostListDto> getPostsByRegion(
             @PathVariable String regionCode,
@@ -42,10 +45,12 @@ public class CommunityController {
             @RequestParam(defaultValue = "10") int size) {
         return communityService.getPostsByRegion(regionCode, page, size);
     }
+    // 게시글 상세
     @GetMapping("/post/{postId}")
     public PostDetailDto getPostDetail(@PathVariable Long postId) {
         return communityService.getPostDetail(postId);
     }
+    
     // s3 이미지
     @PostMapping("/presign")
     public PresignedUrlResponse getPresignedUrl(@RequestBody PresignedUrlRequest request) {
@@ -56,7 +61,14 @@ public class CommunityController {
         return new PresignedUrlResponse(presignedUrl, publicUrl);
     }
     @PostMapping("/write")
-    public void writePost(@RequestBody PostCreateRequestDto request) {
+    public void writePost(@RequestBody @Valid PostCreateRequestDto request) {
         communityService.write(request);
+    }
+    @GetMapping("/regionPopular/{regionCode}")
+    public Page<PostListDto> getPostsByRegionPopular(
+            @PathVariable String regionCode,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return communityService.getPostsByRegion(regionCode, page, size);
     }
 }
