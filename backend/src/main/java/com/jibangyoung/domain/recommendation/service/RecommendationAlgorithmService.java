@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationAlgorithmService {
 
     private final RecommendationRepository recommendationRepository;
-
     private final SurveyAnswerRepository surveyAnswerRepository;
 
     @Transactional
@@ -61,7 +60,6 @@ public class RecommendationAlgorithmService {
             regionRankMap.put(region, rank);
             rank++;
         }
-        // =================================================================================
 
         List<Recommendation> recommendations = new ArrayList<>();
         for (Map.Entry<String, List<PolicyScoreDto>> entry : topPoliciesByRegion.entrySet()) {
@@ -102,6 +100,7 @@ public class RecommendationAlgorithmService {
         List<PolicyScoreDto> filtered = allPolicies.stream()
                 .filter(p -> isPolicyEligible(p, answers))
                 .toList();
+
         return filtered.stream()
                 .peek(p -> p.setPoliscore(calculateScore(p, answers)))
                 .toList();
@@ -117,10 +116,7 @@ public class RecommendationAlgorithmService {
         String userSchoolCode = answers.get("Q2");
         if (policy.getSchoolCode() != null && !"0049010".equalsIgnoreCase(policy.getSchoolCode())) {
             if (!isSchoolEligible(userSchoolCode, policy.getSchoolCode()))
-                System.out.println(
-                        "정책 번호 : " + policy.getPolicyCode() + ", 학력 불일치: userCode=" + userSchoolCode + ", plcyCode="
-                                + policy.getSchoolCode());
-            return false;
+                return false;
         }
 
         String userBizCodes = answers.get("Q3");
@@ -134,12 +130,14 @@ public class RecommendationAlgorithmService {
         if (policy.getMrgCode() != null && !policy.getMrgCode().equals("55003")
                 && !policy.getMrgCode().equalsIgnoreCase(userMrgCode))
             return false;
-    }
 
-    String userJobCode = answers.get("Q5");if(policy.getJobCode()!=null&&!"0013010".equals(policy.getJobCode())&&!policy.getJobCode().equalsIgnoreCase(userJobCode))return false;
-    }
+        String userJobCode = answers.get("Q5");
+        if (policy.getJobCode() != null && !"0013010".equals(policy.getJobCode())
+                && !policy.getJobCode().equalsIgnoreCase(userJobCode))
+            return false;
 
-    return true;}
+        return true;
+    }
 
     private boolean isSchoolEligible(String userSchoolCode, String policySchoolCode) {
         if ("0049010".equalsIgnoreCase(policySchoolCode))
