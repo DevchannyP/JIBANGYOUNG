@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.community.repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import com.jibangyoung.domain.policy.entity.Region;
@@ -30,4 +31,5 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     @Query("SELECT p FROM Posts p WHERE p.regionId = :regionCode AND p.likes >= 10 ORDER BY p.createdAt DESC")
     Page<Posts> findByRegionPopular(@Param("regionCode") String regionCode, Pageable pageable);
 
+    List<Posts> findTop10ByCategoryAndIsDeletedFalseOrderByLikesDesc(Posts.PostCategory postCategory);
 }

@@ -68,9 +68,19 @@ public class CommunityService {
                 .sorted(Comparator.comparing(RegionResponseDto::getRegionCode))
                 .collect(Collectors.toList());
     }
+    // 카테고리가 정착후기인 게시글 중,
+    // 추천 수 기준 상위 10개를 내림차 순 조회.
+    public List<PostListDto> getTopReviews() {
+        return postRepository
+                .findTop10ByCategoryAndIsDeletedFalseOrderByLikesDesc(Posts.PostCategory.SETTLEMENT_REVIEW)
+                .stream()
+                .map(PostListDto::from)
+                .collect(Collectors.toList());
+    }
 
-    // 최근 since 시점 이후(createdAt > since) 에 작성된 게시글 중,
-    // 좋아요(likes) 수 기준 상위 10개를 내림차순으로 조회한다.
+
+    // 최근 since 시점 이후 작성된 게시글 중,
+    // 추천 수 기준 상위 10개를 내림차 순 조회.
     public List<PostListDto> getRecentTop10(LocalDateTime since) {
         return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
                 .map(PostListDto::from)
@@ -154,7 +164,7 @@ public class CommunityService {
         // 썸네일 재추출 (post-images로 치환된 content 기준)
         String thumbnailUrl = Optional.ofNullable(
                 s3ImageManager.extractFirstImageUrl(content)
-        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/default-thumbnail.png");
+        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/main/%ED%9B%84%EB%8B%88.png");
 
         // 게시글 저장
         Posts post = request.toEntity(thumbnailUrl, content);

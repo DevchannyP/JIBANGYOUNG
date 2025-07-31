@@ -1,10 +1,14 @@
 // app/community/[regionCode]/[postId]/page.tsx
-import { fetchPostDetail } from "@/libs/api/community/community.api";
+import {
+  fetchPostDetail,
+  fetchPostsByRegion,
+} from "@/libs/api/community/community.api";
 import { Metadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
 import BoardNavigation from "../components/BoardHeader";
+import PopularPosts from "../components/PopularPosts";
 import PostDetail from "./PostDetail";
 
 interface Props {
@@ -34,7 +38,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function CommunityPage({ params }: Props) {
   const { regionCode, postId } = await params;
   const detail: DetailProps = await fetchPostDetail(postId);
-
+  const { posts, totalPages } = await fetchPostsByRegion(regionCode, 1);
   return (
     <main className={styles["community-container"]}>
       <RegionSelector />
@@ -46,7 +50,9 @@ export default async function CommunityPage({ params }: Props) {
       <div>
         <PostDetail detail={detail} />
       </div>
-      <aside>{/* 인기글 리스트 */}</aside>
+      <aside>
+        <PopularPosts posts={posts} />
+      </aside>
     </main>
   );
 }
