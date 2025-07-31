@@ -39,6 +39,8 @@ public class QPosts extends EntityPathBase<Posts> {
 
     public final StringPath tag = createString("tag");
 
+    public final StringPath thumbnailUrl = createString("thumbnailUrl");
+
     public final StringPath title = createString("title");
 
     public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
