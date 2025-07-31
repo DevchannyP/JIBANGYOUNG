@@ -520,4 +520,26 @@
   }
 
 }
+/* 해시태그 처리 css */
+.keywordInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.hashtag {
+  display: inline-block;
+  background-color: #f0f8ff;
+  color: #1e40af;
+  padding: 4px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.cardMeta {
+  margin-top: 8px;
+  min-height: 24px; /* 키워드 없을 때 높이 유지하고 싶다면 */
+}
 

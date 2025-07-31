@@ -37,7 +37,7 @@ public class RecommendationController {
     public ResponseEntity<List<RecommendationResultDto>> getRecommendations(
             @PathVariable Long userId,
             @PathVariable Long responseId) {
-        List<RecommendationResultDto> result = recommendationResultService.getRankedRecommendationsGroupedByRegion(
+        List<RecommendationResultDto> result = recommendationResultService.getRankedRecommendationsGroupedByRankGroup(
                 userId,
                 responseId);
         return ResponseEntity.ok(result);

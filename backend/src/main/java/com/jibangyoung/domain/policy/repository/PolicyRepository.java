@@ -25,6 +25,6 @@ public interface PolicyRepository extends JpaRepository<Policy, Integer> {
     List<Policy> findTop10Policies();
 
     // recommend된 정책들 불러오기
-    @Query("SELECT p FROM Policy p WHERE p.plcy_no = :policyCode")
+    @Query("SELECT p FROM Policy p WHERE p.NO = :policyCode")
     Policy findByPlcyNo(String policyCode);
 }

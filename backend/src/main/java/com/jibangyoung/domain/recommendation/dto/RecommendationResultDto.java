@@ -11,7 +11,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class RecommendationResultDto {
     private int no;
-    private Integer rank; // 순위
+    private int rankGroup; // 추천 지역 정책 그룹
+    private int rank; // 그룹별 정책 순위
     private Integer regionCode; // recommendation 테이블에서 조회
     private String regionName; // RegionRepository에서 조회
     private List<String> regionDescription; // infta_data 테이블에서 등급 조회

@@ -1,8 +1,10 @@
 package com.jibangyoung.domain.recommendation.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -25,79 +27,93 @@ public class RecommendationService {
     private final RegionRepository regionRepository;
     private final PolicyService policyService;
 
-    // 1) 사용자, 응답별 추천 데이터를 지역별로 그룹화
-    public Map<String, List<Recommendation>> getRecommendationsGroupedByRegion(Long userId, Long responseId) {
-        List<Recommendation> recommendations = recommendationRepository.findByUserIdAndResponseId(userId, responseId);
-        return recommendations.stream()
-                .collect(Collectors.groupingBy(Recommendation::getRegionCode));
-    }
-
-    // 2) 그룹화된 데이터를 기반으로 DTO 리스트 생성, 랭킹 부여
-    public List<RecommendationResultDto> getRankedRecommendationsGroupedByRegion(Long userId, Long responseId) {
-        Map<String, List<Recommendation>> groupedByRegion = getRecommendationsGroupedByRegion(userId, responseId);
+    public List<RecommendationResultDto> getRankedRecommendationsGroupedByRankGroup(Long userId, Long responseId) {
+        Map<Integer, List<Recommendation>> groupedByRankGroup = getRecommendationsGroupedByRankGroup(userId,
+                responseId);
         List<RecommendationResultDto> result = new ArrayList<>();
 
-        // 랭킹은 정렬 기준 필요하면 수정 가능 (여기서는 임의 순서)
-        int rankCounter = 1;
+        groupedByRankGroup.keySet().stream().sorted().forEach(rankGroup -> {
+            List<Recommendation> recs = groupedByRankGroup.get(rankGroup);
 
-        for (Map.Entry<String, List<Recommendation>> entry : groupedByRegion.entrySet()) {
-            String regionCodeStr = entry.getKey();
-            List<Recommendation> recs = entry.getValue();
+            // 지역 정책 중 rank 기준 가장 높은 하나만 선택
+            Optional<Recommendation> selectedRegionRecOpt = recs.stream()
+                    .filter(r -> !"99999".equals(r.getRegionCode()))
+                    .sorted(Comparator.comparingInt(Recommendation::getRank))
+                    .findFirst();
 
+            if (selectedRegionRecOpt.isEmpty())
+                return;
+
+            // 추천 지역명 추출
+            Recommendation selectedRegionRec = selectedRegionRecOpt.get();
+            String regionCodeStr = selectedRegionRec.getRegionCode();
             Integer regionCodeInt;
             try {
-                regionCodeInt = Integer.valueOf(regionCodeStr.trim());
+                regionCodeInt = Integer.parseInt(regionCodeStr);
             } catch (NumberFormatException e) {
-                continue; // 지역코드 파싱 실패 시 스킵
+                regionCodeInt = 99999;
             }
 
-            // 지역명 조회 및 조합
-            String regionName = regionRepository.findById(regionCodeInt)
-                    .map(this::buildFullRegionName)
-                    .orElse("미등록");
+            String regionName = regionCodeInt == 99999
+                    ? "전국"
+                    : regionRepository.findById(regionCodeInt)
+                            .map(this::buildFullRegionName)
+                            .orElse("미등록");
 
-            // InfraData에서 4개 등급 컬럼 조회
-            // getDescriptionByGrade()는 List<Object[]> 반환 예상 (Object[]{medical,
-            // accessibility, transport, housing})
-            List<Object[]> infraRows = recommendationRepository.getDescriptionByGrade(regionCodeInt);
+            // 테스트용
+            System.out.println(regionCodeStr + " : 지역 코드");
 
-            String[] regionGrades;
+            List<Object[]> infraRows = (regionCodeInt == 99999) ? null
+                    : recommendationRepository.getDescriptionByGrade(regionCodeStr);
+
+            String[] regionGrades = new String[] { "정보없음", "정보없음", "정보없음", "정보없음" };
             if (infraRows != null && !infraRows.isEmpty()) {
                 Object[] grades = infraRows.get(0);
-                regionGrades = new String[4];
                 for (int i = 0; i < 4; i++) {
-                    regionGrades[i] = (grades[i] != null) ? grades[i].toString() : null;
+                    regionGrades[i] = (grades[i] != null) ? grades[i].toString() : "정보없음";
                 }
-            } else {
-                regionGrades = new String[] { null, null, null, null };
             }
 
-            // 등급 코드 배열을 설명 메시지 리스트로 변환
             List<String> regionDescription = getDescriptionByGrade(List.of(regionGrades));
 
-            // 추천 정책 최대 4개
-            List<PolicyCardDto> regionPolicies = policyService.getPoliciesByRegion(regionCodeInt)
-                    .stream()
+            // 해당 그룹의 전체 정책코드 모으기 (지역 + 전국)
+            List<Integer> groupPolicyCodesInt = recs.stream()
+                    .map(r -> r.getPolicyCode()) // 이미 Integer 타입이면 String 변환 불필요
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            // 여기서 groupPolicyCodes 출력(테스트용)
+            System.out.println("[DEBUG] RankGroup: " + rankGroup + ", policyCodes: " + groupPolicyCodesInt);
+
+            // 해당 코드로 정책 조회 후 rank 기준 정렬, 상위 4개
+            Map<Integer, Integer> policyCodeToRankMap = recs.stream()
+                    .collect(Collectors.toMap(
+                            r -> r.getPolicyCode(),
+                            Recommendation::getRank,
+                            Math::min)); // 동일 정책코드일 경우 더 낮은 rank 사용
+
+            List<PolicyCardDto> sortedTop4 = policyService.getPoliciesByCodes(groupPolicyCodesInt).stream()
+                    .sorted(Comparator.comparingInt(p -> policyCodeToRankMap.getOrDefault(
+                            p.getNO(), Integer.MAX_VALUE)))
                     .limit(4)
                     .collect(Collectors.toList());
 
-            // no: 해당 지역 추천 리스트 중 첫 Recommendation PK
-            Long no = recs.isEmpty() ? null : recs.get(0).getId();
-            int noValue = (no != null) ? no.intValue() : rankCounter;
-
-            RecommendationResultDto dto = new RecommendationResultDto(
-                    noValue,
-                    rankCounter,
+            result.add(new RecommendationResultDto(
+                    selectedRegionRec.getId().intValue(),
+                    rankGroup,
+                    selectedRegionRec.getRank(),
                     regionCodeInt,
                     regionName,
                     regionDescription,
-                    regionPolicies);
-
-            result.add(dto);
-            rankCounter++;
-        }
+                    sortedTop4));
+        });
 
         return result;
+    }
+
+    public Map<Integer, List<Recommendation>> getRecommendationsGroupedByRankGroup(Long userId, Long responseId) {
+        List<Recommendation> recommendations = recommendationRepository.findByUserIdAndResponseId(userId, responseId);
+        return recommendations.stream().collect(Collectors.groupingBy(Recommendation::getRankGroup));
     }
 
     private String buildFullRegionName(Region region) {
@@ -112,17 +128,15 @@ public class RecommendationService {
     }
 
     public List<String> getDescriptionByGrade(List<String> regionGrades) {
-        List<String> descriptions = new ArrayList<>();
-
         if (regionGrades == null || regionGrades.size() < 4) {
             return List.of("인프라 정보가 부족해요");
         }
 
+        List<String> descriptions = new ArrayList<>();
         descriptions.add(mapMedicalInfra(regionGrades.get(0)));
         descriptions.add(mapAccessibility(regionGrades.get(1)));
         descriptions.add(mapTransportInfra(regionGrades.get(2)));
         descriptions.add(mapHousing(regionGrades.get(3)));
-
         return descriptions;
     }
 
@@ -165,5 +179,4 @@ public class RecommendationService {
             default -> "주거비 정보가 부족해요";
         };
     }
-
 }

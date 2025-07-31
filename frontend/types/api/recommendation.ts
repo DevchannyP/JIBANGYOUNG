@@ -2,6 +2,7 @@ import { PolicyCard } from './policy.c';
 
 export interface RecommendationResultDto {
   no: number;
+  rankGroup: number;
   rank: number;
   regionCode: number;
   regionName: string;

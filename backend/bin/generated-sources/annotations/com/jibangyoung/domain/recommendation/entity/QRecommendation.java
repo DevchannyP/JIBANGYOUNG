@@ -27,6 +27,10 @@ public class QRecommendation extends EntityPathBase<Recommendation> {
 
     public final NumberPath<Integer> policyCode = createNumber("policyCode", Integer.class);
 
+    public final NumberPath<Integer> rank = createNumber("rank", Integer.class);
+
+    public final NumberPath<Integer> rankGroup = createNumber("rankGroup", Integer.class);
+
     public final StringPath regionCode = createString("regionCode");
 
     public final NumberPath<Long> responseId = createNumber("responseId", Long.class);

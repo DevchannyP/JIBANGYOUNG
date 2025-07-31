@@ -101,18 +101,18 @@ const RecommendationList: React.FC<RecommendationListProps> = ({
 
       {/* 추천 지역 카드들 */}
       <div style={regionsContainerStyle}>
-        {data.map(({ no, rank, regionName, regionDescription }) => (
+        {data.map(({ no, rankGroup, regionName, regionDescription }) => (
           <div
             key={no}
-            style={getRegionCardStyle(rank)}
-            onMouseEnter={() => setSelectedRank(rank)}
-            onClick={() => setSelectedRank(rank)}
+            style={getRegionCardStyle(rankGroup)}
+            onMouseEnter={() => setSelectedRank(rankGroup)}
+            onClick={() => setSelectedRank(rankGroup)}
             onMouseLeave={() => {
               // 마우스가 벗어나도 선택 상태는 유지
             }}
           >
             <RecommendationRegionCard
-              rank={rank}
+              rank={rankGroup}
               regionName={regionName}
               regionDescription={regionDescription}
             />
