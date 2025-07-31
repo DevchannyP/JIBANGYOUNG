@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationAlgorithmService {
 
     private final RecommendationRepository recommendationRepository;
-
     private final SurveyAnswerRepository surveyAnswerRepository;
 
     @Transactional
@@ -61,7 +60,6 @@ public class RecommendationAlgorithmService {
             regionRankMap.put(region, rank);
             rank++;
         }
-        // =================================================================================
 
         List<Recommendation> recommendations = new ArrayList<>();
         for (Map.Entry<String, List<PolicyScoreDto>> entry : topPoliciesByRegion.entrySet()) {
@@ -102,6 +100,7 @@ public class RecommendationAlgorithmService {
         List<PolicyScoreDto> filtered = allPolicies.stream()
                 .filter(p -> isPolicyEligible(p, answers))
                 .toList();
+
         return filtered.stream()
                 .peek(p -> p.setPoliscore(calculateScore(p, answers)))
                 .toList();
@@ -117,10 +116,7 @@ public class RecommendationAlgorithmService {
         String userSchoolCode = answers.get("Q2");
         if (policy.getSchoolCode() != null && !"0049010".equalsIgnoreCase(policy.getSchoolCode())) {
             if (!isSchoolEligible(userSchoolCode, policy.getSchoolCode()))
-                System.out.println(
-                        "정책 번호 : " + policy.getPolicyCode() + ", 학력 불일치: userCode=" + userSchoolCode + ", plcyCode="
-                                + policy.getSchoolCode());
-            return false;
+                return false;
         }
 
         String userBizCodes = answers.get("Q3");
@@ -134,12 +130,14 @@ public class RecommendationAlgorithmService {
         if (policy.getMrgCode() != null && !policy.getMrgCode().equals("55003")
                 && !policy.getMrgCode().equalsIgnoreCase(userMrgCode))
             return false;
-    }
 
-    String userJobCode = answers.get("Q5");if(policy.getJobCode()!=null&&!"0013010".equals(policy.getJobCode())&&!policy.getJobCode().equalsIgnoreCase(userJobCode))return false;
-    }
+        String userJobCode = answers.get("Q5");
+        if (policy.getJobCode() != null && !"0013010".equals(policy.getJobCode())
+                && !policy.getJobCode().equalsIgnoreCase(userJobCode))
+            return false;
 
-    return true;}
+        return true;
+    }
 
     private boolean isSchoolEligible(String userSchoolCode, String policySchoolCode) {
         if ("0049010".equalsIgnoreCase(policySchoolCode))
@@ -237,58 +235,4 @@ public class RecommendationAlgorithmService {
             default -> new ArrayList<>();
         };
     }
-
-    /**
-     * 설문 선택 그룹과 지역 인프라 등급을 비교해 점수 계산
-     */
-    private double calculateScoreForQuestion(String selectedGroupStr, String regionGradeStr) {
-        if (selectedGroupStr == null || regionGradeStr == null)
-            return 0;
-
-        char selectedGroup = selectedGroupStr.charAt(0); // 설문으로 선택한 인프라 등급 코드
-        if (regionGradeStr == null || regionGradeStr.isEmpty()) { // 빈값이면 점수 계산에서 제외
-            return 0;
-        }
-        char regionGrade = regionGradeStr.charAt(0); // DTO에 저장된 지역별 인프라 등급 코드
-
-        // 1. 선택한 등급을 기준으로 우선순위 리스트 생성
-        List<Character> priorityList = makePriorityList(selectedGroup);
-
-        // 2. 우선순위 순으로 가중치 부여 (1순위 = 1.5, 2순위 = 1.2, ...)
-        Map<Character, Double> weightMap = new HashMap<>();
-        double[] weights = { 1.5, 1.2, 1.0, 0.8, 0.5 };
-        for (int i = 0; i < priorityList.size(); i++) {
-            weightMap.put(priorityList.get(i), weights[i]);
-        }
-
-        // 3. 각 등급별 가중치에서 지역 등급(regionGrade)에 해당하는 점수를 반환
-        return weightMap.getOrDefault(regionGrade, 0.0);
-    }
-
-    /**
-     * 선택 그룹 기준으로 우선순위 리스트 생성
-     */
-    private List<Character> makePriorityList(char selectedGroup) {
-        List<Character> priorityList = new ArrayList<>();
-
-        switch (selectedGroup) {
-            case 'A':
-                priorityList = List.of('A', 'B', 'C', 'D', 'E');
-                break;
-            case 'B':
-                priorityList = List.of('B', 'A', 'C', 'D', 'E');
-                break;
-            case 'C':
-                priorityList = List.of('C', 'A', 'B', 'D', 'E');
-                break;
-            case 'D':
-                priorityList = List.of('D', 'E', 'C', 'B', 'A');
-                break;
-            case 'E':
-                priorityList = List.of('E', 'D', 'C', 'B', 'A');
-                break;
-        }
-        return priorityList;
-    }
-
 }
