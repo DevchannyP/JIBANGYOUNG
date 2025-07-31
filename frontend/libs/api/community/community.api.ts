@@ -118,10 +118,11 @@ export async function createCommunityPost(
 // /api/community/regionPopular/{regionCode}/?page=${page}
 export async function getPostsByRegionPopular(
   regionCode: string,
-  page: number
+  page: number,
+  size: number
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const res = await fetch(
-    `${BASE}/api/community/regionPopular/${regionCode}?page=${page}`,
+    `${BASE}/api/community/regionPopular/${regionCode}?page=${page}&size=${size}`,
     {
       next: { revalidate: 300 },
     }

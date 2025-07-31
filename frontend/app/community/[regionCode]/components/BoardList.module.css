@@ -27,7 +27,7 @@
 }
 
 .sidebar {
-  flex: 1; /* 사이드바 영역이 적은 공간을 차지하도록 설정 */
+  flex: 1;
 }
 
 /* ================================
@@ -449,6 +449,7 @@
 
 .popular-card {
   flex: 0;
+  margin-left: auto;
   width: 300px;
   height: 500px;
   background-color: #fff;
