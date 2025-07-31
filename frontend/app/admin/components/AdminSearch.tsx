@@ -8,7 +8,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export function SearchBar({
+export function AdminSearch({
   onSearch,
   placeholder = "검색어를 입력하세요",
 }: SearchBarProps) {

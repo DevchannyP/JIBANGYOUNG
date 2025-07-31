@@ -61,10 +61,7 @@
   "java.errors.incompleteClasspath.severity": "error",
   "java.configuration.maven.globalSettings": "",
   "java.configuration.maven.userSettings": "",
-  "java.import.exclusions": [
-    "**/node_modules/**",
-    "**/.vscode/**"
-  ],
+  "java.import.exclusions": ["**/node_modules/**", "**/.vscode/**"],
   "java.autobuild.enabled": true,
   "gradle.autoSync": true,
 

@@ -1,0 +1,51 @@
+package com.jibangyoung.domain.survey.entity;
+
+import static com.querydsl.core.types.PathMetadataFactory.*;
+
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
+import javax.annotation.processing.Generated;
+import com.querydsl.core.types.Path;
+
+
+/**
+ * QSurveyAnswer is a Querydsl query type for SurveyAnswer
+ */
+@Generated("com.querydsl.codegen.DefaultEntitySerializer")
+public class QSurveyAnswer extends EntityPathBase<SurveyAnswer> {
+
+    private static final long serialVersionUID = 1114124031L;
+
+    public static final QSurveyAnswer surveyAnswer = new QSurveyAnswer("surveyAnswer");
+
+    public final NumberPath<Long> answerId = createNumber("answerId", Long.class);
+
+    public final StringPath answerText = createString("answerText");
+
+    public final NumberPath<Float> answerWeight = createNumber("answerWeight", Float.class);
+
+    public final StringPath optionCode = createString("optionCode");
+
+    public final StringPath questionId = createString("questionId");
+
+    public final NumberPath<Long> responseId = createNumber("responseId", Long.class);
+
+    public final DateTimePath<java.time.LocalDateTime> submittedAt = createDateTime("submittedAt", java.time.LocalDateTime.class);
+
+    public final NumberPath<Long> userId = createNumber("userId", Long.class);
+
+    public QSurveyAnswer(String variable) {
+        super(SurveyAnswer.class, forVariable(variable));
+    }
+
+    public QSurveyAnswer(Path<? extends SurveyAnswer> path) {
+        super(path.getType(), path.getMetadata());
+    }
+
+    public QSurveyAnswer(PathMetadata metadata) {
+        super(SurveyAnswer.class, metadata);
+    }
+
+}
+
