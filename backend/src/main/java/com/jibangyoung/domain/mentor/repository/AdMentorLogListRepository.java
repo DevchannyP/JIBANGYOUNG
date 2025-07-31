@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.mentor.dto.AdMentorLogListDTO;
-import com.jibangyoung.domain.mypage.entity.ReviewResultCode;
 
 public interface AdMentorLogListRepository extends JpaRepository<User, Long> {
 
@@ -20,16 +19,12 @@ public interface AdMentorLogListRepository extends JpaRepository<User, Long> {
         m.regionId,
         (SELECT COUNT(p) FROM Posts p WHERE p.userId = u.id),
         (SELECT COUNT(c) FROM Comment c WHERE c.user.id = u.id),
-        (SELECT COUNT(r) FROM Report r WHERE r.reviewedBy = u.id AND r.reviewResultCode = :approved)
+        (SELECT COUNT(r) FROM Report r WHERE r.reviewedBy = u.id AND r.reviewResultCode = com.jibangyoung.domain.report.entity.ReportStatus.APPROVED)
     )
     FROM MentorTest m
     JOIN User u ON m.userId = u.id
     WHERE m.regionId IN :regionIds
 """)
-List<AdMentorLogListDTO> findMentorLogListByRegionIds(
-    @Param("regionIds") List<Long> regionIds,
-    @Param("approved") ReviewResultCode approved
-);
-
+List<AdMentorLogListDTO> findMentorLogListByRegionIds(@Param("regionIds") List<Long> regionIds);
 
 }
