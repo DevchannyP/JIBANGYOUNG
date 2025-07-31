@@ -1,13 +1,16 @@
-// 📁 app/dashboard/MainSection/MainSection.tsx
+// app/dashboard/MainSection/MainSection.tsx
 'use client';
 
 import { AnimatePresence, cubicBezier, motion, Variants } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useState } from "react";
 import styles from './MainSection.module.css';
 import SkeletonCard from './components/SkeletonCard';
 import { mergeRefs } from './components/mergeRefs';
 import { useLazyCards } from './components/useLazyCards';
+import { usePopularPostsQuery } from './components/usePopularPostsQuery';
 
+// 동적 import
 const RegionRankCard = dynamic(() => import('./components/RegionRankCard'), { ssr: false });
 const ReviewCard = dynamic(() => import('./components/ReviewCard'), { ssr: false });
 const TodayPopularCard = dynamic(() => import('./components/TodayPopularCard'), { ssr: false });
@@ -25,11 +28,7 @@ const waveVariants: Variants = {
     opacity: 1,
     x: 0,
     scale: 1,
-    transition: {
-      duration: 0.37,
-      delay: i * 0.11,
-      ease: cubicBezier(0.23, 1, 0.32, 1),
-    },
+    transition: { duration: 0.37, delay: i * 0.11, ease: cubicBezier(0.23, 1, 0.32, 1) },
   }),
   exit: {
     opacity: 0,
@@ -40,24 +39,21 @@ const waveVariants: Variants = {
 };
 
 export default function MainSection() {
-  const { refs, visible } = useLazyCards(5); // 카드 5개용
+  const { refs, visible } = useLazyCards(5);
+  const { data, isLoading, isError, error } = usePopularPostsQuery();
+  const posts = data?.posts ?? [];
+
+  // idx 중앙관리(리스트/썸네일 동기화)
+  const [currIdx, setCurrIdx] = useState(0);
 
   return (
     <>
-      {/* 중앙 컬럼 */}
       <div className={styles.centerCol}>
         <div className={styles.rankCardWrapper} ref={mergeRefs(refs[0])} tabIndex={0} aria-label="지역 랭킹 카드">
           {visible[0] === null && <SkeletonCard type="rank" />}
           {visible[0] && (
             <AnimatePresence mode="wait">
-              <motion.div
-                key="rank"
-                custom={1}
-                variants={waveVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-              >
+              <motion.div key="rank" custom={1} variants={waveVariants} initial="hidden" animate="visible" exit="exit">
                 <RegionRankCard />
               </motion.div>
             </AnimatePresence>
@@ -86,15 +82,20 @@ export default function MainSection() {
           </div>
         </div>
       </div>
-
-      {/* 우측 컬럼 */}
       <div className={styles.rightCol}>
         <div ref={refs[3]} tabIndex={0} aria-label="썸네일 카드">
           {visible[3] === null && <SkeletonCard type="thumb" />}
           {visible[3] && (
             <AnimatePresence mode="wait">
-              <motion.div key="thumb" custom={2} variants={waveVariants} initial="hidden" animate="visible" exit="exit">
-                <RightThumbCard />
+              <motion.div key="thumb" custom={2}>
+                <RightThumbCard
+                  posts={posts}
+                  isLoading={isLoading}
+                  isError={isError}
+                  error={error}
+                  currIdx={currIdx}
+                  setCurrIdx={setCurrIdx}
+                />
               </motion.div>
             </AnimatePresence>
           )}
@@ -103,8 +104,15 @@ export default function MainSection() {
           {visible[4] === null && <SkeletonCard type="top10" />}
           {visible[4] && (
             <AnimatePresence mode="wait">
-              <motion.div key="top10" custom={2.4} variants={waveVariants} initial="hidden" animate="visible" exit="exit">
-                <Top10Card />
+              <motion.div key="top10" custom={2.4}>
+                <Top10Card
+                  posts={posts}
+                  isLoading={isLoading}
+                  isError={isError}
+                  error={error}
+                  currIdx={currIdx}
+                  onListHover={setCurrIdx}
+                />
               </motion.div>
             </AnimatePresence>
           )}
