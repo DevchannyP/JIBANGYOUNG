@@ -8,6 +8,12 @@ import com.jibangyoung.global.exception.ErrorCode;
  * - 코드/메시지 일원화, 유지보수 최적화
  */
 public class MyPageException extends BaseException {
-    public MyPageException(ErrorCode errorCode) { super(errorCode); }
-    public MyPageException(ErrorCode errorCode, String detail) { super(errorCode, detail); }
+    public MyPageException(ErrorCode errorCode) {
+        super(errorCode);
+    }
+
+    public MyPageException(ErrorCode errorCode, String detail) {
+        super(errorCode, detail);
+    }
+
 }

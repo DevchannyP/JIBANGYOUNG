@@ -1,46 +1,83 @@
 package com.jibangyoung.domain.mypage.entity;
 
-import com.jibangyoung.domain.auth.entity.User;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 
-/**
- * [실무형 게시글 엔티티]
- * - 마이페이지 전용 Projection/최적화 인덱스
- * - SoftDelete, 게시글 카테고리, 지역명 등 확장 고려
- */
-@Entity
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "post", indexes = {
-    @Index(name = "idx_user_createdAt", columnList = "user_id, createdAt"),
-    @Index(name = "idx_region", columnList = "region")
-})
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "posts")
 public class Post {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "user_id", nullable = false)
+    private long userId;
+
+    @Column(name = "region_id", nullable = false)
+    private long regionId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 30)
+    private PostCategory category;
+
+    @Column(name = "title", length = 200, nullable = false)
     private String title;
 
-    @Column(nullable = false, length = 50)
-    private String region;
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "tag", length = 50)
+    private String tag;
+
+    @Column(name = "likes", nullable = false)
+    private int likes;
+
+    @Column(name = "views", nullable = false)
+    private int views;
+
+    @Column(name = "is_notice", nullable = false)
+    private boolean isNotice;
+
+    @Column(name = "is_mentor_only", nullable = false)
+    private boolean isMentorOnly;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
+
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // 추후 SoftDelete, status, etc. 확장 가능
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    @Builder
-    public Post(User user, String title, String region) {
-        this.user = user;
-        this.title = title;
-        this.region = region;
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

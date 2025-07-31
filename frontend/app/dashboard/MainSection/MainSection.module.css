@@ -579,3 +579,238 @@
     min-height: 72px;
   }
 }
+
+
+
+.top10Box {
+  width: 340px;
+  min-height: 180px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(238, 210, 84, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  margin: 0 auto 20px auto;
+  padding: 20px 16px 20px 16px;
+  gap: 0;
+}
+
+/* 썸네일 박스 */
+.thumbBoxLarge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.thumbImageLargeWrap {
+  position: relative;
+  width: 260px;
+  height: 152px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f7f7f7;
+}
+.thumbImageLarge {
+  border-radius: 18px;
+}
+.thumbTitleLarge {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.18rem;
+  font-weight: 600;
+  gap: 10px;
+  color: #222;
+}
+.thumbRankLarge {
+  font-size: 1.48rem;
+  color: #ffd600;
+  font-weight: 700;
+}
+.thumbTitleLargeText {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 리스트 */
+.top10ListBox {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.top10ListItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 42px;
+  gap: 12px;
+  padding: 8px 0 8px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.12s, border 0.13s;
+}
+.top10ListItemActive,
+.top10ListItem:hover,
+.top10ListItem:focus {
+  background: #fffbe0;
+  box-shadow: 0 0 0 2px #ffe16b80;
+  color: #111;
+  font-weight: bold;
+  border-bottom: 2.5px solid #ffd600;
+}
+.top10ListRank {
+  width: 28px;
+  text-align: right;
+  color: #ffd600;
+  font-weight: bold;
+  font-size: 1.16rem;
+}
+.top10ListTitle {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 1.06rem;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.top10ListEmoji {
+  margin-left: 8px;
+  font-size: 1.1rem;
+}
+
+
+
+
+
+
+
+/* ▼ 카드 전체, 드롭다운 기준 */
+.subCard {
+  position: relative;
+  overflow: visible !important;
+}
+
+/* ▼ hover/focus/active 인식: 버튼 전체 래퍼 기준 */
+.todayPopularWrap {
+  position: relative;
+  width: 100%;
+  min-height: 48px;   /* 버튼 row 높이와 동일하게 */
+  cursor: pointer;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background: transparent;
+  transition: background 0.13s;
+}
+
+/* 버튼 hover/focus/active: 영역 확장(글자만X) */
+.todayPopularWrap:hover,
+.todayPopularWrap:focus-within {
+  background: #fffbe6;
+}
+
+/* ▼ 버튼(.todayPopularRow)은 디자인 그대로 사용 (수정금지) */
+
+/* ▼ 드롭다운(hover된 래퍼 기준) */
+.todayPopularDropdown {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  min-width: 100%;      /* hover 인식영역 전체에 맞춤 */
+  max-width: 340px;
+  background: #fffdf5;
+  border-radius: 18px;
+  box-shadow: 0 10px 40px 0 rgba(234,184,44,0.12), 0 1.5px 0 #f2e7c8;
+  padding: 12px 0;
+  z-index: 1999;
+  animation: fadeInDown 0.22s cubic-bezier(.43,1.13,.48,1.11);
+  border: 1.5px solid #f7e9bb;
+  will-change: opacity,transform;
+  filter: drop-shadow(0 4px 14px rgba(234,184,44,0.08));
+}
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translateY(-20px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+
+/* ▼ 리스트 아이템(드롭다운) */
+.top10ListItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 17px 11px 9px;
+  cursor: pointer;
+  font-size: 1.025rem;
+  border-radius: 13px;
+  transition: background 0.15s, color 0.13s, box-shadow 0.13s;
+  min-height: 47px;
+  outline: none;
+  background: none;
+  color: #2c2c2c;
+}
+.top10ListItemActive,
+.top10ListItem:focus,
+.top10ListItem:hover {
+  background: #fff7e1;
+  color: #eab82c;
+  font-weight: bold;
+  outline: none;
+  box-shadow: 0 2px 12px 0 rgba(234,184,44,0.06);
+}
+
+/* ▼ 썸네일 */
+.thumbWrap {
+  display: inline-block;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #f5eedc;
+  margin-right: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  vertical-align: middle;
+  border: none;
+  transition: box-shadow 0.16s, border 0.16s;
+}
+.top10ListItemActive .thumbWrap,
+.top10ListItem:focus .thumbWrap,
+.top10ListItem:hover .thumbWrap {
+  border: 1.5px solid #f7e9bb;
+  box-shadow: 0 0 0 2.2px #eab82c33;
+}
+
+.top10ListRank {
+  font-size: 1.16em;
+  font-weight: bold;
+  margin-right: 6px;
+  color: #ecc94b;
+  min-width: 26px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.top10ListTitle {
+  flex: 1 1 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  min-width: 0;
+  line-height: 1.35;
+  font-size: 1em;
+}

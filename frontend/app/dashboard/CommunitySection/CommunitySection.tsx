@@ -41,30 +41,26 @@ export default function CommunitySection() {
   }, [leftVisible]);
 
   return (
-    <section className={styles.sectionRoot}>
-      <div className={styles.bgYellow} aria-hidden="true" />
-      <div className={styles.tablesRow}>
-        <div
-          className={`${styles.tableCol} ${styles.waveCard} ${leftVisible ? styles.visible : ""}`}
-          ref={leftRef}
-          tabIndex={0}
-          aria-label="월간 인기 테이블"
-        >
-          <MonthlyHotTable />
-        </div>
-        {/* 오른쪽 tableCol 안에 타이틀, 정책인기 테이블 순서로 배치 */}
-        <div
-          className={`${styles.tableCol} ${styles.waveCard} ${rightVisible ? styles.visible : ""}`}
-          ref={rightRef}
-          tabIndex={0}
-          aria-label="정책 인기 테이블"
-        >
-          <div className={styles.titleOverlay}>
-            <SectionTitle align="center" />
-          </div>
-          <PolicyHotTable />
-        </div>
+    <div className={styles.tablesRow}>
+      <div
+        className={`${styles.tableCol} ${styles.waveCard} ${leftVisible ? styles.visible : ""}`}
+        ref={leftRef}
+        tabIndex={0}
+        aria-label="월간 인기 테이블"
+      >
+        <MonthlyHotTable />
       </div>
-    </section>
+      <div
+        className={`${styles.tableCol} ${styles.waveCard} ${rightVisible ? styles.visible : ""}`}
+        ref={rightRef}
+        tabIndex={0}
+        aria-label="정책 인기 테이블"
+      >
+        <div className={styles.titleOverlay}>
+          <SectionTitle align="center" />
+        </div>
+        <PolicyHotTable />
+      </div>
+    </div>
   );
 }

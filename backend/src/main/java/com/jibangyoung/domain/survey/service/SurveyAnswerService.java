@@ -1,15 +1,17 @@
 package com.jibangyoung.domain.survey.service;
 
-import com.jibangyoung.domain.survey.dto.AnswerJsonDto.Answer;
-import com.jibangyoung.domain.survey.entity.SurveyAnswer;
-import com.jibangyoung.domain.survey.repository.SurveyAnswerRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.jibangyoung.domain.survey.dto.AnswerJsonDto.Answer;
+import com.jibangyoung.domain.survey.entity.SurveyAnswer;
+import com.jibangyoung.domain.survey.repository.SurveyAnswerRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +21,7 @@ public class SurveyAnswerService {
 
     @Transactional
     public void saveSurveyAnswers(Long userId, Map<String, Answer> answers) {
-        Long responseId = 1L; // TODO: 실제 responseId 생성 로직 적용
-
+        Long responseId = 1L;
         List<SurveyAnswer> saveList = new ArrayList<>();
 
         for (Map.Entry<String, Answer> entry : answers.entrySet()) {
@@ -42,7 +43,8 @@ public class SurveyAnswerService {
         repository.saveAll(saveList);
     }
 
-    private SurveyAnswer buildSurveyAnswer(Long userId, Long responseId, String questionCode, Object value, Answer answer) {
+    private SurveyAnswer buildSurveyAnswer(Long userId, Long responseId, String questionCode, Object value,
+            Answer answer) {
         SurveyAnswer surveyAnswer = new SurveyAnswer();
         surveyAnswer.setUserId(userId);
         surveyAnswer.setResponseId(responseId);
@@ -60,7 +62,8 @@ public class SurveyAnswerService {
             if (answer.getValue() instanceof List) {
                 index = ((List<?>) answer.getValue()).indexOf(value);
             }
-            String selectedText = (index >= 0 && index < texts.size()) ? String.valueOf(texts.get(index)) : String.valueOf(value);
+            String selectedText = (index >= 0 && index < texts.size()) ? String.valueOf(texts.get(index))
+                    : String.valueOf(value);
             surveyAnswer.setAnswerText(selectedText);
         } else {
             surveyAnswer.setAnswerText(String.valueOf(value));

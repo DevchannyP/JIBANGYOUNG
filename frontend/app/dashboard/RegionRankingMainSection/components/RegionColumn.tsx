@@ -6,7 +6,6 @@ interface RegionColumnProps {
 }
 
 export default function RegionColumn({ region, active }: RegionColumnProps) {
-  // 예시 데이터 (8줄)
   const items = Array(8).fill(region);
 
   return (

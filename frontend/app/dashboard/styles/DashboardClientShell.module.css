@@ -201,3 +201,23 @@
   font-size: 1.15em;
   letter-spacing: 0.02em;
 }
+
+
+
+
+.overlayRoot {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1001;
+  pointer-events: none;
+}
+.policyOverlayCard {
+  width: 380px;   /* 카드 크기 * 1.5 (실제 맞춰서) */
+  height: 330px;
+  transform: scale(1.5);
+  box-shadow: 0 10px 40px #ffd83670;
+  pointer-events: none;
+  outline: none;
+}
+

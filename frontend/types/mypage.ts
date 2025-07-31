@@ -13,8 +13,8 @@ export type Tab =
   | "posts"
   | "comments"
   | "surveys"
-  | "favorites"
-  | "alerts";
+  | "alerts"
+  | "reports"; // ← 포함 OK
 
 // 4. 사이드바 메뉴 타입(내부탭/외부확장/권한)
 export interface SidebarMenuItem {

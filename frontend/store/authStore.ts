@@ -1,15 +1,14 @@
 import type {
+  LoginResponse,
   UserDto,
   UserRole,
   UserStatus,
-  LoginResponse,
 } from "@/libs/api/auth/auth.api";
+import type { Tokens } from "@/libs/api/axios";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type { LoginResponse, UserDto, UserRole, UserStatus };
-
-type Tokens = Omit<LoginResponse, "user">; // user 제외 나머지 모두
 
 export interface AuthState {
   user: UserDto | null;
@@ -20,11 +19,11 @@ export interface AuthState {
   issuedAt: string | null;
   expiresAt: string | null;
   setUser: (user: UserDto | null) => void;
-  setAuth: (user: UserDto, tokens: Tokens) => void;
+  setAuth: (user: UserDto, tokens: Tokens) => void; // 타입 통일!
+  setAuthObj: (data: { user: UserDto; accessToken: string; refreshToken: string }) => void;
   logout: () => void;
 }
 
-// SSR/CSR-safe localStorage 핸들러
 const storage = typeof window !== "undefined" ? window.localStorage : undefined;
 
 export const useAuthStore = create<AuthState>()(
@@ -43,14 +42,25 @@ export const useAuthStore = create<AuthState>()(
           user,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
-          tokenType: tokens.tokenType,
-          expiresIn: tokens.expiresIn,
-          issuedAt: tokens.issuedAt,
-          expiresAt: tokens.expiresAt,
+          tokenType: tokens.tokenType ?? null,
+          expiresIn: tokens.expiresIn ?? null,
+          issuedAt: tokens.issuedAt ?? null,
+          expiresAt: tokens.expiresAt ?? null,
         });
         if (storage) {
           storage.setItem("accessToken", tokens.accessToken);
           storage.setItem("refreshToken", tokens.refreshToken);
+        }
+      },
+      setAuthObj: ({ user, accessToken, refreshToken }) => {
+        set({
+          user,
+          accessToken,
+          refreshToken,
+        });
+        if (storage) {
+          storage.setItem("accessToken", accessToken);
+          storage.setItem("refreshToken", refreshToken);
         }
       },
       logout: () => {

@@ -15,7 +15,7 @@
     "cy:open": "cypress open"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-build-classic": "^39.0.2",
     "@ckeditor/ckeditor5-react": "^11.0.0",
     "ckeditor5": "^46.0.0",
     "@radix-ui/react-dialog": "^1.0.6",
@@ -50,6 +50,10 @@
     "cypress": "^13.5.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.3.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.11",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.2",

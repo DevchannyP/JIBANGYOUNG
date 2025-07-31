@@ -1,7 +1,7 @@
 // app/community/[regionCode]/[postId]/page.tsx
 
 import { fetchPostDetail } from "@/libs/api/community/community.api";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
@@ -16,10 +16,10 @@ interface Props {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  _parent: ResolvingMetadata
-): Promise<Metadata> {
+// ✅ SEO 메타데이터
+export async function generateMetadata(props: {
+  params: { regionCode: string };
+}): Promise<Metadata> {
   const { regionCode } = await params;
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,

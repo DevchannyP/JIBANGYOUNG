@@ -20,9 +20,20 @@ export default function PasswordRules({ password }: Props) {
         <li
           key={i}
           className={rule.check ? styles.rulePass : styles.ruleFail}
-          aria-checked={rule.check}
+          // aria-checked 제거! 
+          // 접근성: "통과"/"실패" 텍스트를 숨긴 span으로도 노출 가능
         >
+          <span
+            aria-hidden="true"
+            className={styles.ruleIcon}
+            style={{ marginRight: 6 }}
+          >
+            {rule.check ? "✔️" : "❌"}
+          </span>
           {rule.text}
+          <span className="sr-only">
+            {rule.check ? " (통과)" : " (미충족)"}
+          </span>
         </li>
       ))}
     </ul>

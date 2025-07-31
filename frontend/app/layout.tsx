@@ -1,3 +1,4 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
@@ -15,7 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      {/* ✅ suppressHydrationWarning 추가 */}
       <body>
         <Providers>
           <Header />
