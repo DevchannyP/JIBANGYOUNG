@@ -99,7 +99,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
   return (
     <div className={styles.container}>
       <RegionSelector />
-      <PopularPostCards posts={data.featuredPosts} />
+      <PopularPostCards />
       <BoardNavigation />
       <main className={styles.main}>
         <div className={styles.content}>

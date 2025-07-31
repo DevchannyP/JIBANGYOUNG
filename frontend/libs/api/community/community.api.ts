@@ -114,7 +114,7 @@ export async function createCommunityPost(
   }
 }
 
-// 지역 게시판 작성
+// 지역 게시판 인기
 // /api/community/regionPopular/{regionCode}/?page=${page}
 export async function getPostsByRegionPopular(
   regionCode: string,

@@ -8,6 +8,7 @@ export interface PostListDto {
   regionId: number;
   regionName: string;
   thumbnailUrl: string;
+  summary: string;
 }
 
 // 게시글 상세에서 사용할 타입
