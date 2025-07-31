@@ -1,18 +1,18 @@
-package com.jibangyoung.domain.recommendation;
+// package com.jibangyoung.domain.recommendation;
 
-import java.util.List;
+// import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.CommandLineRunner;
+// import org.springframework.stereotype.Component;
 
 // import com.jibangyoung.domain.recommendation.dto.RecommendationResultDto;
 // import
 // com.jibangyoung.domain.recommendation.service.RecommendationAlgorithmService;
 // import com.jibangyoung.domain.recommendation.service.RecommendationService;
 
-@Component
-public class RecommendationTestRunner implements CommandLineRunner {
+// @Component
+// public class RecommendationTestRunner implements CommandLineRunner {
 
 // @Autowired
 // private RecommendationService recommendationService;
