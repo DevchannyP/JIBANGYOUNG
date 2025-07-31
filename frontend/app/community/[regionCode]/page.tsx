@@ -17,7 +17,7 @@ interface SearchParams {
   searchType?: string;
 }
 
-interface PageProps {
+interface Props {
   params: Promise<{ regionCode: string }>;
   searchParams: Promise<SearchParams>;
 }
@@ -29,9 +29,7 @@ interface PopularPost {
   thumbnail: string;
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { regionCode } = await params;
 
   return {
@@ -85,7 +83,7 @@ async function getBoardData(searchParams: SearchParams) {
   };
 }
 
-export default async function BoardPage({ params, searchParams }: PageProps) {
+export default async function BoardPage({ params, searchParams }: Props) {
   const pageParam = (await searchParams).page ?? "1";
   const currentPage = parseInt(pageParam, 10);
 

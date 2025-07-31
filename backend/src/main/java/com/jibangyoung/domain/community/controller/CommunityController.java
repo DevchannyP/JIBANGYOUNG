@@ -68,6 +68,6 @@ public class CommunityController {
             @PathVariable String regionCode,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return communityService.getPostsByRegion(regionCode, page, size);
+        return communityService.getPostsByRegionPopular(regionCode, page, size);
     }
 }

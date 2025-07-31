@@ -5,10 +5,10 @@ import { Metadata, ResolvingMetadata } from "next";
 import styles from "../../Community.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
-import PostDetail from "./PostDetail";
 import BoardNavigation from "../components/BoardHeader";
+import PostDetail from "./PostDetail";
 
-interface PageProps {
+interface Props {
   params: Promise<{
     regionCode: string;
     postId: string;
@@ -16,9 +16,8 @@ interface PageProps {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-// ✅ SEO 메타데이터
 export async function generateMetadata(
-  { params }: PageProps,
+  { params }: Props,
   _parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { regionCode } = await params;
@@ -31,7 +30,7 @@ export async function generateMetadata(
     },
   };
 }
-export default async function CommunityPage({ params }: PageProps) {
+export default async function CommunityPage({ params }: Props) {
   const { regionCode, postId } = await params;
   const detail: DetailProps = await fetchPostDetail(postId);
 

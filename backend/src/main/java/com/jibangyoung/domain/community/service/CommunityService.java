@@ -160,4 +160,11 @@ public class CommunityService {
         Posts post = request.toEntity(thumbnailUrl, content);
         postRepository.save(post);
     }
+
+    public Page<PostListDto> getPostsByRegionPopular(String regionCode, int page, int size) {
+        int pageIndex = page - 1; // PageRequest는 0-based
+        Pageable pageable = PageRequest.of(pageIndex, size);
+        Page<Posts> postPage = postRepository.findByRegionPopular(regionCode, pageable);
+        return postPage.map(PostListDto::from);
+    }
 }
