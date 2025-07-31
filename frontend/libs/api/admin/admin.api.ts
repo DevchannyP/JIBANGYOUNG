@@ -1,5 +1,6 @@
 // libs/api/admin.api.ts
 
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
 import { AdMentorUser } from "@/types/api/adMentorUser";
 import { AdminPost } from "@/types/api/adminPost";
 import { AdminRegion } from "@/types/api/adminRegion";
@@ -157,7 +158,6 @@ export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    // credentials: "include", // JWT가 헤더로만 쓸 때는 굳이 필요 X
   });
 
   if (!response.ok) {
@@ -166,6 +166,30 @@ export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
       apiError = await response.json();
     } catch {}
     throw new Error(apiError.message || "멘토 지역 유저 목록 조회 실패");
+  }
+
+  return response.json();
+}
+
+// 멘토 데시보드_멘토 활동로그 리스트 API
+export async function fetchAdMentorLogList(): Promise<AdMentorLogList[]> {
+  const token = localStorage.getItem("accessToken");
+
+  const response = await safeFetch("http://localhost:8080/api/mentor/logList", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "멘토 활동로그 리스트 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {}
+    throw new Error(apiError.message || "멘토 활동로그 리스트 조회 실패");
   }
 
   return response.json();
