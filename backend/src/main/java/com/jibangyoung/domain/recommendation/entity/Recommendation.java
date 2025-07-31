@@ -48,4 +48,9 @@ public class Recommendation {
     @Column(name = "is_viewed", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0") // 디폴트 : false
     private boolean isViewed; // 일회용 페이지로 만들기 위한 논리적 삭제
 
+    @Column(name = "rankgroup")
+    private Integer rankGroup; // 추천 지역 순위 그룹
+
+    @Column(name = "rank")
+    private Integer rank; // 추천 지역 내 정책 순위
 }
