@@ -21,15 +21,22 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
             m.regionId,
             m.currentScore
         )
-        FROM com.jibangyoung.domain.mentor.entity.MentorTest m
-        JOIN com.jibangyoung.domain.auth.entity.User u ON m.userId = u.id
+        FROM MentorTest m
+        JOIN User u ON m.userId = u.id
         WHERE m.regionId IN (
             SELECT m2.regionId
-            FROM com.jibangyoung.domain.mentor.entity.MentorTest m2
+            FROM MentorTest m2
             WHERE m2.userId = :userId
         )
     """)
     List<AdMentorUserDTO> findUsersByMentorRegion(@Param("userId") Long userId);
 
+    // regionId(지역코드)를 userId로 조회하는 쿼리
+    @Query("""
+        SELECT m.regionId
+        FROM MentorTest m
+        WHERE m.userId = :userId
+    """)
+    List<Long> findRegionIdByUserId(@Param("userId") Long userId);
 }
 

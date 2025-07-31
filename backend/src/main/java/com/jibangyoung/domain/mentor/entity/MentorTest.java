@@ -44,5 +44,5 @@ public class MentorTest {
     private Long regionId; // BIGINT
 
     @Column(name = "user_id")
-    private Long userId; // BIGINT
+    private Long userId;
 }

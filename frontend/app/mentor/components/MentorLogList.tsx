@@ -1,67 +1,53 @@
-// MentorLogList.tsx
-
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
 import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion";
+
+import { fetchAdMentorLogList } from "@/libs/api/admin/admin.api";
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
 import { MentorLogRow } from "./MentorLogRow";
 
-// 타입 및 더미 데이터 정의
-export interface MentorLog {
-  id: number;
-  level: string;
-  region: string;
-  postCount: number;
-  commentCount: number;
-  reportProcessed: number;
-}
-
-const dummyMentorLogs: MentorLog[] = [
-  {
-    id: 2,
-    level: "Lv.3.실버멤버",
-    region: "서울",
-    postCount: 50,
-    commentCount: 50,
-    reportProcessed: 26,
-  },
-  {
-    id: 1,
-    level: "Lv.4.운영자",
-    region: "서울",
-    postCount: 150,
-    commentCount: 150,
-    reportProcessed: 268,
-  },
-];
+// 타입은 서버와 맞게 유지
 
 export function MentorLogList() {
-  const [logs, setLogs] = useState<MentorLog[]>([]);
-  const [searchResult, setSearchResult] = useState<MentorLog[]>([]);
+  const [logs, setLogs] = useState<AdMentorLogList[]>([]);
+  const [searchResult, setSearchResult] = useState<AdMentorLogList[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRegion, setSelectedRegion] = useState("서울"); // 기본값 예시
+  // regionId 기준 (지역 코드)
+  const [selectedRegion, setSelectedRegion] = useState<number | null>(null);
   const ITEMS_PER_PAGE = 10;
 
-  // 공통 지역탭 훅 사용
+  // 공통 지역탭 훅
   const { regionOptions, loading: regionLoading } = useAdminRegion();
 
+  // 1. API 호출하여 데이터 세팅
   useEffect(() => {
-    setLogs(dummyMentorLogs);
-    setSearchResult(dummyMentorLogs);
+    fetchAdMentorLogList()
+      .then((data) => {
+        setLogs(data);
+        setSearchResult(data);
+      })
+      .catch(() => {
+        setLogs([]);
+        setSearchResult([]);
+      });
   }, []);
 
-  // 지역 선택
+  // 2. 지역 필터링
   const handleSelectRegion = useCallback(
-    (region: string) => {
-      setSelectedRegion(region);
+    (regionId: number | null) => {
+      setSelectedRegion(regionId);
       setCurrentPage(1);
-      let filtered =
-        region === "전체" ? logs : logs.filter((l) => l.region === region);
+      let filtered = regionId
+        ? logs.filter((l) => l.regionId === regionId)
+        : logs;
       if (searchKeyword.trim()) {
-        filtered = filtered.filter((log) =>
-          log.level.includes(searchKeyword.trim())
+        filtered = filtered.filter(
+          (log) =>
+            log.role.includes(searchKeyword.trim()) ||
+            log.nickname.includes(searchKeyword.trim())
         );
       }
       setSearchResult(filtered);
@@ -69,16 +55,19 @@ export function MentorLogList() {
     [logs, searchKeyword]
   );
 
-  // 검색
+  // 3. 검색
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
-      let filtered =
-        selectedRegion === "전체"
-          ? logs
-          : logs.filter((l) => l.region === selectedRegion);
+      let filtered = selectedRegion
+        ? logs.filter((l) => l.regionId === selectedRegion)
+        : logs;
       if (keyword.trim()) {
-        filtered = filtered.filter((log) => log.level.includes(keyword.trim()));
+        filtered = filtered.filter(
+          (log) =>
+            log.role.includes(keyword.trim()) ||
+            log.nickname.includes(keyword.trim())
+        );
       }
       setSearchResult(filtered);
       setCurrentPage(1);
@@ -98,18 +87,22 @@ export function MentorLogList() {
     <div>
       <h1 className={styles.title}>멘토 활동로그</h1>
 
-      {/* <AdminRegionTab
+      {/* 지역 탭 (옵션) */}
+      {/* 
+      <AdminRegionTab
         regionOptions={regionOptions}
-        selectedRegionCode={selectedRegionCode}
+        selectedRegionCode={selectedRegion}
         onSelectRegion={handleSelectRegion}
-      /> */}
+      />
+      */}
 
-      <AdminSearch placeholder="등급 검색" onSearch={handleSearch} />
+      <AdminSearch placeholder="닉네임/등급 검색" onSearch={handleSearch} />
       <div className={styles.tableWrapper}>
         <table className={styles.userTable}>
           <thead>
             <tr>
               <th>NO</th>
+              <th>닉네임</th>
               <th>등급</th>
               <th>지역</th>
               <th>게시글 작성수</th>
@@ -121,7 +114,7 @@ export function MentorLogList() {
             {paginatedData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   style={{ textAlign: "center", padding: "20px" }}
                 >
                   일치하는 정보가 없습니다.
@@ -130,7 +123,7 @@ export function MentorLogList() {
             ) : (
               paginatedData.map((log, idx) => (
                 <MentorLogRow
-                  key={log.id}
+                  key={`${log.id}-${log.regionId}`}
                   log={log}
                   index={idx}
                   ITEMS_PER_PAGE={ITEMS_PER_PAGE}
