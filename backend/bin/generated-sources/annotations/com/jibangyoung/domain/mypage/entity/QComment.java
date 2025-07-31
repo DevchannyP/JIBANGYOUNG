@@ -28,9 +28,15 @@ public class QComment extends EntityPathBase<Comment> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final BooleanPath isDeleted = createBoolean("isDeleted");
+
+    public final QComment parent;
+
     public final NumberPath<Long> targetPostId = createNumber("targetPostId", Long.class);
 
     public final StringPath targetPostTitle = createString("targetPostTitle");
+
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
     public final com.jibangyoung.domain.auth.entity.QUser user;
 
@@ -52,6 +58,7 @@ public class QComment extends EntityPathBase<Comment> {
 
     public QComment(Class<? extends Comment> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.parent = inits.isInitialized("parent") ? new QComment(forProperty("parent"), inits.get("parent")) : null;
         this.user = inits.isInitialized("user") ? new com.jibangyoung.domain.auth.entity.QUser(forProperty("user")) : null;
     }
 
