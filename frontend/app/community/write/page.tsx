@@ -1,7 +1,7 @@
 // app/community/write/page.tsx
 "use client";
 
-import WriteForm from "./writeForm"; // 실제 파일명에 맞추세요 (WriteForm.tsx or writeForm.tsx)
+import WriteForm from "./WriteForm"; // 파일명 대소문자 주의!
 
 export default function Page() {
   return <WriteForm />;
