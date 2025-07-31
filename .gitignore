@@ -61,6 +61,3 @@ application.yml
 # 🔧 Terraform 캐시 등 무거운 툴링 산출물
 .terraform/
 infra/.terraform/
-
-/**
- */
