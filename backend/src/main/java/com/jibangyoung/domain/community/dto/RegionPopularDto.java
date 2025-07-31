@@ -1,17 +1,19 @@
 package com.jibangyoung.domain.community.dto;
 
-import java.time.LocalDateTime;
-
 import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.support.RegionSidoMapper;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostListDto {
+public class RegionPopularDto {
     private Long id;
 
     private String title;
@@ -36,10 +38,10 @@ public class PostListDto {
     // 요약
     private String summary;
 
-    public static PostListDto from(Posts posts) {
+    public static RegionPopularDto from(Posts posts) {
         String regionName = RegionSidoMapper.getRegionName(posts.getRegionId());
         String summary = extractSummary(posts.getContent());
-        return PostListDto.builder()
+        return RegionPopularDto.builder()
                 .id(posts.getId())
                 .title(posts.getTitle())
                 .category(posts.getCategory().name())
@@ -53,6 +55,7 @@ public class PostListDto {
                 .summary(summary)
                 .build();
     }
+    // 요약 데이터
     private static String extractSummary(String content) {
         if (content == null) return "";
         // 이미지 태그 제거

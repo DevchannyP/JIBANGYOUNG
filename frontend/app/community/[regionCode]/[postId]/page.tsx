@@ -8,7 +8,7 @@ import { DetailProps } from "../../types";
 import BoardNavigation from "../components/BoardHeader";
 import PostDetail from "./PostDetail";
 
-interface PageProps {
+interface Props {
   params: Promise<{
     regionCode: string;
     postId: string;
@@ -30,7 +30,7 @@ export async function generateMetadata(props: {
     },
   };
 }
-export default async function CommunityPage({ params }: PageProps) {
+export default async function CommunityPage({ params }: Props) {
   const { regionCode, postId } = await params;
   const detail: DetailProps = await fetchPostDetail(postId);
 

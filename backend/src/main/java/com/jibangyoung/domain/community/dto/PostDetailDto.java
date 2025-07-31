@@ -5,12 +5,9 @@ import java.time.LocalDateTime;
 import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.support.RegionSidoMapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -2,12 +2,9 @@ package com.jibangyoung.domain.community.dto;
 
 import com.jibangyoung.domain.community.entity.Posts;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

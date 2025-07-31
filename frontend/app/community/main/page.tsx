@@ -5,11 +5,11 @@ import PopularPostsByPeriod from "../components/PopularPostsByPeriod";
 import PopularPostTable from "../components/PopularPostTable";
 import RegionSelector from "../components/RegionSelector"; // RegionSelector 임포트
 
-interface PageProps {
+interface Props {
   searchParams: Promise<{ page?: string }>;
 }
 
-export default async function CommunityPage({ searchParams }: PageProps) {
+export default async function CommunityPage({ searchParams }: Props) {
   const pageParam = (await searchParams).page ?? "1";
   const currentPage = parseInt(pageParam, 10);
 
@@ -19,7 +19,6 @@ export default async function CommunityPage({ searchParams }: PageProps) {
     <div className="community-page">
       <main className={styles["community-container"]}>
         <RegionSelector />
-        {/* 인기글 섹션 */}
         <section className={styles["popular-section"]}>
           <div>
             <PopularPostsByPeriod period="week" title="주간 인기" />

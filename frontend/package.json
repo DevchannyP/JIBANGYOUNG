@@ -17,6 +17,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^39.0.2",
     "@ckeditor/ckeditor5-react": "^11.0.0",
+    "ckeditor5": "^46.0.0",
     "@radix-ui/react-dialog": "^1.0.6",
     "@tanstack/react-query": "^5.81.5",
     "axios": "^1.6.8",
