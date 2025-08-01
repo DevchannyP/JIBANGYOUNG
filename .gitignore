@@ -60,7 +60,7 @@ logs/
 # 환경 변수 / 시크릿
 .env
 .env.*
-*.yml
+application.yml
 !.env.example
 !application-example.yml
 
