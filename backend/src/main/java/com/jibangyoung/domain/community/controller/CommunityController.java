@@ -2,15 +2,26 @@ package com.jibangyoung.domain.community.controller;
 
 import java.util.List;
 
-import com.jibangyoung.domain.community.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
+import com.jibangyoung.domain.community.dto.PostDetailDto;
+import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.dto.PresignedUrlRequest;
+import com.jibangyoung.domain.community.dto.PresignedUrlResponse;
+import com.jibangyoung.domain.community.dto.RegionResponseDto;
+import com.jibangyoung.domain.community.service.CommunityService;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import com.jibangyoung.domain.community.service.CommunityService;
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
@@ -30,7 +41,7 @@ public class CommunityController {
     public List<PostListDto> getTopLikedByPeriod(@RequestParam(defaultValue = "today") String period) {
         return communityService.getCachedTop10ByPeriod(period);
     }
-    // TODO : 최신 인기글
+
     @GetMapping("/popular")
     public Page<PostListDto> getPopularPosts(
             @RequestParam(defaultValue = "1") int page,
