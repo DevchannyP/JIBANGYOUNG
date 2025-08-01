@@ -22,7 +22,9 @@ pnpm-debug.log*
 # Java/Gradle / Spring Boot
 .gradle/
 build/
-*/build/ 
+*/build/
+target/
+bin/
 *.class
 *.log
 logs/
@@ -56,8 +58,8 @@ logs/
 # -----------------------------------
 # 환경 변수 / 시크릿
 .env
-#.env.*
-application.yml
+.env.*
+*.yml
 !.env.example
 !application-example.yml
 
@@ -71,6 +73,7 @@ infra/logs/
 # -----------------------------------
 # Test & Coverage
 coverage/
+reports/
 jacoco/
 test-output/
 .nyc_output/
