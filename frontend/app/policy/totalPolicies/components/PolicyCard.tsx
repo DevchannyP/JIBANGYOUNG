@@ -1,4 +1,5 @@
 import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
+import { Heart } from 'lucide-react';
 import React, { memo } from 'react';
 import styles from '../../total_policy.module.css';
 
@@ -97,12 +98,10 @@ const PolicyCard: React.FC<PolicyCardProps> = memo(({
             aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}
             type="button"
           >
-            <span
-              className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
-              aria-hidden="true"
-            >
-              {isBookmarked ? '♥' : '♡'}
-            </span>
+            <Heart
+            className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
+            fill={isBookmarked ? '#6366f1' : 'none'}
+          />
           </button>
         )}
       </div>

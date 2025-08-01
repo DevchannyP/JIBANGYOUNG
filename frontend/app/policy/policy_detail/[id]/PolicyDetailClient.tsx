@@ -56,55 +56,6 @@ export default function PolicyDetailClient({
     const fetchRelatedPolicies = async () => {
       setLoadingRelated(true);
       try {
-        // 관련 정책 API 호출 (예시)
-        // const related = await fetchRelatedPolicies(policy[0].category, policyId);
-        // setRelatedPolicies(related);
-        
-        // 임시 더미 데이터
-        // const dummyRelated = [
-        //   {
-        //     NO: 2,
-        //     plcy_nm: "청년 취업 지원 2025",
-        //     deadline: "2025-03-31",
-        //     dDay: 45,
-        //     sidoName: "대전시",
-        //     oper_inst_nm: "대전광역시청 청년정책과",
-        //     plcy_sprt_cn: "청년 취업 지원금 지원",
-        //     aply_url_addr: "https://example.com/apply2"
-        //   },
-        //   {
-        //     NO: 3,
-        //     plcy_nm: "청년 주택 지원 2025",
-        //     deadline: "2025-04-15",
-        //     dDay: 60,
-        //     sidoName: "부산시",
-        //     oper_inst_nm: "부산광역시 주택정책과",
-        //     plcy_sprt_cn: "청년 주택 임대료 지원",
-        //     aply_url_addr: "https://example.com/apply3"
-        //   },
-        //   {
-        //     NO: 4,
-        //     plcy_nm: "청년 창업 지원 2025",
-        //     deadline: "2025-05-01",
-        //     dDay: 75,
-        //     sidoName: "인천시",
-        //     oper_inst_nm: "인천광역시 경제산업국",
-        //     plcy_sprt_cn: "청년 창업 자금 지원",
-        //     aply_url_addr: "https://example.com/apply4"
-        //   },
-        //   {
-        //     NO: 5,
-        //     plcy_nm: "청년 교육 지원 2025",
-        //     deadline: "2025-06-30",
-        //     dDay: 120,
-        //     sidoName: "광주시",
-        //     oper_inst_nm: "광주광역시 교육청",
-        //     plcy_sprt_cn: "청년 직업교육 지원",
-        //     aply_url_addr: "https://example.com/apply5"
-        //   }
-        // ] as PolicyDetailDto[];
-        
-        // setRelatedPolicies(dummyRelated);
       } catch (error) {
         console.error("Error fetching related policies:", error);
       } finally {

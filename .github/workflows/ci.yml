@@ -1,4 +1,4 @@
-name: ci
+name: 🚦 CI - 지방청년 통합 테스트 (Backend, Frontend, Docker, Vercel)
 
 on:
   pull_request:
@@ -70,8 +70,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-#오예록
-#테스트 용도
+      #오예록
+      #테스트 용도
       - name: 🧹 Clean TS & Next cache
         working-directory: frontend
         run: |
@@ -82,8 +82,7 @@ jobs:
       - name: 🧪 Debug .next/types 존재 여부
         working-directory: frontend
         run: find .next/types || echo "No .next/types found"
-# 여기까지
-
+      # 여기까지
 
       - name: 📦 Install Dependencies
         working-directory: frontend

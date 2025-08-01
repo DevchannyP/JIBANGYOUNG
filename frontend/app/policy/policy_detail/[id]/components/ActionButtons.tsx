@@ -14,9 +14,6 @@ export default function ActionButtons({ onApply, onShare }: ActionButtonsProps) 
       <button className="btn-secondary" onClick={onShare}>
         링크 공유하기
       </button>
-      <button className="btn-secondary">
-        신청
-      </button>
     </div>
   );
 }
