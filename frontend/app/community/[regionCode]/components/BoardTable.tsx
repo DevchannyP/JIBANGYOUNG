@@ -27,7 +27,7 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts }) => {
 
             return (
               <tr key={post.id}>
-                <td>{post.id}</td>
+                <td>{post.category}</td>
                 <td align="left">
                   <Link href={postLink} className={styles["full-cell-link"]}>
                     {post.title}
