@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,15 +17,15 @@ import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.PolicyRepository;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class PolicyDetailService {
 
-    @Autowired
-    private PolicyRepository policyRepository;
-
-    @Autowired
-    private RegionRepository regionRepository;
+    private final PolicyRepository policyRepository;
+    private final RegionRepository regionRepository;
 
     /**
      * 정책 상세 정보 조회
@@ -44,9 +43,6 @@ public class PolicyDetailService {
 
     /**
      * Policy Entity를 PolicyDetailDto로 변환
-     * 
-     * @param policy Policy 엔티티
-     * @return PolicyDetailDto
      */
     private PolicyDetailDto convertToDetailDto(Policy policy) {
         return PolicyDetailDto.builder()
@@ -76,9 +72,6 @@ public class PolicyDetailService {
 
     /**
      * 신청기간(aply_ymd)을 바탕으로 마감일 계산
-     * 
-     * @param aply_ymd 신청기간 문자열
-     * @return 마감일 문자열
      */
     private LocalDate calculateDeadline(String aply_ymd) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -90,6 +83,10 @@ public class PolicyDetailService {
 
             // 끝에서 8자리 추출 (YYYYMMDD)
             String endDateRaw = aply_ymd.substring(aply_ymd.length() - 8);
+
+            if (endDateRaw == null) {
+                return LocalDate.parse("2099-12-31", formatter); // 기본 상시 마감일
+            }
 
             // yyyy-MM-dd 형태로 변환
             String formattedDate = endDateRaw.substring(0, 4) + "-" +
@@ -108,40 +105,25 @@ public class PolicyDetailService {
      * @param aply_ymd 신청기간 문자열
      * @return D-Day 문자열
      */
-    private String calculateDDay(String aply_ymd) {
+    private Long calculateDDay(String aply_ymd) {
         if (aply_ymd == null || aply_ymd.isEmpty()) {
-            return "상시";
+            return 999L;
         }
 
         try {
             LocalDate deadline = calculateDeadline(aply_ymd);
 
-            // 상시 모집 여부 판단 (특정 날짜를 기본값으로 사용)
-            LocalDate defaultDate = LocalDate.parse("2099-12-31", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            if (deadline.equals(defaultDate)) {
-                return "상시";
-            }
-
             LocalDate today = LocalDate.now();
             long daysUntil = ChronoUnit.DAYS.between(today, deadline);
-
-            if (daysUntil < 0) {
-                return "마감";
-            } else if (daysUntil == 0) {
-                return "D-Day";
-            } else {
-                return "D-" + daysUntil;
-            }
+            return daysUntil;
         } catch (Exception e) {
-            return "상시";
+            return 0L;
         }
     }
 
     /**
-     * 우편번호를 바탕으로 시도명 조회
+     * 지역코드를 바탕으로 시도명 조회
      * 
-     * @param zipCd 우편번호
-     * @return 시도명
      */
     private String getSidoNameByZipCode(String zipCd) {
         if (zipCd == null || zipCd.isEmpty()) {
@@ -156,7 +138,7 @@ public class PolicyDetailService {
                             Region::getSido));
 
             Integer zipCodeInt = Integer.valueOf(zipCd.trim());
-            return regionMap.getOrDefault(zipCodeInt, "전국");
+            return regionMap.get(zipCodeInt);
 
         } catch (NumberFormatException e) {
             return "전국";

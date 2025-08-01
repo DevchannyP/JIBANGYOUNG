@@ -24,7 +24,7 @@ public class PolicyDetailDto {
 
     private LocalDate deadline; // 마감기한
 
-    private String dDay; // 마감까지 남은 일수
+    private Long dDay; // 마감까지 남은 일수
 
     private String sidoName; // 시도명
 
