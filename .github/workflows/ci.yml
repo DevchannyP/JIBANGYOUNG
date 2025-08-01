@@ -1,4 +1,4 @@
-name: 🚦 CI - 지방청년 통합 테스트 (Backend, Frontend, Docker, Vercel)
+name: ci.yml
 
 on:
   pull_request:
