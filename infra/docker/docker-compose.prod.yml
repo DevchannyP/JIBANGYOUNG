@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  backend:
+    image: jibangyoung/backend-prod
+    build:
+      context: ../../
+      dockerfile: infra/docker/Dockerfile.backend
+      args:
+        ENV: prod
+    ports:
+      - "8080:8080"
+    env_file:
+      - infra/docker/.env.prod
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+    networks:
+      - jibang-net
+
+  frontend:
+    image: jibangyoung/frontend-prod
+    build:
+      context: ../../
+      dockerfile: infra/docker/Dockerfile.frontend
+      args:
+        ENV: prod
+    ports:
+      - "80:3000"
+    env_file:
+      - infra/docker/.env.prod
+    depends_on:
+      - backend
+    networks:
+      - jibang-net
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - jibang-net
+
+  redis:
+    image: redis:7
+    networks:
+      - jibang-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - jibang-net
+
+volumes:
+  mysql_data:
+  esdata:
+
+networks:
+  jibang-net:
+    driver: bridge
