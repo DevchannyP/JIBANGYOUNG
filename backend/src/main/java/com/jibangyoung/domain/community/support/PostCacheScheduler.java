@@ -30,5 +30,8 @@ public class PostCacheScheduler {
             List<PostListDto> posts = communityService.getRecentTop10(since);
             redisTemplate.opsForValue().set(key, posts);
         });
+
+        List<PostListDto> topReviews = communityService.getTopReviews();
+        redisTemplate.opsForValue().set("top10ReviewPosts", topReviews);
     }
 }

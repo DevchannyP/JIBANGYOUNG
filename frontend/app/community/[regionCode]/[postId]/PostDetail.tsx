@@ -1,4 +1,6 @@
+import { formatDetailDate } from "@/libs/utils/date";
 import { DetailProps } from "../../types";
+import styles from "../components/BoardList.module.css";
 
 interface Props {
   detail: DetailProps;
@@ -6,15 +8,19 @@ interface Props {
 
 export default function PostDetail({ detail }: Props) {
   return (
-    <article>
-      <h2>{detail.title}</h2>
-      <div>
-        <span>{detail.author}</span>
-        <span>{detail.createdAt}</span>
-        <span>조회 {detail.views}</span>
-        <span>추천 {detail.likes}</span>
+    <div className={styles.tableContainer}>
+      <div className={styles.postMeta}>
+        <h2 className={styles.boardTitle}>{detail.title}</h2>
+        <span>작성자: {detail.author}</span>
+        <span>작성일: {formatDetailDate(detail.createdAt)}</span>
+        <span>조회: {detail.views}</span>
+        <span>추천: {detail.likes}</span>
       </div>
-      <div dangerouslySetInnerHTML={{ __html: detail.content }} />
-    </article>
+      <div
+        className={styles.postContent}
+        dangerouslySetInnerHTML={{ __html: detail.content }}
+      />
+    </div>
   );
 }
+1;

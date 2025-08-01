@@ -1,7 +1,7 @@
+import Link from "next/link";
 import React from "react";
 import styles from "../Community.module.css";
 import { PostListDto } from "../types";
-import Link from "next/link";
 
 interface PostListDtoProps {
   posts: PostListDto[];
@@ -19,14 +19,14 @@ const PopularPostTable: React.FC<PostListDtoProps> = ({ posts }) => {
         {posts.map((post) => (
           <tr key={post.id}>
             <td>
-              <Link href={`/community/${String(post.regionId).slice(0, 2)}`}>
+              <Link href={`/community/${String(post.regionId)}`}>
                 <span className={styles.regionTag}>{post.regionName}</span>
               </Link>
             </td>
 
             <td>
               <Link
-                href={`/community/${String(post.regionId).slice(0, 2)}/${post.id}`}
+                href={`/community/${String(post.regionId)}/${post.id}`}
                 className={styles["full-cell-link"]}
               >
                 {post.title}
@@ -35,7 +35,7 @@ const PopularPostTable: React.FC<PostListDtoProps> = ({ posts }) => {
 
             <td>
               <Link
-                href={`/community/${String(post.regionId).slice(0, 2)}/${post.id}`}
+                href={`/community/${String(post.regionId)}/${post.id}`}
                 className={styles["full-cell-link"]}
               >
                 👍{post.likes} 👁️{post.views}

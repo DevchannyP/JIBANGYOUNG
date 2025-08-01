@@ -13,8 +13,8 @@
 .main {
   flex-direction: column;
   display: flex;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 5px;
+  margin-top: 10px;
   align-items: flex-start;
   flex-direction: row;
 }
@@ -122,41 +122,39 @@
 .navigation {
   display: flex;
   gap: 0;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .navButton {
-  padding: 12px 20px;
-  background: transparent;
-  border: none;
-  color: #5c4a1c;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 10px 20px; /* .searchButton과 동일하게 */
+  background: #fff; /* 비활성화 시 흰색 배경 */
+  border: 1px solid #ddd; /* 비활성화 시 회색 테두리 */
+  color: #333; /* 비활성화 시 어두운 글자색 */
+  font-size: 14px; /* .searchButton과 동일하게 */
+  font-weight: 600; /* .searchButton과 동일하게 */
   cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
-  border-radius: 8px 8px 0 0;
+  border-radius: 8px; /* .searchButton과 동일하게 */
 }
 
 .navButton:hover {
-  background: #fff8e7;
-  color: #b17c00;
+  background: #f5f5f5; /* 호버 시 약간의 배경색 변경 */
 }
 
 .navButton.active {
-  background: #fff8e7;
-  color: #b17c00;
-  font-weight: 700;
+  background: linear-gradient(135deg, #ffc82c, #f3a800); /* 활성화 시 노란색 배경 */
+  color: #fff; /* 활성화 시 흰색 글자 */
+  border-color: transparent; /* 활성화 시 테두리 없음 */
 }
 
-.navButton.active::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #ffc82c;
+.navButton.active:hover {
+  background: linear-gradient(135deg, #f0b700, #de9000); /* 활성화 호버 시 약간 어둡게 */
+}
+
+.navButton:focus,
+.navButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 200, 44, 0.6); /* 노란색 포커스 효과 */
 }
 
 .searchButton {
@@ -183,7 +181,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 20px 0 20px;
+  padding: 10px 10px 0 10px;
   border-bottom: 1px solid #eee;
   margin-bottom: 0;
 }
@@ -197,7 +195,7 @@
 
 .writeButton {
   padding: 10px 20px;
-  background: #007bff;
+  background: #00000000;
   color: white;
   border: none;
   border-radius: 4px;
@@ -208,15 +206,32 @@
 }
 
 .writeButton:hover {
-  background: #0056b3;
+  background: #0057b300;
 }
 
 .bottomSection {
   padding: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* 중앙 정렬 */
   align-items: center;
-  border-top: 1px solid #eee;
+}
+
+.postMeta {
+  padding: 10px 20px;
+  border-top: 2px solid #ffc82c; /* 옐로우 상단 보더 */
+  border-bottom: 1px solid #d7d7d7; /* 회색 하단 보더 */
+  font-size: 13px;
+  color: #666;
+}
+
+.postMeta span {
+  margin-right: 15px;
+}
+
+.postContent {
+  padding: 10px;
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 /* ================================
@@ -243,7 +258,7 @@
   padding: 14px 10px;
   text-align: center;
   font-weight: 600;
-  color: #5c4a1c;
+  color: #000000;
 }
 
 .noColumn {
@@ -252,7 +267,6 @@
 
 .titleColumn {
   width: auto;
-  text-align: left !important;
 }
 
 .authorColumn {
@@ -293,7 +307,7 @@
 
 .categoryBadge {
   background: #ffe377;
-  color: #a08029;
+  color: #624f1e;
   padding: 5px 10px;
   border-radius: 8px;
   font-size: 12px;
@@ -334,6 +348,14 @@
   font-size: 13px;
 }
 
+.noticeRow {
+  background-color: #f9f9f9; /* 아주 연한 회색 */
+}
+
+.noticeTitle {
+  font-weight: 700; /* 볼드 처리 */
+}
+
 /* ================================
    검색 섹션 스타일
    ================================ */
@@ -369,7 +391,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #007bff00;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
@@ -428,8 +450,6 @@
 .pageButton:hover,
 .navButton:hover {
   background: #f8f9fa;
-  border-color: #007bff;
-  color: #007bff;
 }
 
 .pageButton.active {
