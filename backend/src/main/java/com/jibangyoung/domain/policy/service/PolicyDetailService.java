@@ -81,20 +81,24 @@ public class PolicyDetailService {
      * @return 마감일 문자열
      */
     private LocalDate calculateDeadline(String aply_ymd) {
-        if (aply_ymd == null || aply_ymd.isEmpty()) {
-            return LocalDate.par"2099-12-31";
-        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         try {
-            if (aply_ymd.contains("~")) {
-                String[] periods = aply_ymd.split("~");
-                if (periods.length >= 2) {
-                    return periods[1].trim();
-                }
+            if (aply_ymd == null || aply_ymd.length() < 8) {
+                return LocalDate.parse("2099-12-31", formatter); // 기본 상시 마감일
             }
-            return aply_ymd;
+
+            // 끝에서 8자리 추출 (YYYYMMDD)
+            String endDateRaw = aply_ymd.substring(aply_ymd.length() - 8);
+
+            // yyyy-MM-dd 형태로 변환
+            String formattedDate = endDateRaw.substring(0, 4) + "-" +
+                    endDateRaw.substring(4, 6) + "-" +
+                    endDateRaw.substring(6, 8);
+
+            return LocalDate.parse(formattedDate, formatter);
         } catch (Exception e) {
-            return aply_ymd;
+            return LocalDate.parse("2099-12-31", formatter); // 파싱 실패 시 기본 마감일
         }
     }
 
@@ -110,30 +114,26 @@ public class PolicyDetailService {
         }
 
         try {
-            String deadline = calculateDeadline(aply_ymd);
+            LocalDate deadline = calculateDeadline(aply_ymd);
 
-            if (deadline.contains("상시") || deadline.contains("연중") || deadline.contains("수시")) {
-                return "상시모집";
+            // 상시 모집 여부 판단 (특정 날짜를 기본값으로 사용)
+            LocalDate defaultDate = LocalDate.parse("2099-12-31", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            if (deadline.equals(defaultDate)) {
+                return "상시";
             }
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            if (deadline.length() >= 10) {
-                LocalDate deadlineDate = LocalDate.parse(deadline.substring(0, 10), formatter);
-                LocalDate today = LocalDate.now();
-                long daysUntil = ChronoUnit.DAYS.between(today, deadlineDate);
+            LocalDate today = LocalDate.now();
+            long daysUntil = ChronoUnit.DAYS.between(today, deadline);
 
-                if (daysUntil < 0) {
-                    return "마감";
-                } else if (daysUntil == 0) {
-                    return "D-Day";
-                } else {
-                    return "D-" + daysUntil;
-                }
+            if (daysUntil < 0) {
+                return "마감";
+            } else if (daysUntil == 0) {
+                return "D-Day";
+            } else {
+                return "D-" + daysUntil;
             }
-
-            return "";
         } catch (Exception e) {
-            return "";
+            return "상시";
         }
     }
 

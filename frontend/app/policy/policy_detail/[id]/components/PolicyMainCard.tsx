@@ -27,7 +27,7 @@ export default function PolicyMainCard({
           <span className="policy-category">청년</span>
           <span className="policy-region">{policy.sidoName}</span>
           <span className={getDDayClass(Number(policy.dDay))}>
-            D-{policy.dDay}
+            {policy.dDay}
           </span>
         </div>
         <button 
