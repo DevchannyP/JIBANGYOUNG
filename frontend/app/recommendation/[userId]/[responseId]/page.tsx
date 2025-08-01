@@ -7,8 +7,7 @@ interface PageProps {
   };
 }
 
-// ✅ 여기를 async function으로 변경
-const Page = async ({ params }: PageProps) => {
+export default async function Page({ params }: PageProps) {
   const userId = Number(params.userId);
   const responseId = Number(params.responseId);
 
@@ -21,6 +20,4 @@ const Page = async ({ params }: PageProps) => {
       <RecommendationDataLoader userId={userId} responseId={responseId} />
     </div>
   );
-};
-
-export default Page;
+}
