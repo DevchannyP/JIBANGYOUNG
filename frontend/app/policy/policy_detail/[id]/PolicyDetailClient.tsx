@@ -117,7 +117,7 @@ export default function PolicyDetailClient({
       />
 
       <ActionButtons 
-        onApply={handleApply}
+        onApply={currentPolicy.aply_url_addr ? handleApply : undefined} // 링크 없으면 undefined
         onShare={handleShare}
       />
     </>
