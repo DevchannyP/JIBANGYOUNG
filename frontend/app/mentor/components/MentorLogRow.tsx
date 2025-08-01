@@ -1,7 +1,7 @@
 import { AdMentorLogList } from "@/types/api/adMentorLogList";
 
 interface MentorLogRowProps {
-  log: AdMentorLogList;
+  log: AdMentorLogList & { regionName?: string }; // regionName 확장
   index: number;
   ITEMS_PER_PAGE: number;
   currentPage: number;
@@ -23,7 +23,8 @@ export function MentorLogRow({
       </td>
       <td>{log.nickname}</td>
       <td>{log.role}</td>
-      <td>{log.regionId ? log.regionId : log.regionId}</td>
+      {/* 지역명 먼저, 없으면 코드 출력 */}
+      <td>{log.regionName ?? log.regionId}</td>
       <td>{log.postCount}</td>
       <td>{log.commentCount}</td>
       <td>{log.reportProcessed}</td>
