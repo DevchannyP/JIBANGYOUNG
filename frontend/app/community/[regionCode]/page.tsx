@@ -6,6 +6,7 @@ import PaginationClient from "../components/PaginationClient";
 import RegionSelector from "../components/RegionSelector";
 import BoardNavigation from "./components/BoardHeader";
 import styles from "./components/BoardList.module.css";
+import BoardSearch from "./components/BoardSearch";
 import BoardTable from "./components/BoardTable";
 import PopularPostCards from "./components/PopularPostCards";
 import PopularPosts from "./components/PopularPosts";
@@ -48,16 +49,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BoardPage({ params, searchParams }: Props) {
-  const pageParam = (await searchParams).page ?? "1";
-  const currentPage = parseInt(pageParam, 10);
+  const { page, category, search, searchType } = await searchParams;
+  const currentPage = parseInt(page ?? "1", 10);
 
-  console.log(currentPage);
   const { regionCode } = await params;
   const { posts, totalPages } = await fetchPostsByRegion(
     regionCode,
-    currentPage
+    currentPage,
+    search,
+    searchType
   );
-  const searchData = await searchParams;
 
   return (
     <div className={styles.container}>
@@ -68,6 +69,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
         <div className={styles.content}>
           <BoardTable posts={posts} />
           <PaginationClient totalPages={totalPages} />
+          <BoardSearch />
         </div>
         <aside className={styles.sidebar}>
           <PopularPosts posts={posts} />
