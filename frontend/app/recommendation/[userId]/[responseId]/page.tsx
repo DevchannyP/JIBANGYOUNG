@@ -1,13 +1,10 @@
 import RecommendationDataLoader from './RecommendationDataLoader';
 
-interface PageProps {
-  params: {
-    userId: string;
-    responseId: string;
-  };
-}
-
-export default async function Page({ params }: PageProps) {
+export default async function Page({
+  params,
+}: {
+  params: { userId: string; responseId: string };
+}) {
   const userId = Number(params.userId);
   const responseId = Number(params.responseId);
 
