@@ -20,14 +20,14 @@
 }
 
 .content {
-
+  flex: 1; /* 남는 공간을 모두 차지하도록 설정 */
   background: white;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .sidebar {
-  flex: 1;
+  /* flex: 1; */
 }
 
 /* ================================
@@ -117,51 +117,63 @@
 }
 
 /* ================================
-   네비게이션 스타일
+   네비게이션 & 탭 스타일 (옐로우 테마)
    ================================ */
 .navigation {
   display: flex;
   gap: 0;
   margin: 20px 0;
-  border-bottom: 1px solid #ddd;
 }
 
 .navButton {
   padding: 12px 20px;
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-  border-bottom: none;
-  color: #666;
-  font-size: 14px;
+  background: transparent;
+  border: none;
+  color: #5c4a1c;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
+  border-radius: 8px 8px 0 0;
 }
 
 .navButton:hover {
-  background: #e9ecef;
-}
-
-.navButton:first-child {
-  border-radius: 8px 0 0 0;
+  background: #fff8e7;
+  color: #b17c00;
 }
 
 .navButton.active {
-  background: #ffd43b;
-  color: #333;
-  font-weight: 500;
+  background: #fff8e7;
+  color: #b17c00;
+  font-weight: 700;
+}
+
+.navButton.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ffc82c;
 }
 
 .searchButton {
   margin-left: auto;
-  padding: 12px 20px;
-  background: #ffd43b;
-  border: 1px solid #ddd;
-  border-bottom: none;
-  border-radius: 0 8px 0 0;
-  color: #333;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ffc82c, #f3a800);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
   font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.searchButton:hover {
+  background: linear-gradient(135deg, #f0b700, #de9000);
 }
 
 /* ================================
@@ -208,33 +220,30 @@
 }
 
 /* ================================
-   테이블 스타일
+   테이블 스타일 (옐로우 테마)
    ================================ */
 .tableContainer {
   overflow-x: auto;
+  background: #fff;
+  border-radius: 12px;
 }
 
 .table {
-  width: 875px;
+  width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
 .headerRow {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
+  border-top: 2px solid #ffc82c;
+  border-bottom: 1px solid #f2e7c8;
 }
 
 .headerRow th {
-  padding: 12px 8px;
+  padding: 14px 10px;
   text-align: center;
-  font-weight: 500;
-  color: #495057;
-  border-right: 1px solid #dee2e6;
-}
-
-.headerRow th:last-child {
-  border-right: none;
+  font-weight: 600;
+  color: #5c4a1c;
 }
 
 .noColumn {
@@ -247,39 +256,34 @@
 }
 
 .authorColumn {
-  width: 100px;
+  width: 120px;
 }
 
 .dateColumn {
-  width: 100px;
+  width: 120px;
 }
 
 .viewsColumn {
-  width: 60px;
+  width: 80px;
 }
 
 .commentsColumn {
-  width: 60px;
+  width: 80px;
 }
 
 .tableRow {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f2e7c8;
   transition: background-color 0.2s;
 }
 
 .tableRow:hover {
-  background-color: #f8f9fa;
+  background-color: #fffdf5;
 }
 
 .tableRow td {
-  padding: 12px 8px;
+  padding: 14px 10px;
   text-align: center;
   vertical-align: middle;
-  border-right: 1px solid #f0f0f0;
-}
-
-.tableRow td:last-child {
-  border-right: none;
 }
 
 .noCell {
@@ -288,17 +292,17 @@
 }
 
 .categoryBadge {
-  background: #28a745;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background: #ffe377;
+  color: #a08029;
+  padding: 5px 10px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .titleCell {
   text-align: left !important;
-  padding-left: 16px !important;
+  padding-left: 20px !important;
 }
 
 .titleLink {
@@ -306,10 +310,11 @@
   text-decoration: none;
   display: block;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .titleLink:hover {
-  color: #007bff;
+  color: #b17c00;
   text-decoration: underline;
 }
 
