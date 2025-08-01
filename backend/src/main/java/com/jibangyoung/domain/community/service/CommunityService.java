@@ -1,15 +1,15 @@
 package com.jibangyoung.domain.community.service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
-import com.jibangyoung.domain.community.dto.RegionResponseDto;
-import com.jibangyoung.domain.community.support.S3ImageManager;
-import com.jibangyoung.domain.policy.entity.Region;
-import com.jibangyoung.domain.policy.repository.RegionRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +17,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.dto.RegionResponseDto;
 import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.repository.PostRepository;
+import com.jibangyoung.domain.community.support.S3ImageManager;
+import com.jibangyoung.domain.policy.entity.Region;
+import com.jibangyoung.domain.policy.repository.RegionRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -69,16 +75,6 @@ public class CommunityService {
         return regionMap.values().stream()
                 .flatMap(guGunMap -> guGunMap.values().stream())
                 .sorted(Comparator.comparing(RegionResponseDto::getRegionCode))
-                .collect(Collectors.toList());
-    }
-
-    // 카테고리가 정착후기인 게시글 중,
-    // 추천 수 기준 상위 10개를 내림차 순 조회.
-    public List<PostListDto> getTopReviews() {
-        return postRepository
-                .findTop10ByCategoryAndIsDeletedFalseOrderByLikesDesc(Posts.PostCategory.SETTLEMENT_REVIEW)
-                .stream()
-                .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
 
