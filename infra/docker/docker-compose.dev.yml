@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  #######################################
+  # ❌ 백엔드 비활성화 (dev 환경 테스트용)
+  #######################################
+  # backend:
+  #   build:
+  #     context: ../../
+  #     dockerfile: infra/docker/Dockerfile.backend
+  #     args:
+  #       ENV: dev
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - .env.dev
+  #   volumes:
+  #     - ../../backend:/app
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - jibang-net
+
+  #######################################
+  # ❌ 프론트엔드 비활성화 (dev 환경 테스트용)
+  #######################################
+  # frontend:
+  #   build:
+  #     context: ../../
+  #     dockerfile: infra/docker/Dockerfile.frontend
+  #     args:
+  #       ENV: dev
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - .env.dev
+  #   volumes:
+  #     - ../../frontend:/app
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - jibang-net
+
+  #######################################
+  # ✅ Redis (dev)
+  #######################################
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - jibang-net
+
+networks:
+  jibang-net:
