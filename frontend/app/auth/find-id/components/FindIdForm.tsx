@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "../FindIdPage.module.css";
 
+
+//  Props 타입 정의
 interface Props {
   onSuccess: (username: string) => void;
   onError: (msg: string) => void;
