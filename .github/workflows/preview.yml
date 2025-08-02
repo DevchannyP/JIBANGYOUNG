@@ -3,7 +3,9 @@ name: 🔍 Preview Deployment (PR)
 on:
   pull_request:
     types: [opened, synchronize]
-    branches: [main] # 👉 main 브랜치 대상 PR에만 실행
+    branches:
+      - main # 👉 main 브랜치로 향하는 PR
+      - dev # 👉 dev 브랜치로 향하는 PR
 
 jobs:
   preview:
