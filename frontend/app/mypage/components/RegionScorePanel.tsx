@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "../MyPageLayout.module.css";
 
-// 점수 프로그레스 바
+// 점수 프로그레스 바 컴포넌트
 function ScoreProgress({ score, max = 300 }: { score: number; max?: number }) {
   const pct = Math.min(Math.round((score / max) * 100), 100);
   return (
