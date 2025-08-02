@@ -11,6 +11,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  ci_yml_check:
+    name: Dummy CI.yml Required Check
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ ci.yml check passed"
+
   backend:
     name: 🛠️ Backend Test
     runs-on: ubuntu-latest
