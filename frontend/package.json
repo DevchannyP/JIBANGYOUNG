@@ -6,7 +6,6 @@
   "dev": "next dev -p 3000",
   "build": "next build",
   "vercel-build": "npm install --include=optional --include=dev --platform=linux --arch=x64 sharp && next build",
-
   "start": "next start",
   "lint": "eslint . --ext .ts,.tsx",
   "format": "prettier --write .",
