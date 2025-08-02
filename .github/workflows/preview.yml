@@ -4,25 +4,30 @@ on:
   pull_request:
     types: [opened, synchronize]
     branches:
-      - main # 👉 main 브랜치로 향하는 PR
-      - dev # 👉 dev 브랜치로 향하는 PR
+      - main
+      - dev
 
 jobs:
   preview:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: ⛔ Clean all node_modules and cache (sharp/platform 관련)
+        run: |
+          rm -rf frontend/node_modules
+          rm -rf ~/.npm
 
-      - name: Build Frontend
+      - name: 📦 Install Dependencies (sharp + optional)
         working-directory: frontend
         run: |
-          npm ci
+          npm install --include=optional
+          npm install --platform=linux --arch=x64 sharp
+
+      - name: 🛠 Build Frontend
+        working-directory: frontend
+        run: |
           npm run build
 
-      - name: Deploy to Vercel (Preview)
+      - name: 🚀 Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
