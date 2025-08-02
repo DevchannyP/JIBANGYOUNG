@@ -5,22 +5,38 @@ on:
     types: [opened, synchronize]
     branches: [main, dev]
 
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   preview:
+    name: 🔎 Vercel Preview Deploy (Frontend Only)
     runs-on: ubuntu-latest
 
     steps:
-      - name: ✅ Checkout
+      - name: ✅ Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🧹 Clean node_modules and cache
+      - name: 📁 List Directory Tree (디버깅용)
         run: |
-          rm -rf frontend/node_modules
+          echo "[root dir]"
+          ls -al
+          echo "[frontend dir]"
+          ls -al frontend
+
+      - name: 🧹 Clean node_modules and cache
+        working-directory: frontend
+        run: |
+          rm -rf node_modules .next .cache
+          rm -f package-lock.json tsconfig.tsbuildinfo
           rm -rf ~/.npm
 
-      - name: 📦 Install Dependencies
+      - name: 📦 Install Dependencies (sharp + optional)
         working-directory: frontend
-        run: npm ci
+        run: |
+          npm install --include=optional
+          npm install --os=linux --cpu=x64 sharp
 
       - name: ⚙️ Build Frontend (Sharp 포함)
         working-directory: frontend
