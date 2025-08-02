@@ -1,8 +1,8 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { checkEmail, findIdByEmailAndCode, sendFindIdCode, verifyFindIdCode } from "@/libs/api/auth/auth.api";
 import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import styles from "../FindIdPage.module.css";
-import { sendFindIdCode, verifyFindIdCode, findIdByEmailAndCode, checkEmail } from "@/libs/api/auth/auth.api";
 
 interface Props {
   onSuccess: (username: string) => void;
@@ -10,6 +10,7 @@ interface Props {
   error?: string;
 }
 
+// 아이디 찾기 폼 컴포넌트
 export default function FindIdForm({ onSuccess, onError, error }: Props) {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
