@@ -1,11 +1,8 @@
-name: 🔍 Preview Deployment (PR)
-
+# name: 🔍 Preview Deployment (PR)
 on:
   pull_request:
     types: [opened, synchronize]
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
 
 jobs:
   preview:
@@ -24,9 +21,9 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: ⚙️ Build Frontend
+      - name: ⚙️ Build Frontend (with Sharp for Linux)
         working-directory: frontend
-        run: npm run build
+        run: npm run vercel-build
 
       - name: 🚀 Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25

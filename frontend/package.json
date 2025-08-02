@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write .",
-    "check": "tsc --noEmit && eslint . --ext .ts,.tsx && prettier --check .",
-    "test": "jest",
-    "test:unit": "jest --passWithNoTests",
-    "test:e2e": "cypress run",
-    "cy:open": "cypress open"
+  "dev": "next dev -p 3000",
+  "build": "next build",
+  "vercel-build": "npm install --include=optional --platform=linux --arch=x64 sharp && next build",
+  "start": "next start",
+  "lint": "eslint . --ext .ts,.tsx",
+  "format": "prettier --write .",
+  "check": "tsc --noEmit && eslint . --ext .ts,.tsx && prettier --check .",
+  "test": "jest",
+  "test:unit": "jest --passWithNoTests",
+  "test:e2e": "cypress run",
+  "cy:open": "cypress open"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^39.0.2",
