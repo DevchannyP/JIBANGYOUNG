@@ -6,7 +6,7 @@ interface Props {
   username: string;
   onRetry: () => void;
 }
-
+// 아이디 찾기 결과 컴포넌트
 export default function FindIdResult({ username, onRetry }: Props) {
   return (
     <div className={styles.resultContainer}>
