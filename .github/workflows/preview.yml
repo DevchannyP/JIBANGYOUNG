@@ -3,46 +3,24 @@ name: 🔍 Preview Deployment (PR)
 on:
   pull_request:
     types: [opened, synchronize]
-    branches: [main, dev]
-
-concurrency:
-  group: preview-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [main] # 👉 main 브랜치 대상 PR에만 실행
 
 jobs:
   preview:
-    name: 🔎 Vercel Preview Deploy (Frontend Only)
     runs-on: ubuntu-latest
-
     steps:
-      - name: ✅ Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: 📁 List Directory Tree (디버깅용)
-        run: |
-          echo "[root dir]"
-          ls -al
-          echo "[frontend dir]"
-          ls -al frontend
-
-      - name: 🧹 Clean node_modules and cache
+      - name: Build Frontend
         working-directory: frontend
         run: |
-          rm -rf node_modules .next .cache
-          rm -f package-lock.json tsconfig.tsbuildinfo
-          rm -rf ~/.npm
+          npm ci
+          npm run build
 
-      - name: 📦 Install Dependencies (sharp + optional)
-        working-directory: frontend
-        run: |
-          npm install --include=optional
-          npm install --os=linux --cpu=x64 sharp
-
-      - name: ⚙️ Build Frontend (Sharp 포함)
-        working-directory: frontend
-        run: npm run vercel-build
-
-      - name: 🚀 Deploy to Vercel (Preview)
+      - name: Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
