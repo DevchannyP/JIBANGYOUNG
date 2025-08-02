@@ -1,16 +1,16 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import styles from "../FindIdPage.module.css";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import styles from "../FindIdPage.module.css";
 
 interface Props {
   username: string;
   open: boolean;
   onClose: () => void;
 }
-
+// 아이디 찾기 성공 모달 컴포넌트
 export default function FindIdSuccessModal({ username, open, onClose }: Props) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
