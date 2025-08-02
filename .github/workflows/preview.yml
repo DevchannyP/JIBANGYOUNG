@@ -1,4 +1,5 @@
-# name: 🔍 Preview Deployment (PR)
+name: 🔍 Preview Deployment (PR)
+
 on:
   pull_request:
     types: [opened, synchronize]
@@ -21,7 +22,7 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: ⚙️ Build Frontend (with Sharp for Linux)
+      - name: ⚙️ Build Frontend (Sharp 포함)
         working-directory: frontend
         run: npm run vercel-build
 
@@ -31,5 +32,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: frontend
+          working-directory: ./frontend
           alias-domains: pr-${{ github.event.pull_request.number }}.preview.jibangyoung.dev
