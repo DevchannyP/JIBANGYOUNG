@@ -10,22 +10,25 @@ on:
 jobs:
   preview:
     runs-on: ubuntu-latest
+
     steps:
-      - name: ⛔ Clean all node_modules and cache (sharp/platform 관련)
+      - name: ✅ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🧹 Clean node_modules and cache
         run: |
           rm -rf frontend/node_modules
           rm -rf ~/.npm
 
-      - name: 📦 Install Dependencies (sharp + optional)
+      - name: 📦 Install Dependencies
         working-directory: frontend
         run: |
-          npm install --include=optional
-          npm install --platform=linux --arch=x64 sharp
+          npm ci
+          npm install --include=optional --platform=linux --arch=x64 sharp
 
-      - name: 🛠 Build Frontend
+      - name: ⚙️ Build Frontend
         working-directory: frontend
-        run: |
-          npm run build
+        run: npm run build
 
       - name: 🚀 Deploy to Vercel (Preview)
         uses: amondnet/vercel-action@v25
@@ -33,5 +36,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
+          working-directory: frontend
           alias-domains: pr-${{ github.event.pull_request.number }}.preview.jibangyoung.dev
