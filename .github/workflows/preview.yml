@@ -22,9 +22,7 @@ jobs:
 
       - name: 📦 Install Dependencies
         working-directory: frontend
-        run: |
-          npm ci
-          npm install --include=optional --platform=linux --arch=x64 sharp
+        run: npm ci
 
       - name: ⚙️ Build Frontend
         working-directory: frontend
