@@ -1,10 +1,10 @@
+// MentorReportListRow.tsx
 import {
   Report,
   StatusType,
   reportTypeLabel,
 } from "@/types/api/adMentorReport";
 
-// 상태별 라벨/컬러 정의
 const STATUS_MAP: Record<StatusType, { label: string; color: string }> = {
   PENDING: { label: "검토중", color: "#fbbf24" },
   APPROVED: { label: "승인", color: "#36b37e" },
@@ -52,7 +52,7 @@ export const MentorReportListRow: React.FC<MentorReportListRowProps> = ({
           • {status.label}
         </span>
       </td>
-      <td>{report.reporterName ?? report.userId}</td>
+      <td>{report.reviewerName ?? "미지정"}</td>
       <td>
         {report.url ? (
           <button

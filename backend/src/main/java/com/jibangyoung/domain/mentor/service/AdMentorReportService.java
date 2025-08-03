@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jibangyoung.domain.mentor.dto.AdMentorReportDTO;
 import com.jibangyoung.domain.mentor.repository.AdMentorReportRepository;
 import com.jibangyoung.domain.mentor.repository.AdMentorUserRepository;
+import com.jibangyoung.domain.mypage.entity.Report;
 import com.jibangyoung.domain.mypage.entity.ReportTargetType;
+import com.jibangyoung.domain.mypage.entity.ReviewResultCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,5 +47,14 @@ public class AdMentorReportService {
         System.out.println("[서비스] 최종 결과 리스트 크기: " + result.size());
 
         return result;
+    }
+
+    // 🚩 신고 상태 변경(승인요청/무시/무효)
+    @Transactional
+    public void updateReportStatus(Long reportId, String status, Long reviewedBy) {
+        Report report = mentorReportRepository.findById(reportId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 신고내역이 존재하지 않습니다: " + reportId));
+        report.setReviewResultCode(ReviewResultCode.valueOf(status)); // enum으로!
+        report.setReviewedBy(reviewedBy);
     }
 }

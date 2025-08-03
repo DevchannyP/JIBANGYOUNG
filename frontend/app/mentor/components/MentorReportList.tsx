@@ -2,7 +2,10 @@ import { CommonModal } from "@/app/admin/components/AdminModal";
 import { AdminReportTab } from "@/app/admin/components/AdminReportTab";
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
-import { fetchMentorReports } from "@/libs/api/admin/adminMentor.api";
+import {
+  fetchMentorReports,
+  requestReportApproval,
+} from "@/libs/api/admin/adminMentor.api";
 import {
   Report,
   ReportTabType,
@@ -76,20 +79,35 @@ export function MentorReportList() {
     if (url) window.open(url, "_blank");
   }, []);
 
-  // 승인요청(1차)
-  const handleRequestApprove = useCallback(async (reportId: number) => {
-    setReports((prev) =>
-      prev.map((r) =>
-        r.id === reportId ? { ...r, reviewResultCode: "REQUESTED" } : r
-      )
-    );
-    setSearchResult((prev) =>
-      prev.map((r) =>
-        r.id === reportId ? { ...r, reviewResultCode: "REQUESTED" } : r
-      )
-    );
-    setSelectedReport(null);
-  }, []);
+  // 상태 변경(승인요청, 무시, 무효) 공통 핸들러
+  const handleChangeStatus = useCallback(
+    async (
+      reportId: number,
+      nextStatus: "REQUESTED" | "IGNORED" | "INVALID"
+    ) => {
+      if (!selectedReport) return;
+      try {
+        // 서버 반영 (userId 필요 시 넘겨줌)
+        await requestReportApproval(reportId, nextStatus);
+
+        // 프론트 상태 동기화
+        setReports((prev) =>
+          prev.map((r) =>
+            r.id === reportId ? { ...r, reviewResultCode: nextStatus } : r
+          )
+        );
+        setSearchResult((prev) =>
+          prev.map((r) =>
+            r.id === reportId ? { ...r, reviewResultCode: nextStatus } : r
+          )
+        );
+        setSelectedReport(null);
+      } catch (e: any) {
+        alert(e.message || "상태 변경 실패");
+      }
+    },
+    [selectedReport]
+  );
 
   const paginatedData = searchResult.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -179,8 +197,21 @@ export function MentorReportList() {
                 ? [
                     {
                       label: "승인 요청",
-                      onClick: () => handleRequestApprove(selectedReport.id),
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "REQUESTED"),
                       type: "primary" as const,
+                    },
+                    {
+                      label: "무시",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "IGNORED"),
+                      type: "secondary" as const,
+                    },
+                    {
+                      label: "무효",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "INVALID"),
+                      type: "danger" as const,
                     },
                   ]
                 : []),
