@@ -1,6 +1,11 @@
 package com.jibangyoung.domain.policy.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -91,4 +96,7 @@ public class Policy {
 
     @Column(name = "job_cd", length = 20)
     private String job_cd;
+
+    @Column(name = "favorites", nullable = false)
+    private int favorites;
 }

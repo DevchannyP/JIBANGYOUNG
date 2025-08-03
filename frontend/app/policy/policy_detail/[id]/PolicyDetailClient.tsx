@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
 import { fetchPolicyDetail } from "@/libs/api/policy/policyDetail";
+import { syncBookmarkedPolicies } from "@/libs/api/policy/sync";
 import type { PolicyDetailDto } from "@/types/api/policy";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,30 +11,45 @@ import PolicyHeader from "./components/PolicyHeader";
 import PolicyMainCard from "./components/PolicyMainCard";
 import RelatedPoliciesSection from "./components/RelatedPoliciesSection";
 
-
 interface PolicyDetailClientProps {
   initialData: PolicyDetailDto[] | null;
   policyId: number;
+  userId: number;  // userId 추가
 }
 
 export default function PolicyDetailClient({ 
   initialData, 
-  policyId 
+  policyId,
+  userId,         // userId 받기
 }: PolicyDetailClientProps) {
   const router = useRouter();
   const { id } = useParams();
   const [policy, setPolicy] = useState<PolicyDetailDto[] | null>(initialData);
-  const [loading, setLoading] = useState(!initialData); // SSR 데이터가 있으면 로딩 false
+  const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  // --- localStorage에서 해당 정책 북마크 상태 복원 ---
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("bookmarkedPolicyIds");
+        if (stored) {
+          const bookmarkedIds: number[] = JSON.parse(stored);
+          return bookmarkedIds.includes(policyId);
+        }
+      } catch {
+        // 무시
+      }
+    }
+    return false;
+  });
+
   const [relatedPolicies, setRelatedPolicies] = useState<PolicyDetailDto[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
 
-  // CSR로 정책 데이터 가져오기 (SSR 실패 시 또는 재검증)
   useEffect(() => {
     if (!id) return;
 
-    // SSR 데이터가 없는 경우에만 CSR로 fetch
     if (!initialData) {
       setLoading(true);
       fetchPolicyDetail(Number(id))
@@ -49,13 +65,13 @@ export default function PolicyDetailClient({
     }
   }, [id, initialData]);
 
-  // CSR로 관련 정책 데이터 가져오기
   useEffect(() => {
     if (!policy || policy.length === 0) return;
 
     const fetchRelatedPolicies = async () => {
       setLoadingRelated(true);
       try {
+        // 관련 정책 API 호출 로직 필요시 작성
       } catch (error) {
         console.error("Error fetching related policies:", error);
       } finally {
@@ -66,13 +82,56 @@ export default function PolicyDetailClient({
     fetchRelatedPolicies();
   }, [policy, policyId]);
 
+  // 5분마다 localStorage 북마크 동기화 서버 전송 (userId 포함)
+useEffect(() => {
+  const syncBookmarksToServer = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem('bookmarkedPolicyIds');
+      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+
+      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
+    } catch (error) {
+      console.error('북마크 동기화 실패:', error);
+    }
+  };
+
+  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+
+  return () => clearInterval(intervalId);
+}, [userId]);
+
   const handleBack = () => {
     router.back();
   };
 
   const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-    // 북마크 API 호출
+    setIsBookmarked((prev) => {
+      const nextState = !prev;
+
+      // localStorage 업데이트
+      if (typeof window !== "undefined") {
+        try {
+          const stored = localStorage.getItem("bookmarkedPolicyIds");
+          let bookmarkedIds: number[] = stored ? JSON.parse(stored) : [];
+
+          if (nextState) {
+            if (!bookmarkedIds.includes(policyId)) {
+              bookmarkedIds.push(policyId);
+            }
+          } else {
+            bookmarkedIds = bookmarkedIds.filter(id => id !== policyId);
+          }
+
+          localStorage.setItem("bookmarkedPolicyIds", JSON.stringify(bookmarkedIds));
+        } catch {
+          // 무시
+        }
+      }
+
+      return nextState;
+    });
   };
 
   const handleApply = () => {
@@ -89,7 +148,6 @@ export default function PolicyDetailClient({
         url: window.location.href,
       });
     } else {
-      // 클립보드에 복사
       navigator.clipboard.writeText(window.location.href);
       alert('링크가 클립보드에 복사되었습니다.');
     }
@@ -117,7 +175,7 @@ export default function PolicyDetailClient({
       />
 
       <ActionButtons 
-        onApply={currentPolicy.aply_url_addr ? handleApply : undefined} // 링크 없으면 undefined
+        onApply={currentPolicy.aply_url_addr ? handleApply : undefined}
         onShare={handleShare}
       />
     </>

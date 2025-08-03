@@ -1,5 +1,6 @@
 'use client';
 
+import { syncBookmarkedPolicies } from '@/libs/api/policy/sync';
 import { fetchRecommendations } from '@/libs/api/recommendation.api';
 import { RecommendationResultDto } from '@/types/api/recommendation';
 import { useRouter } from 'next/navigation';
@@ -12,6 +13,8 @@ interface RecommendationDataLoaderProps {
   responseId: number;
 }
 
+const STORAGE_KEY = 'bookmarkedPolicyIds';
+
 const RecommendationDataLoader: React.FC<RecommendationDataLoaderProps> = ({
   userId,
   responseId,
@@ -20,7 +23,42 @@ const RecommendationDataLoader: React.FC<RecommendationDataLoaderProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
-  const router = useRouter(); // ⬅️ Next.js navigation 훅
+  const router = useRouter();
+
+  // localStorage에서 북마크 아이디 복원
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          setBookmarkedPolicyIds(JSON.parse(stored));
+        }
+      } catch {
+        console.log("아이디 복원 실패");
+        // 무시
+      }
+    }
+  }, []);
+
+  // 5분마다 localStorage 북마크 동기화 서버 전송
+useEffect(() => {
+  const syncBookmarksToServer = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem('bookmarkedPolicyIds');
+      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+
+      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
+    } catch (error) {
+      console.error('북마크 동기화 실패:', error);
+    }
+  };
+
+  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+
+  return () => clearInterval(intervalId);
+}, [userId]);
 
   useEffect(() => {
     const loadRecommendations = async () => {
@@ -41,23 +79,31 @@ const RecommendationDataLoader: React.FC<RecommendationDataLoaderProps> = ({
   }, [userId, responseId]);
 
   const handlePolicyClick = (policyId: number) => {
-    // 정책 상세 페이지 이동
     router.push(`/policy/policy_detail/${policyId}`);
   };
 
   const handleRegionClick = (regionCode: string) => {
-    // 추천 지역 상세 페이지로 이동
     router.push(`/recommendation/${userId}/${responseId}/${regionCode}`);
   };
 
   const handleBookmarkToggle = (policyId: number) => {
-    setBookmarkedPolicyIds((prev) =>
-      prev.includes(policyId)
+    setBookmarkedPolicyIds((prev) => {
+      const isBookmarked = prev.includes(policyId);
+      const updated = isBookmarked
         ? prev.filter((id) => id !== policyId)
-        : [...prev, policyId]
-    );
+        : [...prev, policyId];
 
-    // 예: 북마크 토글 API 호출 등
+      // localStorage 저장
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch {
+          // 무시
+        }
+      }
+
+      return updated;
+    });
   };
 
   const handleViewAllPolicies = () => {

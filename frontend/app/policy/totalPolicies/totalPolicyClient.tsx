@@ -1,15 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import PolicyFilterBar from './components/PolicyFilterBar';
-import PolicyCardList from './components/PolicyCardList';
-import Pagination from './components/Pagination';
-import PolicyCounter from './components/PolicyCounter';
-import styles from '../total_policy.module.css';
-import { PolicyCard } from "@/types/api/policy.c";
-import { fetchPoliciesByRegion } from "@/libs/api/policy/region.api";
 import { fetchAllPolicies } from "@/libs/api/policy/policy.c";
+import { fetchPoliciesByRegion } from "@/libs/api/policy/region.api";
+import { syncBookmarkedPolicies } from "@/libs/api/policy/sync";
+import { PolicyCard } from "@/types/api/policy.c";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import styles from '../total_policy.module.css';
+import Pagination from './components/Pagination';
+import PolicyCardList from './components/PolicyCardList';
+import PolicyCounter from './components/PolicyCounter';
+import PolicyFilterBar from './components/PolicyFilterBar';
 import SkeletonLoader from "./skeleton";
 
 interface ServerState {
@@ -21,7 +22,12 @@ interface ServerState {
   itemsPerPage: number;
 }
 
-export default function PolicyClient({ serverState }: { serverState: ServerState }) {
+interface PolicyClientProps {
+  serverState: ServerState;
+  userId: number;  // userId prop 추가
+}
+
+export default function PolicyClient({ serverState, userId }: PolicyClientProps) {
   const [policies, setPolicies] = useState<PolicyCard[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(serverState.currentPage);
@@ -29,7 +35,20 @@ export default function PolicyClient({ serverState }: { serverState: ServerState
   const [region, setRegion] = useState(serverState.region);
   const [sortBy, setSortBy] = useState(serverState.sortBy);
   const [searchQuery, setSearchQuery] = useState(serverState.searchQuery);
-  const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
+
+  // --- localStorage에서 북마크 초기값 복원 ---
+  const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('bookmarkedPolicyIds');
+        return stored ? JSON.parse(stored) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,43 +79,41 @@ export default function PolicyClient({ serverState }: { serverState: ServerState
   }, []);
 
   // 지역 변경 시 데이터 재패칭
- const fetchPoliciesByRegionChange = useCallback(async (newRegion: number) => {
-  setIsLoading(true);
-  setError(null);
+  const fetchPoliciesByRegionChange = useCallback(async (newRegion: number) => {
+    setIsLoading(true);
+    setError(null);
 
-  try {
-    if (newRegion === 99999) {
-      // 전국인 경우 초기 전체 데이터로 복원
-      const allPolicies = await fetchAllPolicies();
-      const sorted = allPolicies.sort((a, b) => {
-        const today = new Date();
-        const dDayA = (new Date(a.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-        const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-        return dDayA - dDayB;
-      });
-      setPolicies(sorted);
-      setTotal(sorted.length);
-    } else {
-      // 특정 지역인 경우 기존 로직 유지
-      const [regionData, nationalData] = await Promise.all([
-        fetchPoliciesByRegion(newRegion),
-        fetchPoliciesByRegion(99999),
-      ]);
+    try {
+      if (newRegion === 99999) {
+        const allPolicies = await fetchAllPolicies();
+        const sorted = allPolicies.sort((a, b) => {
+          const today = new Date();
+          const dDayA = (new Date(a.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+          const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+          return dDayA - dDayB;
+        });
+        setPolicies(sorted);
+        setTotal(sorted.length);
+      } else {
+        const [regionData, nationalData] = await Promise.all([
+          fetchPoliciesByRegion(newRegion),
+          fetchPoliciesByRegion(99999),
+        ]);
 
-      const merged = [...regionData, ...nationalData].filter(
-        (policy, index, self) =>
-          index === self.findIndex(p => p.plcy_no === policy.plcy_no)
-      );
+        const merged = [...regionData, ...nationalData].filter(
+          (policy, index, self) =>
+            index === self.findIndex(p => p.plcy_no === policy.plcy_no)
+        );
 
-      setPolicies(merged);
-      setTotal(merged.length);
+        setPolicies(merged);
+        setTotal(merged.length);
+      }
+    } catch (err) {
+      setError("데이터를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    setError("데이터를 불러오는 중 오류가 발생했습니다.");
-  } finally {
-    setIsLoading(false);
-  }
-}, []);
+  }, []);
 
   useEffect(() => {
     fetchPoliciesByRegionChange(region);
@@ -165,17 +182,50 @@ export default function PolicyClient({ serverState }: { serverState: ServerState
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   }, [currentPage, totalPages]);
 
+  // --- 북마크 토글 & localStorage 저장 ---
   const handleBookmarkToggle = useCallback((policyId: number) => {
-    setBookmarkedPolicyIds(prev =>
-      prev.includes(policyId)
-        ? prev.filter(id => id !== policyId)
-        : [...prev, policyId]
-    );
+    setBookmarkedPolicyIds(prev => {
+      let updated: number[];
+      if (prev.includes(policyId)) {
+        updated = prev.filter(id => id !== policyId);
+      } else {
+        updated = [...prev, policyId];
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('bookmarkedPolicyIds', JSON.stringify(updated));
+        } catch {
+          // localStorage error 무시
+        }
+      }
+
+      return updated;
+    });
   }, []);
 
-  // 로딩 및 에러 처리
+  // --- 5분마다 localStorage 북마크 상태 서버 전송 ---
+useEffect(() => {
+  const syncBookmarksToServer = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem('bookmarkedPolicyIds');
+      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+
+      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
+    } catch (error) {
+      console.error('북마크 동기화 실패:', error);
+    }
+  };
+
+  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+
+  return () => clearInterval(intervalId);
+}, [1001]);
+
   if (isLoading) {
-    <SkeletonLoader />
+    return <SkeletonLoader />;
   }
 
   if (error) {
