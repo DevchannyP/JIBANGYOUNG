@@ -2,6 +2,8 @@
 # 🖥 OS 임시 파일
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # -----------------------------------
 # 🟦 Node.js 캐시 (프론트엔드)
@@ -9,6 +11,7 @@ node_modules/
 .next/
 out/
 dist/
+.npm/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -18,7 +21,7 @@ pnpm-debug.log*
 # ☕ Java/Gradle 캐시 (백엔드)
 .gradle/
 build/
-*/build/            
+*/build/
 *.class
 
 # Gradle wrapper는 예외적으로 포함
@@ -26,7 +29,21 @@ build/
 !**/gradle-wrapper.properties
 
 # -----------------------------------
-# 🗂 패키징 파일 (배포 산출물)
+# ☕ Spring Boot 설정 파일 (민감 정보 포함)
+application.yml
+application.yaml
+application.properties
+**/application.yml
+**/application.yaml
+**/application.properties
+**/application-local.yml
+**/application-dev.yml
+**/application-prod.yml
+application.yml___jb_tmp___
+application.yml___jb_old___
+
+# -----------------------------------
+# 🗂 패키징 산출물
 *.zip
 *.tar.gz
 *.tar
@@ -36,28 +53,77 @@ build/
 *.ear
 
 # -----------------------------------
-# ⚙️ IDE 및 편집기 캐시
+# ⚙️ IDE / 에디터 관련 캐시
 .idea/
 *.iml
+*.iws
+*.ipr
 *.swp
 *.swo
 *.bak
-
-# VSCode 설정은 공유 목적이면 포함 가능
-# .vscode/ ← ❗ 주석 처리 해제 시 공유 가능
-# .vscode/
+*.tmp
+*.vscode/
+.shelf/
 
 # -----------------------------------
-# ✅ 모든 설정·보안 파일 포함
-# .env, .env.local, application.yml 등은 전부 Git에 포함
-# 따라서 아래는 주석 처리하거나 삭제
+# ⚠️ 민감 환경 설정 (.env, 자격 증명 등)
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.example
+.env.*
+**/.env
+**/.env.*
+infra/.env
+infra/.env.*
 backend/.env
-# .env.local
-application.yml
-# infra/.env
+backend/.env.*
+resources/application.yml
+backend/src/main/resources/application.yml
+
+# AWS, GCP, Firebase, 인증 키 파일
+*.pem
+*.key
+*.crt
+*.csr
+*.jks
+*.p12
+*.keystore
+*.gpg
+credentials.json
+config.json
+firebase-adminsdk-*.json
+firebase-service-account.json
+serviceAccountKey.json
+secrets.*
+*.secrets.json
+
+# GitHub Push Protection 대응 (임시 백업, 충돌 파일 등)
+*.orig
+*.rej
+*.backup
+*.merge
+*.sw?
+_*                 # macOS resource forks
+.swp               # vim swap files
 
 # -----------------------------------
-# 🔧 Terraform 캐시 등 무거운 툴링 산출물
+# 🔧 Terraform, Docker, 기타 툴링 캐시
 .terraform/
 infra/.terraform/
+.docker/
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# -----------------------------------
+# 🔄 Git 작업 디렉토리 상태 파일
+.git-credentials
+.gitconfig
+.gitignore.lock
+*.lock

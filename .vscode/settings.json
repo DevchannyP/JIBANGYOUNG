@@ -1,5 +1,5 @@
 {
-  // ---------- (공통) ----------
+   // ---------- (공통) ----------
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
@@ -10,6 +10,7 @@
   "files.exclude": {
     "**/.next": true,
     "**/node_modules": true,
+    "**/node_modules/.bin": true,
     "**/build": true,
     "**/.gradle": true
   },
@@ -60,10 +61,7 @@
   "java.errors.incompleteClasspath.severity": "error",
   "java.configuration.maven.globalSettings": "",
   "java.configuration.maven.userSettings": "",
-  "java.import.exclusions": [
-    "**/node_modules/**",
-    "**/.vscode/**"
-  ],
+  "java.import.exclusions": ["**/node_modules/**", "**/.vscode/**"],
   "java.autobuild.enabled": true,
   "gradle.autoSync": true,
 

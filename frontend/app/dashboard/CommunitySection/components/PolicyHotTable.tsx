@@ -1,68 +1,10 @@
+"use client";
+
 import styles from "../CommunitySection.module.css";
+import { usePolicyHotTop10Query } from "./usePolicyHotTop10Query";
 
 export default function PolicyHotTable() {
-  const rows = [
-    {
-      no: "01",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "서울",
-      value: "56",
-    },
-    {
-      no: "02",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "부산",
-      value: "56",
-    },
-    {
-      no: "03",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "04",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "05",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "06",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "07",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "08",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "09",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "10",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-  ];
+  const { data, isLoading, isError } = usePolicyHotTop10Query();
 
   return (
     <div className={styles.tableCard}>
@@ -81,14 +23,36 @@ export default function PolicyHotTable() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.no}>
-                <td>{row.no}</td>
-                <td>{row.name}</td>
-                <td>{row.region}</td>
-                <td className={styles.hot}>{row.value}</td>
+            {isLoading ? (
+              [...Array(10)].map((_, i) => (
+                <tr key={i}>
+                  <td colSpan={4}>
+                    <div className={styles.skeletonRow} />
+                  </td>
+                </tr>
+              ))
+            ) : isError ? (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", color: "#888" }}>
+                  데이터를 불러올 수 없습니다.
+                </td>
               </tr>
-            ))}
+            ) : data && data.length > 0 ? (
+              data.map((row) => (
+                <tr key={row.no}>
+                  <td>{row.no}</td>
+                  <td>{row.name}</td>
+                  <td>{row.region}</td>
+                  <td className={styles.hot}>{row.value}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", color: "#aaa" }}>
+                  인기 정책 데이터가 없습니다.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
