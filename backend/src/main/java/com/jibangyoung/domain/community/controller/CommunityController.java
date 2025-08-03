@@ -48,8 +48,12 @@ public class CommunityController {
     public Page<PostListDto> getPostsByRegion(
             @PathVariable String regionCode,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return communityService.getPostsByRegion(regionCode, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String searchType
+    ) {
+        return communityService.getPostsByRegion(regionCode, page, size, category, search, searchType);
     }
     // 게시글 상세
     @GetMapping("/post/{postId}")
@@ -86,6 +90,13 @@ public class CommunityController {
         return communityService.getTopReviewPosts();
     }
 
+    // 공지
+    @GetMapping("/notices")
+    public ResponseEntity<List<PostListDto>> getNotices() {
+        return ResponseEntity.ok(communityService.getNotices());
+    }
+
+    // 댓글 가져오기
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
         return ResponseEntity.ok(communityService.findCommentsByPostId(postId));
@@ -102,6 +113,7 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId
@@ -110,5 +122,16 @@ public class CommunityController {
         Long userId = 1L;
         communityService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    // 게시글 추천
+    @PostMapping("/post/{postId}/recommend")
+    public ResponseEntity<Void> recommendPost(
+            @PathVariable Long postId,
+            @RequestBody @Valid RecommendationRequestDto requestDto,
+            @AuthenticationPrincipal User user
+    ) {
+        communityService.recommendPost(postId, user.getId(), requestDto.getType());
+        return ResponseEntity.ok().build();
     }
 }

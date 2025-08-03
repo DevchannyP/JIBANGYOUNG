@@ -101,6 +101,10 @@ public class Posts {
         this.views += 1;
     }
 
+    public void incrementLikes() {
+        this.likes += 1;
+    }
+
     // 내부 enum으로 카테고리 정의
     @Getter
     public enum PostCategory {

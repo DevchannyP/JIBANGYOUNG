@@ -38,11 +38,25 @@ export async function fetchPopularPostsByPeriod(
 
   return res.json();
 }
+
+// 공지사항 조회
+export async function fetchNotices(): Promise<PostListDto[]> {
+  const res = await fetch(`${BASE}/api/community/notices`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`API 요청 실패: ${res.status} ${res.statusText}`);
+  }
+
+  return res.json();
+}
 export async function fetchPostsByRegion(
   regionCode: string,
   page: number,
   search?: string,
-  searchType?: string
+  searchType?: string,
+  category?: string // category 파라미터 추가
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const query = new URLSearchParams({
     page: page.toString(),
@@ -51,6 +65,10 @@ export async function fetchPostsByRegion(
   if (search && searchType) {
     query.set("search", search);
     query.set("searchType", searchType);
+  }
+
+  if (category && category !== "all") { // "all" 카테고리는 백엔드로 보내지 않음
+    query.set("category", category);
   }
 
   const res = await fetch(
@@ -86,6 +104,7 @@ export async function fetchPostDetail(postId: string): Promise<DetailProps> {
   const data = await res.json();
 
   return {
+    id: data.id,
     title: data.title,
     author: data.author,
     createdAt: data.createdAt,
@@ -149,4 +168,22 @@ export async function getPostsByRegionPopular(
     posts: data.content,
     totalPages: data.totalPages,
   };
+}
+
+export async function recommendPost(
+  postId: number,
+  recommendationType: string
+): Promise<void> {
+  const res = await fetch(`${BASE}/api/community/post/${postId}/recommend`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type: recommendationType }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "추천 실패");
+  }
 }

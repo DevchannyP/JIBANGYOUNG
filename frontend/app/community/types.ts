@@ -14,6 +14,7 @@ export interface PostListDto {
 
 // 게시글 상세에서 사용할 타입
 export interface DetailProps {
+  id: number;
   title: string;
   author: string;
   createdAt: string;

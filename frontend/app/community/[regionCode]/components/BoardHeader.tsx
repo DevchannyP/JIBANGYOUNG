@@ -28,7 +28,7 @@ const BoardNavigation: React.FC = () => {
     } else {
       params.set("category", categoryId);
     }
-    router.push(`/board?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleWrite = () => {

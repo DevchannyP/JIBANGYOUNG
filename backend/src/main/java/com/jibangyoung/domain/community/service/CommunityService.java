@@ -27,13 +27,17 @@ import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
 import com.jibangyoung.domain.community.dto.RegionResponseDto;
+import com.jibangyoung.domain.community.entity.PostRecommendation;
 import com.jibangyoung.domain.community.entity.Posts;
+import com.jibangyoung.domain.community.repository.PostRecommendationRepository;
 import com.jibangyoung.domain.community.repository.PostRepository;
 import com.jibangyoung.domain.community.support.S3ImageManager;
 import com.jibangyoung.domain.mypage.entity.Comment;
 import com.jibangyoung.domain.mypage.repository.CommentRepository;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
+import com.jibangyoung.global.exception.BusinessException;
+import com.jibangyoung.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,9 +48,36 @@ public class CommunityService {
     private final RegionRepository regionRepository;
     private final CommentRepository commentRepository; // 의존성 추가
     private final UserRepository userRepository; // UserRepository 주입
+    private final PostRecommendationRepository postRecommendationRepository; // PostRecommendationRepository 주입
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final S3ImageManager s3ImageManager;
+
+    @Transactional
+    public void recommendPost(Long postId, Long userId, String recommendationType) {
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // 사용자가 이미 이 게시글을 추천했는지 확인
+        if (postRecommendationRepository.findByUserIdAndPostId(userId, postId).isPresent()) {
+            throw new BusinessException(ErrorCode.ALREADY_RECOMMENDED);
+        }
+
+        // 추천 정보 저장
+        PostRecommendation recommendation = PostRecommendation.builder()
+                .user(user)
+                .post(post)
+                .recommendationType(recommendationType)
+                .build();
+        postRecommendationRepository.save(recommendation);
+
+        // 게시글 좋아요 수 증가
+        post.incrementLikes();
+        postRepository.save(post); // 변경된 likes 수를 저장
+    }
 
     // 지역 코드
     // 지역 시도
@@ -133,10 +164,47 @@ public class CommunityService {
         return postPage.map(PostListDto::from); // ✅ now it's correct
     }
 
-    public Page<PostListDto> getPostsByRegion(String regionCode, int page, int size) {
+    public Page<PostListDto> getPostsByRegion(String regionCode, int page, int size, String category, String search,
+            String searchType) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
-        Page<Posts> postPage = postRepository.findByRegionIdOrderByCreatedAtDesc(Long.parseLong(regionCode), pageable);
+        Page<Posts> postPage;
+
+        Long regionId = Long.parseLong(regionCode);
+
+        if (search != null && !search.trim().isEmpty()) {
+            // 검색어가 있는 경우
+            switch (searchType) {
+                case "title":
+                    postPage = postRepository.findByRegionIdAndTitleContainingOrderByCreatedAtDesc(regionId, search,
+                            pageable);
+                    break;
+                case "content":
+                    postPage = postRepository.findByRegionIdAndContentContainingOrderByCreatedAtDesc(regionId, search,
+                            pageable);
+                    break;
+                case "author":
+                    // TODO: 작성자 검색 로직 추가 (User 엔티티의 닉네임 필드 사용)
+                    // 현재 Posts 엔티티에 닉네임 필드가 직접 없으므로, User 엔티티와 조인하여 검색해야 함
+                    // 임시로 제목 검색으로 대체하거나, 복잡한 쿼리 작성이 필요
+                    postPage = postRepository.findByRegionIdAndTitleContainingOrderByCreatedAtDesc(regionId, search,
+                            pageable); // 임시
+                    break;
+                default:
+                    postPage = postRepository.findByRegionIdOrderByCreatedAtDesc(regionId, pageable);
+                    break;
+            }
+        } else if (category == null || category.equals("all")) {
+            postPage = postRepository.findByRegionIdOrderByCreatedAtDesc(regionId, pageable);
+        } else if (category.equals("popular")) {
+            // 인기글은 지역별로 필터링하면서 좋아요 수 기준으로 정렬
+            postPage = postRepository.findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(regionId, 10,
+                    pageable);
+        } else {
+            // 특정 카테고리 필터링
+            Posts.PostCategory postCategory = Posts.PostCategory.valueOf(category.toUpperCase());
+            postPage = postRepository.findByRegionIdAndCategoryOrderByCreatedAtDesc(regionId, postCategory, pageable);
+        }
         return postPage.map(PostListDto::from);
     }
 
@@ -211,6 +279,13 @@ public class CommunityService {
         List<Object> rawList = (List<Object>) raw;
         return rawList.stream()
                 .map(item -> objectMapper.convertValue(item, PostListDto.class))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostListDto> getNotices() {
+        return postRepository.findTop2ByIsNoticeTrueOrderByCreatedAtDesc()
+                .stream()
+                .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
 
