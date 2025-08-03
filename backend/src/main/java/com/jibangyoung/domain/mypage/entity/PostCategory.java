@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum PostCategory {
     FREE("자유"),
     QUESTION("질문"),
-    SETTLEMENT_REVIEW("정착 후기");
+    SETTLEMENT_REVIEW("정착 후기"),
+    REVIEW("리뷰"); 
 
     private final String label;
 
