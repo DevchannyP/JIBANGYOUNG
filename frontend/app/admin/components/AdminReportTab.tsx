@@ -1,24 +1,35 @@
-import styles from "../AdminPage.module.css";
+import { REPORT_TAB_OPTIONS, ReportTabType } from "@/types/api/adMentorReport";
 
-type ReportType = "게시글" | "댓글" | "전체";
-
-interface Props {
-  selectedType: ReportType;
-  onSelectType: (type: ReportType) => void;
+interface AdminReportTabProps {
+  selectedType: ReportTabType;
+  onSelectType: (type: ReportTabType) => void;
 }
 
-const types: ReportType[] = ["전체", "게시글", "댓글"];
-
-export function AdminReportTab({ selectedType, onSelectType }: Props) {
+export function AdminReportTab({
+  selectedType,
+  onSelectType,
+}: AdminReportTabProps) {
   return (
-    <div className={styles.tabWrapper}>
-      {types.map((type) => (
+    <div style={{ display: "flex", gap: "12px", marginBottom: "18px" }}>
+      {REPORT_TAB_OPTIONS.map((tab) => (
         <button
-          key={type}
-          onClick={() => onSelectType(type)}
-          className={`${styles.tabButton} ${selectedType === type ? styles.active : ""}`}
+          key={tab}
+          onClick={() => onSelectType(tab)}
+          style={{
+            padding: "8px 22px",
+            borderRadius: "6px",
+            border: "none",
+            outline: "none",
+            background: selectedType === tab ? "#2563eb" : "#e5e7eb",
+            color: selectedType === tab ? "#fff" : "#222",
+            fontWeight: selectedType === tab ? "bold" : "normal",
+            fontSize: "16px",
+            cursor: "pointer",
+            boxShadow: selectedType === tab ? "0 2px 8px #2267ff22" : "none",
+            transition: "background 0.15s",
+          }}
         >
-          {type}
+          {tab}
         </button>
       ))}
     </div>
