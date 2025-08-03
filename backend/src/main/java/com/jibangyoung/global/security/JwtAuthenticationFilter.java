@@ -30,8 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         log.debug("[JWT FILTER] 요청 URI = {}", uri);
 
-        // 아래 경로는 토큰 검사 없이 통과
-        if (isPermitAllUri(uri)) {
+        if (isPermitAllUri(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -55,8 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPermitAllUri(String uri) {
-        // ✅ 실무: 모두 공개 허용할 경로를 여기서 명확히 지정
+    private boolean isPermitAllUri(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        // GET /api/policy/policy.c는 항상 공개 (permitAll)
+        if ("GET".equals(method) && "/api/policy/policy.c".equals(uri))
+            return true;
+        // 아래 경로는 모두 공개
         return uri.startsWith("/api/auth/")
                 || uri.startsWith("/api/public/")
                 // 어드민/멘토 테스트
