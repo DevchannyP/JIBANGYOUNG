@@ -1,8 +1,9 @@
+// app/dashboard/CommunitySection/components/Top10Card.tsx
 "use client";
 
+import type { PostListDto } from "@/app/community/types";
 import { useRouter } from "next/navigation";
 import styles from "../MainSection.module.css";
-import type { PostListDto } from "@/app/community/types";
 
 const rankEmoji = ["🥇", "🥈", "🥉", "", "", "", "", "", "", ""];
 
@@ -15,7 +16,13 @@ interface Props {
   onListHover?: (idx: number) => void;
 }
 
-export default function Top10Card({ posts, isLoading, isError, currIdx, onListHover }: Props) {
+export default function Top10Card({
+  posts,
+  isLoading,
+  isError,
+  currIdx,
+  onListHover,
+}: Props) {
   const router = useRouter();
 
   if (isLoading)
@@ -68,8 +75,12 @@ export default function Top10Card({ posts, isLoading, isError, currIdx, onListHo
             }
             aria-label={`${idx + 1}위 ${post.title}`}
             title={post.title}
-            onClick={() => router.push(`/community/post/${post.id}`)}
-            onKeyDown={e => ["Enter", " "].includes(e.key) && router.push(`/community/post/${post.id}`)}
+            // ✅ regionId와 id로 이동 경로 변경!
+            onClick={() => router.push(`/community/${post.regionId}/${post.id}`)}
+            onKeyDown={e =>
+              ["Enter", " "].includes(e.key) &&
+              router.push(`/community/${post.regionId}/${post.id}`)
+            }
             onMouseEnter={() => onListHover?.(idx)}
             onFocus={() => onListHover?.(idx)}
           >

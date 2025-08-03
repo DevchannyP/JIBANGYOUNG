@@ -29,57 +29,6 @@ bin/
 *.class
 *.log
 logs/
-<<<<<<< HEAD
-=======
-
-# -----------------------------------
-# 패키징 파일 (배포 산출물)
-*.zip
-*.tar.gz
-*.tar
-*.tgz
-*.jar
-*.war
-*.ear
-
-# -----------------------------------
-# IDE 및 편집기 캐시
-.idea/
-*.iml
-*.swp
-*.swo
-*.bak
-.project
-.classpath
-.settings/
-.apt_generated/
-
-# -----------------------------------
-# VSCode 설정은 공유 목적이면 포함 가능
-# .vscode
-
-# -----------------------------------
-# 환경 변수 / 시크릿
-.env
-#.env.* 
-application.yml
-!.env.example
-!application-example.yml
-
-# -----------------------------------
-# Docker & Infra
-docker-data/
-infra/data/
-infra/logs/
-.terraform/
-
-# -----------------------------------
-# Test & Coverage
-coverage/
-jacoco/
-test-output/
-.nyc_output/
->>>>>>> 7e9b3d5 (전반적인 통합)
 
 # -----------------------------------
 <<<<<<< HEAD
@@ -155,6 +104,3 @@ test-output/
 # Gradle wrapper는 예외적으로 포함
 !**/gradle-wrapper.jar
 !**/gradle-wrapper.properties
-
-
->>>>>>> 7e9b3d5 (전반적인 통합)

@@ -80,7 +80,8 @@ export default function TodayPopularCard() {
       }
       if (e.key === "Enter" || e.key === " ") {
         if (activeIdx !== -1 && posts[activeIdx]) {
-          window.location.href = `/community/post/${posts[activeIdx].id}`;
+          // ✅ regionId와 id를 사용해 이동
+          window.location.href = `/community/${posts[activeIdx].regionId}/${posts[activeIdx].id}`;
         }
       }
     },
@@ -199,7 +200,8 @@ export default function TodayPopularCard() {
                   onFocus={() => setActiveIdx(idx)}
                   onMouseEnter={() => setActiveIdx(idx)}
                   onMouseLeave={() => setActiveIdx(-1)}
-                  onClick={() => window.location.href = `/community/post/${post.id}`}
+                  // ✅ regionId, id를 사용한 이동 경로!
+                  onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
                   title={post.title?.length > 32 ? post.title : undefined}
                 >
                   <span className={styles.thumbWrap}>

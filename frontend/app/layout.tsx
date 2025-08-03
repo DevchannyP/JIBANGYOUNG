@@ -16,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
-      {/* ✅ suppressHydrationWarning 추가 */}
+    <html lang="ko">
+      {/* suppressHydrationWarning 제거: SSR/CSR 결과 일치시 불필요 */}
       <body>
         <Providers>
           <Header />

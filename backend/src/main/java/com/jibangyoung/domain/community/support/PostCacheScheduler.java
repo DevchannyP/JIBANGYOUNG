@@ -1,15 +1,17 @@
 package com.jibangyoung.domain.community.support;
 
-import com.jibangyoung.domain.community.dto.PostListDto;
-import com.jibangyoung.domain.community.service.CommunityService;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.service.CommunityService;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -24,8 +26,7 @@ public class PostCacheScheduler {
         Map<String, LocalDateTime> periodMap = Map.of(
                 "top10TodayPosts", LocalDateTime.now().minusDays(1),
                 "top10WeeklyPosts", LocalDateTime.now().minusWeeks(1),
-                "top10MonthlyPosts", LocalDateTime.now().minusMonths(1)
-        );
+                "top10MonthlyPosts", LocalDateTime.now().minusMonths(1));
         periodMap.forEach((key, since) -> {
             List<PostListDto> posts = communityService.getRecentTop10(since);
             redisTemplate.opsForValue().set(key, posts);
