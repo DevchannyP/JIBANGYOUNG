@@ -1,5 +1,5 @@
 {
-   // ---------- (공통) ----------
+  // ---------- (공통) ----------
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
