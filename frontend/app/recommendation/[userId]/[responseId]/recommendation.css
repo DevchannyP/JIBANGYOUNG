@@ -1,0 +1,420 @@
+/* globals.css */
+:root {
+  --primary-blue: #6366f1;
+  --light-blue: #e0e7ff;
+  --text-dark: #1f2937;
+  --text-light: #6b7280;
+  --border-light: #e5e7eb;
+  --background-gray: #f9fafb;
+  --white: #ffffff;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 16px;
+  --border-radius-small: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 페이지 헤더 */
+.page-header {
+  text-align: center;
+  padding: 60px 0 40px 0;
+  background: transparent;
+  margin-bottom: 40px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 20px;
+  color: var(--primary-blue);
+  font-weight: 600;
+}
+
+/* 추천 지역 카드 컨테이너 */
+.recommendation-regions {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 60px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 개별 지역 카드 */
+.region-card {
+  background: var(--white);
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius);
+  padding: 32px 24px;
+  min-width: 240px;
+  max-width: 280px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  position: relative;
+  box-shadow: var(--shadow-light);
+}
+
+.region-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.region-card.selected {
+  border-color: var(--primary-blue);
+  background: var(--light-blue);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-medium);
+}
+
+.region-card.rank-1 {
+  border-color: var(--primary-blue);
+  background: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+}
+
+.region-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.region-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+}
+
+.region-description {
+  list-style: none;
+  text-align: left;
+}
+
+.region-description li {
+  font-size: 15px;
+  color: var(--text-light);
+  margin-bottom: 10px;
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.region-description li:before {
+  content: "•";
+  color: var(--primary-blue);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  font-size: 16px;
+}
+
+/* 정책 카드 섹션 */
+.policy-section {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 60px;
+  box-shadow: none;
+}
+
+.policy-section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.policy-section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.policy-section-subtitle {
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+/* 정책 카드 그리드 */
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.policy-card {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-small);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: var(--shadow-light);
+  min-height: 200px;
+}
+
+.policy-card:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+  border-color: var(--primary-blue);
+}
+
+.policy-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.policy-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.4;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.bookmark-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--text-light);
+  transition: color 0.2s ease;
+  padding: 4px;
+}
+
+.bookmark-btn:hover {
+  color: var(--primary-blue);
+}
+
+.bookmark-btn.bookmarked {
+  color: var(--primary-blue);
+}
+
+.policy-description {
+  font-size: 15px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.policy-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: auto;
+}
+
+.policy-tag {
+  background: var(--light-blue);
+  color: var(--primary-blue);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* 더보기 버튼 */
+.load-more-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius-small);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.load-more-btn:disabled {
+  background: var(--text-light);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 로딩 및 에러 상태 */
+.loading-container,
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  margin: 20px 0;
+  box-shadow: var(--shadow-light);
+}
+
+.loading-text,
+.error-text {
+  font-size: 18px;
+  color: var(--text-light);
+}
+
+/* Footer 관련 CSS */
+.footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 80px 0 40px 0;
+  padding: 0 20px;
+}
+
+.btn {
+  padding: 16px 32px;
+  border: none;
+  border-radius: var(--border-radius-small);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 160px;
+}
+
+.btn.primary {
+  background-color: var(--primary-blue);
+  color: white;
+}
+
+.btn.primary:hover {
+  background-color: #4f46e5;
+  transform: translateY(-1px);
+}
+
+.btn.secondary {
+  background-color: var(--white);
+  color: var(--text-dark);
+  border: 2px solid var(--border-light);
+}
+
+.btn.secondary:hover {
+  background-color: var(--background-gray);
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .policy-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .recommendation-regions {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .recommendation-regions {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .region-card {
+    min-width: unset;
+    width: 100%;
+    max-width: 400px;
+    padding: 24px 20px;
+  }
+  
+  .policy-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .page-subtitle {
+    font-size: 18px;
+  }
+  
+  .policy-section-title {
+    font-size: 24px;
+  }
+  
+  .footer-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-section {
+    padding: 0;
+  }
+  
+  .region-card {
+    padding: 20px 16px;
+  }
+  
+  .policy-card {
+    padding: 20px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .region-name {
+    font-size: 20px;
+  }
+  
+  .policy-section-title {
+    font-size: 20px;
+  }
+}

@@ -20,8 +20,10 @@ public class SurveyAnswerService {
     private final SurveyAnswerRepository repository;
 
     @Transactional
-    public void saveSurveyAnswers(Long userId, Map<String, Answer> answers) {
-        Long responseId = 1L;
+    public Long saveSurveyAnswers(Long userId, Map<String, Answer> answers) {
+        Long lastResponseId = repository.findMaxResponseIdByUserId(userId).orElse(0L);
+        Long responseId = lastResponseId + 1;
+
         List<SurveyAnswer> saveList = new ArrayList<>();
 
         for (Map.Entry<String, Answer> entry : answers.entrySet()) {
@@ -41,6 +43,7 @@ public class SurveyAnswerService {
         }
 
         repository.saveAll(saveList);
+        return Long.valueOf(responseId);
     }
 
     private SurveyAnswer buildSurveyAnswer(Long userId, Long responseId, String questionCode, Object value,

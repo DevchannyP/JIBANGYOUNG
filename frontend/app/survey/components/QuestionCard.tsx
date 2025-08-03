@@ -127,12 +127,12 @@ export default function QuestionCard({
 
       <div className="question-type">
         {question.filtering && (
-          <span className="type-badge filtering">필터링</span>
+          <span className="type-badge filtering">수혜대상여부</span>
         )}
         {question.weighting && (
-          <span className="type-badge weighting">가중치</span>
+          <span className="type-badge weighting">관심정책</span>
         )}
-        {question.infra && <span className="type-badge infra">인프라</span>}
+        {question.infra && <span className="type-badge infra">인프라조사</span>}
         {question.multiple && (
           <span className="type-badge multiple">복수선택</span>
         )}
@@ -167,11 +167,6 @@ export default function QuestionCard({
             >
               <span className="option-number">{index + 1}.</span>
               <span className="option-text">{option.option_text}</span>
-              {question.weighting && (
-                <span className="option-weight">
-                  가중치: {option.weight}
-                </span>
-              )}
             </button>
           ))
         )}

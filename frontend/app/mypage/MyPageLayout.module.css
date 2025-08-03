@@ -6,14 +6,14 @@
 /* ============================= */
 .mypageGridLayout {
   display: grid;
-  grid-template-columns: 240px 1fr;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  grid-template-columns: 250px 950px;
+  width: 1200px;
   min-height: 600px;
-  background: #fffdf5; /* 💛 연한 노랑톤 배경 */
+  margin: 0 auto;
+  padding: 0;
+  background: #f5f9ff;
   border-radius: 18px;
-  box-shadow: 0 4px 28px rgba(255, 212, 96, 0.1);
+  box-shadow: 0 2px 20px 0 #eaf2fd;
   overflow-x: auto;
 }
 
@@ -827,7 +827,38 @@
   from { opacity: 0; transform: translateY(22px);}
   to { opacity: 1; transform: translateY(0);}
 }
-@keyframes skeleton-loading {
-  0% { opacity: 0.67; }
-  100% { opacity: 0.96; }
+/* 반응형 */
+@media (max-width: 950px) {
+  .mypageGridLayout {
+    grid-template-columns: 1fr;
+    padding: 20px 4px 56px 4px;
+    gap: 0;
+  }
+  .mypageSidebarWrap {
+    min-width: 0;
+    margin-bottom: 14px;
+  }
+  .mypagePanelWrap {
+    padding: 18px 6px 24px 6px;
+    min-height: 410px;
+    border-radius: 10px;
+  }
+}
+/* 다크모드(확장) */
+/* 반응형 제거 또는 강제로 고정 유지 */
+@media (max-width: 950px) {
+  .mypageGridLayout {
+    grid-template-columns: 220px 1fr; /* 고정 유지 */
+    padding: 44px 14px 80px 14px;     /* 원래대로 */
+    gap: 34px;
+  }
+  .mypageSidebarWrap {
+    min-width: 180px;
+    margin-bottom: 0;
+  }
+  .mypagePanelWrap {
+    padding: 36px 36px 28px 36px;
+    min-height: 540px;
+    border-radius: 16px;
+  }
 }

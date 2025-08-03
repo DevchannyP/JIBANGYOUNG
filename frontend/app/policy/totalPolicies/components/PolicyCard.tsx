@@ -1,6 +1,7 @@
+import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
+import { Heart } from 'lucide-react';
 import React, { memo } from 'react';
 import styles from '../../total_policy.module.css';
-import { PolicyCard as PolicyCardType } from '@/types/api/policy.c';
 
 interface PolicyCardProps {
   policy: PolicyCardType;
@@ -11,7 +12,7 @@ interface PolicyCardProps {
 
 // D-Day 계산 함수
 const calculateDDay = (deadline: string): { text: string; isUrgent: boolean } => {
-  if (deadline === '2099-12-31') {
+  if (deadline === '2099-12-31' || deadline === '9999-12-31') {
     return { text: '상시', isUrgent: false };
   }
 
@@ -29,6 +30,15 @@ const calculateDDay = (deadline: string): { text: string; isUrgent: boolean } =>
   } else {
     return { text: `D-${diffDays}`, isUrgent: false };
   }
+};
+
+// 키워드 배열로 변환
+const extractHashtags = (keywords: string | null | undefined): string[] => {
+  if (!keywords) return [];
+  return keywords
+    .split(',')
+    .map((kw) => kw.trim())
+    .filter((kw) => kw.length > 0);
 };
 
 const PolicyCard: React.FC<PolicyCardProps> = memo(({
@@ -55,6 +65,7 @@ const PolicyCard: React.FC<PolicyCardProps> = memo(({
   };
 
   const dDayInfo = calculateDDay(policy.deadline);
+  const hashtags = extractHashtags(policy.plcy_kywd_nm);
 
   return (
     <article 
@@ -87,30 +98,29 @@ const PolicyCard: React.FC<PolicyCardProps> = memo(({
             aria-label={isBookmarked ? '북마크 해제' : '북마크 추가'}
             type="button"
           >
-            <span
-              className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
-              aria-hidden="true"
-            >
-              {isBookmarked ? '♥' : '♡'}
-            </span>
+            <Heart
+            className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
+            fill={isBookmarked ? '#6366f1' : 'none'}
+          />
           </button>
         )}
       </div>
 
       <div className={styles.cardContent}>
-          <h3 className={styles.itemTitle}>
-            {policy.plcy_nm}
-          </h3>
+      <h3 className={styles.itemTitle}>
+      {policy.plcy_nm}
+        </h3>
 
-        <div className={styles.cardMeta}>
-          <p className={styles.keywordInfo}>
-            <span className={styles.keywordLabel}>키워드:</span>
-            <span className={styles.keywordValue}>
-              {policy.plcy_kywd_nm || '없음'}
-            </span>
-          </p>
-        </div>
+      <div className={styles.cardMeta}>
+        {hashtags.length > 0 && (
+      <div className={styles.keywordInfo}>
+        {hashtags.map((tag, index) => (
+          <span key={index} className={styles.hashtag}>#{tag}</span>
+        ))}
       </div>
+      )}
+    </div>
+  </div>
     </article>
   );
 });

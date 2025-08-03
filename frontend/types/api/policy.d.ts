@@ -1,9 +1,9 @@
-// /types/api/policy.ts
+// /types/api/policy.d.ts
 export interface PolicyDetailDto {
   NO: number;
   plcy_nm: string;
   deadline: string;
-  dDay: string;
+  dDay: number;
   sidoName: string;
   ptcp_prp_trgt_cn: string;
   ref_url_addr1: string;

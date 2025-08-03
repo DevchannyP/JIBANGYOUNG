@@ -3,12 +3,12 @@
 
 import { AnimatePresence, cubicBezier, motion, Variants } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { usePopularPostsQuery } from './components/usePopularPostsQuery';
+import { useState } from "react";
+import styles from './MainSection.module.css';
 import SkeletonCard from './components/SkeletonCard';
 import { mergeRefs } from './components/mergeRefs';
 import { useLazyCards } from './components/useLazyCards';
-import { useState } from "react";
-import styles from './MainSection.module.css';
+import { usePopularPostsQuery } from './components/usePopularPostsQuery';
 
 // 동적 import
 const RegionRankCard = dynamic(() => import('./components/RegionRankCard'), { ssr: false });
