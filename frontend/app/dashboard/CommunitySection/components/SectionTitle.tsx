@@ -1,5 +1,5 @@
 import styles from "../CommunitySection.module.css";
-
+// 커뮤니티 섹션 타이틀 컴포넌트
 type Props = {
   align?: "left" | "center" | "right";
 };
