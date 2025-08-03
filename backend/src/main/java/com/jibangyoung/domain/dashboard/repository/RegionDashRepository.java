@@ -26,4 +26,5 @@ public interface RegionDashRepository extends JpaRepository<RegionDashEntity, In
                 ORDER BY r.guGun1 ASC
             """)
     List<RegionDashEntity> findBySidoOrderByGuGun1Asc(String sido);
+
 }

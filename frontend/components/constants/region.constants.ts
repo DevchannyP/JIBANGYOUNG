@@ -283,17 +283,15 @@ export const REGION_TABLE = [
   { regionCode: 99999, sido: "전국", guGun1: "", guGun2: null }
 ] as const;
 
+
 type RegionRow = typeof REGION_TABLE[number];
 
-// 빠른 코드→이름 조회 Map (런타임 생성)
 export const REGION_CODE_MAP: Record<number, RegionRow> = Object.fromEntries(
   REGION_TABLE.map(r => [r.regionCode, r])
 );
 
-// 함수: regionCode → 명칭(string)
 export function getRegionNameByCode(code: number): string {
   const r = REGION_CODE_MAP[code];
   if (!r) return "알수없음";
-  // 최상위+구군1+구군2 모두 이어붙임
   return [r.sido, r.guGun1, r.guGun2].filter(Boolean).join(" ").trim();
 }

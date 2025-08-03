@@ -1,5 +1,5 @@
 {
-  // ---------- (공통) ----------
+   // ---------- (공통) ----------
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
@@ -10,6 +10,7 @@
   "files.exclude": {
     "**/.next": true,
     "**/node_modules": true,
+    "**/node_modules/.bin": true,
     "**/build": true,
     "**/.gradle": true
   },
