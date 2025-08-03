@@ -178,7 +178,9 @@ export function AdminReportList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [searchResult, setSearchResult] = useState<Report[]>([]);
   const [selectedRegionCode, setSelectedRegionCode] = useState(0);
-  const [selectedType, setSelectedType] = useState<ReportType | "전체">("전체");
+  const [selectedType, setSelectedType] = useState<ReportType | "게시글">(
+    "게시글"
+  );
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -221,7 +223,7 @@ export function AdminReportList() {
   // 타입 선택
   const handleTypeChange = useCallback(
     (type: string) => {
-      setSelectedType(type as ReportType | "전체");
+      setSelectedType(type as ReportType | "게시글");
       filterData(selectedRegionCode, searchKeyword, type);
     },
     [filterData, selectedRegionCode, searchKeyword]
