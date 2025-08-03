@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.community.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,8 +16,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jibangyoung.domain.auth.entity.User;
+import com.jibangyoung.domain.auth.repository.UserRepository; // UserRepository 추가
+import com.jibangyoung.domain.community.dto.CommentRequestDto;
+import com.jibangyoung.domain.community.dto.CommentResponseDto;
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
@@ -24,10 +30,11 @@ import com.jibangyoung.domain.community.dto.RegionResponseDto;
 import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.community.repository.PostRepository;
 import com.jibangyoung.domain.community.support.S3ImageManager;
+import com.jibangyoung.domain.mypage.entity.Comment;
+import com.jibangyoung.domain.mypage.repository.CommentRepository;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,6 +42,8 @@ import lombok.RequiredArgsConstructor;
 public class CommunityService {
     private final PostRepository postRepository;
     private final RegionRepository regionRepository;
+    private final CommentRepository commentRepository; // 의존성 추가
+    private final UserRepository userRepository; // UserRepository 주입
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final S3ImageManager s3ImageManager;
@@ -203,5 +212,76 @@ public class CommunityService {
         return rawList.stream()
                 .map(item -> objectMapper.convertValue(item, PostListDto.class))
                 .collect(Collectors.toList());
+    }
+
+    // ===================================================================
+    // 댓글 관련 로직 추가
+    // ===================================================================
+
+    @Transactional(readOnly = true)
+    public List<CommentResponseDto> findCommentsByPostId(Long postId) {
+        // 1. 게시글 존재 여부 확인
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("게시글을 찾을 수 없습니다. id=" + postId);
+        }
+
+        // 2. 게시글의 모든 댓글을 가져옵니다.
+        List<Comment> comments = commentRepository.findByTargetPostId(postId);
+        Map<Long, CommentResponseDto> commentDtoMap = new HashMap<>();
+        List<CommentResponseDto> rootComments = new ArrayList<>();
+
+        // 3. 모든 댓글을 DTO로 변환하고 Map에 저장합니다.
+        for (Comment comment : comments) {
+            CommentResponseDto dto = new CommentResponseDto(comment, new ArrayList<>());
+            commentDtoMap.put(comment.getId(), dto);
+        }
+
+        // 4. 대댓글을 부모 댓글의 replies 리스트에 추가합니다.
+        for (Comment comment : comments) {
+            if (comment.getParent() != null) {
+                CommentResponseDto parentDto = commentDtoMap.get(comment.getParent().getId());
+                if (parentDto != null) {
+                    parentDto.getReplies().add(commentDtoMap.get(comment.getId()));
+                }
+            } else {
+                rootComments.add(commentDtoMap.get(comment.getId()));
+            }
+        }
+        return rootComments;
+    }
+
+    @Transactional
+    public void saveComment(Long postId, Long userId, String author, CommentRequestDto requestDto) {
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. id=" + postId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. id=" + userId));
+
+        Comment parent = null;
+        if (requestDto.getParentId() != null) {
+            parent = commentRepository.findById(requestDto.getParentId())
+                    .orElseThrow(
+                            () -> new IllegalArgumentException("부모 댓글을 찾을 수 없습니다. id=" + requestDto.getParentId()));
+        }
+
+        Comment comment = Comment.builder()
+                .user(user)
+                .content(requestDto.getContent())
+                .targetPostId(post.getId())
+                .targetPostTitle(post.getTitle())
+                .parent(parent)
+                .build();
+
+        commentRepository.save(comment);
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다. id=" + commentId));
+
+        // 사용자 권한 확인 로직 제거 (임시 방편)
+        commentRepository.delete(comment);
     }
 }

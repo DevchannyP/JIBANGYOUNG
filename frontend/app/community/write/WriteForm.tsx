@@ -89,10 +89,7 @@ export default function WriteForm() {
           </option>
         ))}
       </select>
-      <Editor
-        initialData="<p>내용을 입력하세요...</p>"
-        onChange={handleContentChange}
-      />
+      <Editor onChange={handleContentChange} />
       <div style={{ marginTop: "2rem" }}>
         <button onClick={handleSubmit} disabled={loading}>
           {loading ? "저장 중..." : "저장"}

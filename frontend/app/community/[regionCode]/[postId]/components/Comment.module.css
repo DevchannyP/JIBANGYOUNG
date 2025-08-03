@@ -1,0 +1,143 @@
+.commentList {
+  margin-top: 2rem;
+}
+
+.commentItem {
+  padding: 0.75rem 0; /* 상하 패딩 유지, 좌우 패딩은 내부 요소에서 처리 */
+  /* border-top: 1px solid #eee; */ /* 구분선 제거 */
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+  width: 100%; /* 부모 요소의 전체 너비를 사용하도록 */
+}
+
+.commentItemSeparator {
+  border-top: 1px solid #eee; /* 새로운 구분선 */
+  margin-bottom: 0.75rem; /* 내용과의 간격 */
+}
+
+.commentList > .commentItem:first-child .commentItemSeparator {
+  border-top: none; /* 첫 번째 댓글의 상단 구분선 제거 */
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #dc3545; /* 빨간색 */
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+  margin-left: 10px;
+}
+
+.deleteButton:hover {
+  text-decoration: underline;
+}
+
+.commentAuthor {
+  font-weight: normal; /* 닉네임 폰트 굵기 조정 */
+  color: #888; /* 닉네임 색상 조정 */
+  font-size: 0.9rem; /* 닉네임 크기 조정 */
+}
+
+.authorLabel {
+  color: #007bff; /* 파란색으로 강조 */
+  font-weight: bold;
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.commentDate {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.commentContent {
+  margin: 0 0 0.5rem 0;
+  color: #000; /* 본문 텍스트 검정색 */
+  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
+}
+
+.commentContent.deleted {
+  color: #aaa; /* 삭제된 댓글 흐린 회색 */
+  font-style: italic;
+  font-weight: normal; /* 삭제된 댓글 굵기 조정 */
+}
+
+.replyButton {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+}
+
+.replyButton:hover {
+  text-decoration: underline;
+}
+
+.replies {
+  margin-left: 0; /* 들여쓰기 공백 축소 */
+  padding-left: 1.5rem; /* L자 화살표 공간 확보 및 들여쓰기 */
+  position: relative; /* 가상 요소 위치 지정을 위해 */
+}
+
+.replies > .commentItem { /* 대댓글 항목의 상대 위치 지정 */
+  position: relative;
+}
+
+.replies > .commentItem::before { /* 각 대댓글 항목 앞의 L자 화살표 */
+  content: '';
+  position: absolute;
+  left: 0.5rem; /* L자 화살표의 시작 위치 */
+  top: 1rem; /* L자 화살표의 세로 위치 */
+  width: 0.75rem; /* L자 화살표의 가로 길이 */
+  height: 0.75rem; /* L자 화살표의 세로 길이 */
+  border-left: 2px solid #ccc;
+  border-bottom: 2px solid #ccc;
+  border-bottom-left-radius: 4px; /* 선택 사항: 모서리 둥글게 */
+}
+
+.commentForm {
+  display: flex;
+  margin-top: 1.5rem;
+}
+
+.commentTextarea {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.commentSubmitButton {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  border: none;
+  background-color: #facc15;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.commentActions {
+  display: flex;
+  justify-content: space-between; /* 날짜와 답글 달기 버튼을 양 끝으로 정렬 */
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
+}
+
+.commentSection {
+  margin-top: 2rem; /* 기존 마진 유지 */
+  border-top: 1px solid #eee; /* 구분선 */
+  padding-top: 2rem; /* 구분선 위쪽 여백 */
+}
