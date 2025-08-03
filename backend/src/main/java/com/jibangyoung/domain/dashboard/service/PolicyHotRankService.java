@@ -1,3 +1,4 @@
+// domain/dashboard/service/PolicyHotRankService.java
 package com.jibangyoung.domain.dashboard.service;
 
 import java.time.Duration;
@@ -26,10 +27,11 @@ public class PolicyHotRankService {
         List<Object[]> raw = repository.findPolicyHotTop10Native();
         return raw.stream()
                 .map(row -> new PolicyHotRankDto(
-                        (String) row[0],
-                        (String) row[1],
-                        (String) row[2],
-                        (String) row[3]))
+                        (String) row[0], // no
+                        ((Number) row[1]).intValue(), // id
+                        (String) row[2], // name
+                        (String) row[3], // region
+                        (String) row[4])) // value
                 .toList();
     }
 
@@ -47,12 +49,13 @@ public class PolicyHotRankService {
             if (list.get(0) instanceof PolicyHotRankDto) {
                 return (List<PolicyHotRankDto>) list;
             } else if (list.get(0) instanceof java.util.Map map) {
-                // ⭐ Map → DTO 변환
+                // ⭐ Map → DTO 변환 (id 필드 주의)
                 return list.stream()
                         .map(item -> {
                             var m = (java.util.Map<?, ?>) item;
                             return new PolicyHotRankDto(
                                     String.valueOf(m.get("no")),
+                                    Integer.parseInt(String.valueOf(m.get("id"))),
                                     String.valueOf(m.get("name")),
                                     String.valueOf(m.get("region")),
                                     String.valueOf(m.get("value")));

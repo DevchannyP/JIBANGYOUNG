@@ -1,3 +1,4 @@
+// domain/dashboard/dto/PolicyHotRankDto.java
 package com.jibangyoung.domain.dashboard.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,6 +10,9 @@ import lombok.Data;
 public class PolicyHotRankDto {
     @Schema(description = "정책 순위 (01~10)")
     private String no; // "01", "02", ...
+
+    @Schema(description = "정책 ID")
+    private Integer id;
 
     @Schema(description = "정책명")
     private String name;

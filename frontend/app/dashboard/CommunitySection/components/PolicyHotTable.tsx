@@ -1,10 +1,24 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import styles from "../CommunitySection.module.css";
 import { usePolicyHotTop10Query } from "./usePolicyHotTop10Query";
 
 export default function PolicyHotTable() {
   const { data, isLoading, isError } = usePolicyHotTop10Query();
+  const router = useRouter();
+
+  // 상세 페이지 이동 함수 (tr 클릭/엔터/스페이스 지원)
+  const handlePolicyClick = (id: number) => {
+    router.push(`/policy/policy_detail/${id}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>, id: number) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handlePolicyClick(id);
+    }
+  };
 
   return (
     <div className={styles.tableCard}>
@@ -24,7 +38,7 @@ export default function PolicyHotTable() {
           </thead>
           <tbody>
             {isLoading ? (
-              [...Array(10)].map((_, i) => (
+              Array.from({ length: 10 }).map((_, i) => (
                 <tr key={i}>
                   <td colSpan={4}>
                     <div className={styles.skeletonRow} />
@@ -39,10 +53,18 @@ export default function PolicyHotTable() {
               </tr>
             ) : data && data.length > 0 ? (
               data.map((row) => (
-                <tr key={row.no}>
+                <tr
+                  key={row.no}
+                  className={styles.dataRow} // ✅ 행 전체 hover/focus 효과
+                  tabIndex={0}
+                  onClick={() => handlePolicyClick(row.id)}
+                  onKeyDown={(e) => handleKeyDown(e, row.id)}
+                  aria-label={`${row.name} 상세 페이지로 이동`}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{row.no}</td>
-                  <td>{row.name}</td>
-                  <td>{row.region}</td>
+                  <td className={styles.region}>{row.name}</td>
+                  <td className={styles.region}>{row.region}</td>
                   <td className={styles.hot}>{row.value}</td>
                 </tr>
               ))

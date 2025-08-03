@@ -1,3 +1,4 @@
+// domain/dashboard/controller/PolicyHotController.java
 package com.jibangyoung.domain.dashboard.controller;
 
 import java.util.List;
