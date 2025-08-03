@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Builder
@@ -23,6 +25,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "posts")
+@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ?")  // 삭제 시 실제로는 UPDATE 실행
+@SQLRestriction("is_deleted = false")                               // 조회 시 항상 is_deleted = false 조건 자동 추가
 public class Posts {
 
     // 기본 식별자
@@ -95,15 +99,15 @@ public class Posts {
     public void increaseViews() {
         this.views += 1;
     }
+
     // 내부 enum으로 카테고리 정의
     @Getter
     public enum PostCategory {
         FREE("자유"),
         QUESTION("질문"),
-        SETTLEMENT_REVIEW("정착 후기");
-
+        REVIEW("후기"),
+        NOTICE("공지");
         private final String label;
-
         PostCategory(String label) {
             this.label = label;
         }

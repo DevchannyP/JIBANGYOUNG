@@ -17,7 +17,7 @@ const PopularPostCards: React.FC = () => {
 
     const fetchPopularPosts = async () => {
       try {
-        const data = await getPostsByRegionPopular(regionCode, 1);
+        const data = await getPostsByRegionPopular(regionCode, 1, 4);
         setPosts(data.posts);
       } catch (err) {
         console.error("인기글 데이터를 불러오는데 실패했습니다:", err);

@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.community.repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import com.jibangyoung.domain.policy.entity.Region;
@@ -18,16 +19,16 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     // 최근 after 동안 생성된 게시글 중 좋아요 Top10 조회
     List<Posts> findTop10ByCreatedAtAfterOrderByLikesDesc(LocalDateTime after);
 
-    // 전체 게시판에서 인기순 (추천 10개) 이상 글 목록
-    @Query("SELECT p FROM Posts p WHERE p.likes >= 10 ORDER BY p.id DESC")
-    Page<Posts> findPopularPosts(Pageable pageable);
+    // 전체 게시판에서 추천수 이상 글 목록
+    Page<Posts> findByLikesGreaterThanEqualOrderByIdDesc(int i, Pageable pageable);
 
     // 최근 regionCode 게시판
-    @Query("SELECT p FROM Posts p WHERE p.regionId = :regionCode ORDER BY p.createdAt DESC")
-    Page<Posts> findByRegionPrefix(@Param("regionCode") String regionCode, Pageable pageable);
+    Page<Posts> findByRegionIdOrderByCreatedAtDesc(long regionId, Pageable pageable);
 
-    // 최근 regionCode 인기글 (추천 10개 이상) 글 목록
-    @Query("SELECT p FROM Posts p WHERE p.regionId = :regionCode AND p.likes >= 10 ORDER BY p.createdAt DESC")
-    Page<Posts> findByRegionPopular(@Param("regionCode") String regionCode, Pageable pageable);
+    // 최근 regionCode 추천 수 이상 글 목록
+    Page<Posts> findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(Long regionId, int likes, Pageable pageable);
+
+    // Category 추천수 이상 글 목록
+    List<Posts> findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory postCategory);
 
 }

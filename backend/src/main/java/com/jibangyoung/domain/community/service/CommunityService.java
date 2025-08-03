@@ -69,8 +69,19 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    // 최근 since 시점 이후(createdAt > since) 에 작성된 게시글 중,
-    // 좋아요(likes) 수 기준 상위 10개를 내림차순으로 조회한다.
+    // 카테고리가 정착후기인 게시글 중,
+    // 추천 수 기준 상위 10개를 내림차 순 조회.
+    public List<PostListDto> getTopReviews() {
+        return postRepository
+                .findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory.REVIEW)
+                .stream()
+                .map(PostListDto::from)
+                .collect(Collectors.toList());
+    }
+
+
+    // 최근 since 시점 이후 작성된 게시글 중,
+    // 추천 수 기준 상위 10개를 내림차 순 조회.
     public List<PostListDto> getRecentTop10(LocalDateTime since) {
         return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
                 .map(PostListDto::from)
@@ -101,14 +112,14 @@ public class CommunityService {
 
     public Page<PostListDto> getPopularPostsPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Posts> postPage = postRepository.findPopularPosts(pageable);
+        Page<Posts> postPage = postRepository.findByLikesGreaterThanEqualOrderByIdDesc(10, pageable);
         return postPage.map(PostListDto::from); // ✅ now it's correct
     }
 
     public Page<PostListDto> getPostsByRegion(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
-        Page<Posts> postPage = postRepository.findByRegionPrefix(regionCode, pageable);
+        Page<Posts> postPage = postRepository.findByRegionIdOrderByCreatedAtDesc(Long.parseLong(regionCode), pageable);
         return postPage.map(PostListDto::from);
     }
 
@@ -154,7 +165,7 @@ public class CommunityService {
         // 썸네일 재추출 (post-images로 치환된 content 기준)
         String thumbnailUrl = Optional.ofNullable(
                 s3ImageManager.extractFirstImageUrl(content)
-        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/post-images/default-thumbnail.png");
+        ).orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/main/%ED%9B%84%EB%8B%88.png");
 
         // 게시글 저장
         Posts post = request.toEntity(thumbnailUrl, content);
@@ -164,7 +175,24 @@ public class CommunityService {
     public Page<PostListDto> getPostsByRegionPopular(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
-        Page<Posts> postPage = postRepository.findByRegionPopular(regionCode, pageable);
+        Page<Posts> postPage = postRepository.findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(Long.valueOf(regionCode), 10 , pageable);
         return postPage.map(PostListDto::from);
+    }
+
+    // 인기 후기
+    public List<PostListDto> getTopReviewPosts() {
+        String redisKey = "top10ReviewPosts";
+
+        // 1️⃣ Redis 캐시에서 바로 조회
+        Object raw = redisTemplate.opsForValue().get(redisKey);
+        if (raw == null) {
+            return Collections.emptyList(); // 캐시 없으면 빈 리스트 반환
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Object> rawList = (List<Object>) raw;
+        return rawList.stream()
+                .map(item -> objectMapper.convertValue(item, PostListDto.class))
+                .collect(Collectors.toList());
     }
 }

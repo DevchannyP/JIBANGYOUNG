@@ -26,11 +26,12 @@ public class CommunityController {
         return communityService.getAllRegionsBoard();
     }
 
+    // period 인기순
     @GetMapping("/top-liked")
     public List<PostListDto> getTopLikedByPeriod(@RequestParam(defaultValue = "today") String period) {
         return communityService.getCachedTop10ByPeriod(period);
     }
-    // TODO : 최신 인기글
+    // 최신 인기글
     @GetMapping("/popular")
     public Page<PostListDto> getPopularPosts(
             @RequestParam(defaultValue = "1") int page,
@@ -60,6 +61,8 @@ public class CommunityController {
 
         return new PresignedUrlResponse(presignedUrl, publicUrl);
     }
+    
+    // 글작성
     @PostMapping("/write")
     public void writePost(@RequestBody @Valid PostCreateRequestDto request) {
         communityService.write(request);
@@ -70,5 +73,11 @@ public class CommunityController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
         return communityService.getPostsByRegionPopular(regionCode, page, size);
+    }
+
+    // 후기 추천순
+    @GetMapping("/popular/reviews")
+    public List<PostListDto> getTopReviewPosts() {
+        return communityService.getTopReviewPosts();
     }
 }

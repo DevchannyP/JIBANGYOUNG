@@ -6,6 +6,7 @@ import PaginationClient from "../components/PaginationClient";
 import RegionSelector from "../components/RegionSelector";
 import BoardNavigation from "./components/BoardHeader";
 import styles from "./components/BoardList.module.css";
+import BoardSearch from "./components/BoardSearch";
 import BoardTable from "./components/BoardTable";
 import PopularPostCards from "./components/PopularPostCards";
 import PopularPosts from "./components/PopularPosts";
@@ -47,54 +48,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-async function getBoardData(searchParams: SearchParams) {
-  const page = parseInt(searchParams.page || "1");
-
-  const featuredPosts: PopularPost[] = [
-    {
-      id: 1,
-      title: "이건 하드 코딩입니다. 그냥 더미임",
-      description: "일단 이거 이미지 위에 겹쳐있어야해",
-      thumbnail: "/images/post1.jpg",
-    },
-    {
-      id: 2,
-      title: "눌러도 의미 1도 없음",
-      description: "103번은 왜 없을까? 삭제 여부로 표시해야하나?",
-      thumbnail: "/images/post2.jpg",
-    },
-    {
-      id: 3,
-      title: "하 진짜 이건 모르겠다 ㅋㅋㅋ",
-      description: "페이지네이션 땜에 그런 것 같은데 나중에 고치자",
-      thumbnail: "/images/post3.jpg",
-    },
-    {
-      id: 4,
-      title: "아니 근데 진짜 지역코드를 왜 난 바보처럼 구현했을까",
-      description: "폰트 깨짐 ㅋㅋ 미친 돈벌레 지나감",
-      thumbnail: "/images/post4.jpg",
-    },
-  ];
-
-  return {
-    currentPage: page,
-    featuredPosts,
-  };
-}
-
 export default async function BoardPage({ params, searchParams }: Props) {
-  const pageParam = (await searchParams).page ?? "1";
-  const currentPage = parseInt(pageParam, 10);
+  const { page, category, search, searchType } = await searchParams;
+  const currentPage = parseInt(page ?? "1", 10);
 
-  console.log(currentPage);
   const { regionCode } = await params;
   const { posts, totalPages } = await fetchPostsByRegion(
     regionCode,
-    currentPage
+    currentPage,
+    search,
+    searchType
   );
-  const searchData = await searchParams;
-  const data = await getBoardData(searchData);
 
   return (
     <div className={styles.container}>
@@ -105,6 +69,7 @@ export default async function BoardPage({ params, searchParams }: Props) {
         <div className={styles.content}>
           <BoardTable posts={posts} />
           <PaginationClient totalPages={totalPages} />
+          <BoardSearch />
         </div>
         <aside className={styles.sidebar}>
           <PopularPosts posts={posts} />

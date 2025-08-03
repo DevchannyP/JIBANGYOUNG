@@ -1,32 +1,36 @@
 # -----------------------------------
-# 🖥 OS 임시 파일
+# OS 임시 파일
 .DS_Store
 Thumbs.db
+Desktop.ini
+.AppleDouble
 
 # -----------------------------------
-# 🟦 Node.js 캐시 (프론트엔드)
+# Node.js / Next.js
 node_modules/
 .next/
+.next/cache/
 out/
 dist/
+.vercel/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
 # -----------------------------------
-# ☕ Java/Gradle 캐시 (백엔드)
+# Java/Gradle / Spring Boot
 .gradle/
 build/
-*/build/            
+*/build/
+target/
+bin/
 *.class
-
-# Gradle wrapper는 예외적으로 포함
-!**/gradle-wrapper.jar
-!**/gradle-wrapper.properties
+*.log
+logs/
 
 # -----------------------------------
-# 🗂 패키징 파일 (배포 산출물)
+# 패키징 파일 (배포 산출물)
 *.zip
 *.tar.gz
 *.tar
@@ -36,28 +40,44 @@ build/
 *.ear
 
 # -----------------------------------
-# ⚙️ IDE 및 편집기 캐시
+# IDE 및 편집기 캐시
 .idea/
 *.iml
 *.swp
 *.swo
 *.bak
+.project
+.classpath
+.settings/
+.apt_generated/
 
+# -----------------------------------
 # VSCode 설정은 공유 목적이면 포함 가능
-# .vscode/ ← ❗ 주석 처리 해제 시 공유 가능
-# .vscode/
+# .vscode
 
 # -----------------------------------
-# ✅ 모든 설정·보안 파일 포함
-# .env, .env.local, application.yml 등은 전부 Git에 포함
-# 따라서 아래는 주석 처리하거나 삭제
+# 환경 변수 / 시크릿
 .env
-backend/.env
-# .env.local
+#.env.* 
 application.yml
-# infra/.env
+!.env.example
+!application-example.yml
 
 # -----------------------------------
-# 🔧 Terraform 캐시 등 무거운 툴링 산출물
+# Docker & Infra
+docker-data/
+infra/data/
+infra/logs/
 .terraform/
-infra/.terraform/
+
+# -----------------------------------
+# Test & Coverage
+coverage/
+jacoco/
+test-output/
+.nyc_output/
+
+# -----------------------------------
+# Gradle wrapper는 예외적으로 포함
+!**/gradle-wrapper.jar
+!**/gradle-wrapper.properties

@@ -1,10 +1,14 @@
 // app/community/[regionCode]/[postId]/page.tsx
-import { fetchPostDetail } from "@/libs/api/community/community.api";
+import {
+  fetchPostDetail,
+  fetchPostsByRegion,
+} from "@/libs/api/community/community.api";
 import { Metadata } from "next";
-import styles from "../../Community.module.css";
+import styles from "../components/BoardList.module.css";
 import RegionSelector from "../../components/RegionSelector";
 import { DetailProps } from "../../types";
 import BoardNavigation from "../components/BoardHeader";
+import PopularPosts from "../components/PopularPosts";
 import PostDetail from "./PostDetail";
 
 interface Props {
@@ -34,19 +38,21 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function CommunityPage({ params }: Props) {
   const { regionCode, postId } = await params;
   const detail: DetailProps = await fetchPostDetail(postId);
-
+  const { posts, totalPages } = await fetchPostsByRegion(regionCode, 1);
   return (
-    <main className={styles["community-container"]}>
+    <div className={styles.container}>
       <RegionSelector />
       <div>{/* 카드형 게시글 */}</div>
-      <div>
-        <BoardNavigation />
-      </div>
+      <BoardNavigation />
       <div>{/* 검색창 */}</div>
-      <div>
-        <PostDetail detail={detail} />
+      <div className={styles.main}>
+        <div className={styles.content}>
+          <PostDetail detail={detail} />
+        </div>
+        <aside className={styles.sidebar}>
+          <PopularPosts posts={posts} />
+        </aside>
       </div>
-      <aside>{/* 인기글 리스트 */}</aside>
-    </main>
+    </div>
   );
 }
