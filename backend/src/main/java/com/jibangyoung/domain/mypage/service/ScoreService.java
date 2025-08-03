@@ -25,7 +25,6 @@ public class ScoreService {
     private final UserActivityEventRepository activityRepo;
     private final UserRegionScoreRepository scoreRepo;
     private final UserRegionScoreRepository userRegionScoreRepository;
-    // TODO: 게시글/댓글/멘토링 등 Repository 추가 주입 필요
 
     @Transactional(readOnly = true)
     public RegionScoreDto getRegionScore(Long userId, int regionId) {
@@ -39,7 +38,7 @@ public class ScoreService {
 
         int totalScore = score.getTotalScore() == null ? 0 : score.getTotalScore().intValue();
         double progress = Math.min(1.0, totalScore / 100.0);
-        int daysToMentor = 7; // TODO: 실제 로직 적용
+        int daysToMentor = 7;
 
         List<ScoreHistoryItem> history = activityRepo
                 .findTop30ByUserIdAndRegionIdOrderByCreatedAtDesc(userId, regionId)

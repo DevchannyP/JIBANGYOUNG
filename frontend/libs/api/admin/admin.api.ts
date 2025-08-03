@@ -1,9 +1,11 @@
 // libs/api/admin.api.ts
 
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
+import { AdMentorUser } from "@/types/api/adMentorUser";
 import { AdminPost } from "@/types/api/adminPost";
+import { AdminRegion } from "@/types/api/adminRegion";
 import { AdminUser } from "@/types/api/adminUser";
 import { AdminUserRole } from "@/types/api/adminUserRole";
-import { promises } from "dns";
 
 export interface ApiError {
   code?: string;
@@ -22,7 +24,7 @@ async function safeFetch(
   }
 }
 
-// 사용자 리스트 조회 API
+// 관리자 데시보드_사용자 리스트 조회 API
 export async function fetchAllUsers(): Promise<AdminUser[]> {
   const response = await safeFetch("http://localhost:8080/api/admin/users", {
     method: "GET",
@@ -47,12 +49,12 @@ export async function fetchAllUsers(): Promise<AdminUser[]> {
   return response.json();
 }
 
-// 사용자 권한 변경 API
+// 관리자 데시보드_사용자 권한 변경 API
 export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
   const response = await safeFetch(
     "http://localhost:8080/api/admin/users/roles",
     {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -74,7 +76,7 @@ export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
   }
 }
 
-// 게시글 리스트 조회 API
+// 관리자 데시보드_게시글 리스트 조회 API
 export async function featchAllPost(): Promise<AdminPost[]> {
   const response = await safeFetch("http://localhost:8080/api/admin/posts", {
     method: "GET",
@@ -98,7 +100,7 @@ export async function featchAllPost(): Promise<AdminPost[]> {
   return response.json();
 }
 
-// 게시글 삭제 API
+// 관리자 데시보드_게시글 삭제 API
 export async function deletePostById(id: number): Promise<void> {
   const response = await safeFetch(
     "http://localhost:8080/api/admin/posts/${id}",
@@ -122,4 +124,73 @@ export async function deletePostById(id: number): Promise<void> {
 
     throw new Error(apiError.message || "게시글 삭제 실패");
   }
+}
+
+// 관리자 데시보드_시/도 리스트 조회 API
+export async function fetchAdminRegion(): Promise<AdminRegion[]> {
+  const response = await safeFetch("http://localhost:8080/api/admin/region", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "지역 목록 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {
+      // JSON 파싱 불가
+    }
+    throw new Error(apiError.message || "지역 목록 조회 실패");
+  }
+  return response.json();
+}
+
+// 멘토 데시보드_내 지역멘토 리스트 API
+export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
+  const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
+
+  const response = await safeFetch("http://localhost:8080/api/mentor/local", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "멘토 지역 유저 목록 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {}
+    throw new Error(apiError.message || "멘토 지역 유저 목록 조회 실패");
+  }
+
+  return response.json();
+}
+
+// 멘토 데시보드_멘토 활동로그 리스트 API
+export async function fetchAdMentorLogList(): Promise<AdMentorLogList[]> {
+  const token = localStorage.getItem("accessToken");
+
+  const response = await safeFetch("http://localhost:8080/api/mentor/logList", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    let apiError: ApiError = { message: "멘토 활동로그 리스트 조회 실패" };
+    try {
+      apiError = await response.json();
+    } catch {}
+    throw new Error(apiError.message || "멘토 활동로그 리스트 조회 실패");
+  }
+
+  return response.json();
 }

@@ -1,30 +1,19 @@
-"use client";
-
 import styles from "../AdminPage.module.css";
 
-interface AdminRegionTabProps {
+export interface AdminRegionTabProps {
+  regionOptions: { code: number; name: string }[];
   selectedRegionCode: number;
   onSelectRegion: (regionName: string, code: number) => void;
 }
 
-const regionOptions = [
-  { name: "전체", code: 0 },
-  { name: "서울", code: 1001 },
-  { name: "경기도", code: 1002 },
-  { name: "충청북도", code: 1003 },
-  { name: "충청남도", code: 1004 },
-  { name: "전라북도", code: 1005 },
-  { name: "전라남도", code: 1006 },
-  { name: "경상북도", code: 1007 },
-  { name: "경상남도", code: 1008 },
-  { name: "강원도", code: 1009 },
-  { name: "제주도", code: 1010 },
-];
-
 export function AdminRegionTab({
+  regionOptions,
   selectedRegionCode,
   onSelectRegion,
 }: AdminRegionTabProps) {
+  if (!regionOptions || regionOptions.length === 0)
+    return <div>지역 정보 없음</div>;
+
   return (
     <div className={styles.regionTabs}>
       {regionOptions.map((region) => (

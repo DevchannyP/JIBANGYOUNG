@@ -1,5 +1,3 @@
-"use client";
-
 import styles from "../AdminPage.module.css";
 
 interface PaginationProps {

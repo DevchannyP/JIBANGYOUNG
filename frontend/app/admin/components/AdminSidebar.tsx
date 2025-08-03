@@ -1,37 +1,41 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import styles from "../AdminPage.module.css";
+interface AdminSidebarProps {
+  selectedMenu: string;
+  setSelectedMenu: (menu: string) => void;
+}
 
-const menu = [
-  { name: "멘토 공지사항", href: "/mentors/notices" },
-  { name: "사용자 관리", href: "/admin/users" },
-  { name: "멘토 신청 목록", href: "/admin/mentorsApply" },
-  { name: "신고 목록", href: "/admin/reports" },
-  { name: "게시글 관리", href: "/admin/posts" },
-];
-
-export default function AdminSidebar() {
-  const pathname = usePathname();
-
+export function AdminSidebar({
+  selectedMenu,
+  setSelectedMenu,
+}: AdminSidebarProps) {
   return (
-    <aside className={styles.adminSidebar}>
-      <nav className={styles.adminNav}>
-        {menu.map((item) => {
-          const isActive = pathname.startsWith(item.href);
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navLink} ${isActive ? styles.navLinkActive : ""}`}
-            >
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+    <div className={styles.sidebar}>
+      <ul>
+        <li
+          className={selectedMenu === "user" ? styles.active : ""}
+          onClick={() => setSelectedMenu("user")}
+        >
+          사용자 관리
+        </li>
+        <li
+          className={selectedMenu === "mentor" ? styles.active : ""}
+          onClick={() => setSelectedMenu("mentor")}
+        >
+          멘토 신청 목록
+        </li>
+        <li
+          className={selectedMenu === "report" ? styles.active : ""}
+          onClick={() => setSelectedMenu("report")}
+        >
+          신고 목록
+        </li>
+        <li
+          className={selectedMenu === "post" ? styles.active : ""}
+          onClick={() => setSelectedMenu("post")}
+        >
+          게시글 관리
+        </li>
+      </ul>
+    </div>
   );
 }
