@@ -4,13 +4,23 @@ interface RecommendationRegionCardProps {
   rank: number;
   regionName: string;
   regionDescription: string[];
+  regionCode?: string; // string 타입으로 명확히 지정
+  onClick?: (regionCode: string) => void;
 }
 
 const RecommendationRegionCard: React.FC<RecommendationRegionCardProps> = ({ 
   rank, 
   regionName, 
-  regionDescription 
+  regionDescription,
+  regionCode = `region-${rank}`, // 기본값 제공
+  onClick
 }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick(regionCode);
+    }
+  };
+
   const rankBadgeStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
@@ -49,7 +59,7 @@ const RecommendationRegionCard: React.FC<RecommendationRegionCardProps> = ({
   };
 
   return (
-    <>
+    <div onClick={handleClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div style={rankBadgeStyle}>{rank}</div>
       <h3 style={regionNameStyle}>{regionName}</h3>
       <ul style={descriptionListStyle}>
@@ -65,7 +75,7 @@ const RecommendationRegionCard: React.FC<RecommendationRegionCardProps> = ({
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 };
 

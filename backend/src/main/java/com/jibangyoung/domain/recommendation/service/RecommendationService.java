@@ -35,7 +35,6 @@ public class RecommendationService {
         groupedByRankGroup.keySet().stream().sorted().forEach(rankGroup -> {
             List<Recommendation> recs = groupedByRankGroup.get(rankGroup);
 
-            // 지역 정책 중 rank 기준 가장 높은 하나만 선택
             Optional<Recommendation> selectedRegionRecOpt = recs.stream()
                     .filter(r -> !"99999".equals(r.getRegionCode()))
                     .sorted(Comparator.comparingInt(Recommendation::getRank))
@@ -44,7 +43,6 @@ public class RecommendationService {
             if (selectedRegionRecOpt.isEmpty())
                 return;
 
-            // 추천 지역명 추출
             Recommendation selectedRegionRec = selectedRegionRecOpt.get();
             String regionCodeStr = selectedRegionRec.getRegionCode();
             Integer regionCodeInt;
@@ -60,9 +58,6 @@ public class RecommendationService {
                             .map(this::buildFullRegionName)
                             .orElse("미등록");
 
-            // 테스트용
-            System.out.println(regionCodeStr + " : 지역 코드");
-
             List<Object[]> infraRows = (regionCodeInt == 99999) ? null
                     : recommendationRepository.getDescriptionByGrade(regionCodeStr);
 
@@ -76,25 +71,43 @@ public class RecommendationService {
 
             List<String> regionDescription = getDescriptionByGrade(List.of(regionGrades));
 
-            // 해당 그룹의 전체 정책코드 모으기 (지역 + 전국)
-            List<Integer> groupPolicyCodesInt = recs.stream()
-                    .map(r -> r.getPolicyCode()) // 이미 Integer 타입이면 String 변환 불필요
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            // 여기서 groupPolicyCodes 출력(테스트용)
-            System.out.println("[DEBUG] RankGroup: " + rankGroup + ", policyCodes: " + groupPolicyCodesInt);
-
-            // 해당 코드로 정책 조회 후 rank 기준 정렬, 상위 4개
+            // 정책 코드 → rank 매핑
             Map<Integer, Integer> policyCodeToRankMap = recs.stream()
                     .collect(Collectors.toMap(
-                            r -> r.getPolicyCode(),
+                            Recommendation::getPolicyCode,
                             Recommendation::getRank,
                             Math::min)); // 동일 정책코드일 경우 더 낮은 rank 사용
 
-            List<PolicyCardDto> sortedTop4 = policyService.getPoliciesByCodes(groupPolicyCodesInt).stream()
-                    .sorted(Comparator.comparingInt(p -> policyCodeToRankMap.getOrDefault(
-                            p.getNO(), Integer.MAX_VALUE)))
+            // 지역 정책과 전국 정책 분리
+            List<Recommendation> localRecommendations = recs.stream()
+                    .filter(r -> r.getRegionCode().equals(regionCodeStr))
+                    .collect(Collectors.toList());
+
+            List<Recommendation> nationalRecommendations = recs.stream()
+                    .filter(r -> r.getRegionCode().equals("99999"))
+                    .collect(Collectors.toList());
+
+            // 각각 정책코드 정렬
+            List<Integer> localPolicyCodes = localRecommendations.stream()
+                    .map(Recommendation::getPolicyCode)
+                    .distinct()
+                    .sorted(Comparator.comparingInt(policyCodeToRankMap::get))
+                    .collect(Collectors.toList());
+
+            List<Integer> nationalPolicyCodes = nationalRecommendations.stream()
+                    .map(Recommendation::getPolicyCode)
+                    .distinct()
+                    .sorted(Comparator.comparingInt(policyCodeToRankMap::get))
+                    .collect(Collectors.toList());
+
+            // 병합: 지역 우선 → 전국 후순위
+            List<Integer> sortedPolicyCodes = new ArrayList<>();
+            sortedPolicyCodes.addAll(localPolicyCodes);
+            sortedPolicyCodes.addAll(nationalPolicyCodes);
+
+            // 정책 조회 후 정렬 유지
+            List<PolicyCardDto> sortedTop4 = policyService.getPoliciesByCodes(sortedPolicyCodes).stream()
+                    .sorted(Comparator.comparingInt(p -> sortedPolicyCodes.indexOf(p.getNO())))
                     .limit(4)
                     .collect(Collectors.toList());
 

@@ -45,6 +45,11 @@ const RecommendationDataLoader: React.FC<RecommendationDataLoaderProps> = ({
     router.push(`/policy/policy_detail/${policyId}`);
   };
 
+  const handleRegionClick = (regionCode: string) => {
+    // 추천 지역 상세 페이지로 이동
+    router.push(`/recommendation/${userId}/${responseId}/${regionCode}`);
+  };
+
   const handleBookmarkToggle = (policyId: number) => {
     setBookmarkedPolicyIds((prev) =>
       prev.includes(policyId)
@@ -92,6 +97,7 @@ const RecommendationDataLoader: React.FC<RecommendationDataLoaderProps> = ({
       <RecommendationList
         data={data}
         onPolicyClick={handlePolicyClick}
+        onRegionClick={handleRegionClick}
         onBookmarkToggle={handleBookmarkToggle}
         bookmarkedPolicyIds={bookmarkedPolicyIds}
         userId={userId}
