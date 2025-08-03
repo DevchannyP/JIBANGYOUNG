@@ -19,7 +19,7 @@ export function RecommendationHeader({ regionName, rankGroup }: RecommendationHe
         <span className="user-name">홍길동</span>님의
       </h1>
       <h2 className="header-title">
-        <span className="rank-text">추천지역 {getRankText(rankGroup)}</span> <span className="region-name">'{regionName}'</span>입니다.
+        <span className="rank-text">추천지역 {getRankText(rankGroup)}</span> <span className="region-name">{regionName}</span>입니다.
       </h2>
     </div>
   );
