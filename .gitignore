@@ -31,23 +31,7 @@ bin/
 logs/
 
 # -----------------------------------
-<<<<<<< HEAD
 # 패키징 파일 (배포 산출물)
-=======
-# ☕ Spring Boot 설정 파일 (민감 정보 포함)
-backend/src/main/resources/application.yml
-application.yaml
-application.properties
-**/application.yml
-**/application.yaml
-**/application.properties
-application.yml___jb_tmp___
-application.yml___jb_old___
-
-# -----------------------------------
-<<<<<<< HEAD
-# 🗂 패키징 산출물
->>>>>>> b2845a2 (전반적인 통합)
 *.zip
 *.tar.gz
 *.tar
@@ -57,11 +41,9 @@ application.yml___jb_old___
 *.ear
 
 # -----------------------------------
-# ⚙️ IDE / 에디터 관련 캐시
+# IDE 및 편집기 캐시
 .idea/
 *.iml
-*.iws
-*.ipr
 *.swp
 *.swo
 *.bak
@@ -97,10 +79,6 @@ test-output/
 .nyc_output/
 
 # -----------------------------------
-# Gradle wrapper는 예외적으로 포함
-!**/gradle-wrapper.jar
-!**/gradle-wrapper.properties
-=======
 # Gradle wrapper는 예외적으로 포함
 !**/gradle-wrapper.jar
 !**/gradle-wrapper.properties
