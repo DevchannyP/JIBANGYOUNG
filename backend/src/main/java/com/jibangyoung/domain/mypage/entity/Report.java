@@ -67,4 +67,15 @@ public class Report {
 
     @Column(name = "reviewed_by")
     private Long reviewedBy;
+
+    // 멘토 데시보드_신고목록(상태변경)
+    public void setReviewResultCode(ReviewResultCode reviewResultCode) {
+        this.reviewResultCode = reviewResultCode;
+    }
+    public void setReviewedAt(LocalDateTime reviewedAt){
+        this.reviewedAt = reviewedAt;
+    }
+    public void setReviewedBy(Long reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
 }

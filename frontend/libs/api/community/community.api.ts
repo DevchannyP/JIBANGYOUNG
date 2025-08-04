@@ -40,10 +40,21 @@ export async function fetchPopularPostsByPeriod(
 }
 export async function fetchPostsByRegion(
   regionCode: string,
-  page: number
+  page: number,
+  search?: string,
+  searchType?: string
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
+  const query = new URLSearchParams({
+    page: page.toString(),
+  });
+
+  if (search && searchType) {
+    query.set("search", search);
+    query.set("searchType", searchType);
+  }
+
   const res = await fetch(
-    `${BASE}/api/community/region/${regionCode}?page=${page}`,
+    `${BASE}/api/community/region/${regionCode}?${query.toString()}`,
     {
       next: { revalidate: 3 },
     }
@@ -118,10 +129,11 @@ export async function createCommunityPost(
 // /api/community/regionPopular/{regionCode}/?page=${page}
 export async function getPostsByRegionPopular(
   regionCode: string,
-  page: number
+  page: number,
+  size: number
 ): Promise<{ posts: PostListDto[]; totalPages: number }> {
   const res = await fetch(
-    `${BASE}/api/community/regionPopular/${regionCode}?page=${page}`,
+    `${BASE}/api/community/regionPopular/${regionCode}?page=${page}&size=${size}`,
     {
       next: { revalidate: 300 },
     }

@@ -5,6 +5,7 @@ export interface PostListDto {
   views: number;
   createdAt: string;
   userId: number;
+  category: string;
   regionId: number;
   regionName: string;
   thumbnailUrl: string;

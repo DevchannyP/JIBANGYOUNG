@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "../LoginPage.module.css";
 
+
+// 로그인 폼 컴포넌트
 function LoginForm() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const accessToken = useAuthStore((state) => state.accessToken);

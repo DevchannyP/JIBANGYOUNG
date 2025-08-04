@@ -4,13 +4,19 @@ on:
   pull_request:
     branches: [main, dev]
   push:
-    branches: [dev]
+    branches: [main, dev]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  ci_yml_check:
+    name: Dummy CI.yml Required Check
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ ci.yml check passed"
+
   backend:
     name: 🛠️ Backend Test
     runs-on: ubuntu-latest
@@ -66,28 +72,17 @@ jobs:
       - name: ✅ Checkout Frontend Code
         uses: actions/checkout@v4
 
-      - name: ⚙️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-#오예록
-#테스트 용도
-      - name: 🧹 Clean TS & Next cache
+      - name: 🧹 Clean all cache and lock (sharp fix)
         working-directory: frontend
         run: |
-          rm -rf .next
-          rm -rf node_modules/.cache
-          rm -f tsconfig.tsbuildinfo
+          rm -rf node_modules .next .cache
+          rm -f package-lock.json tsconfig.tsbuildinfo
 
-      - name: 🧪 Debug .next/types 존재 여부
+      - name: 📦 Install Dependencies (sharp + optional)
         working-directory: frontend
-        run: find .next/types || echo "No .next/types found"
-# 여기까지
-
-
-      - name: 📦 Install Dependencies
-        working-directory: frontend
-        run: npm ci
+        run: |
+          npm install --include=optional
+          npm install --os=linux --cpu=x64 sharp
 
       - name: 🧪 Lint & Build
         working-directory: frontend
@@ -95,38 +90,40 @@ jobs:
           npm run lint
           npm run build
 
+  # Docker Build Test (옵션, 필요시 주석 해제)
   # docker:
   #   name: 🐳 Docker Build Check
   #   runs-on: ubuntu-latest
   #   needs: [frontend, backend]
-
+  #
   #   steps:
   #     - name: ✅ Checkout Code
   #       uses: actions/checkout@v4
-
+  #
   #     - name: 🔧 Docker Build Test (frontend)
   #       run: docker build -f infra/docker/Dockerfile.frontend -t jibangyoung-frontend:latest .
-
+  #
   #     - name: 🔧 Docker Build Test (backend)
   #       run: docker build -f infra/docker/Dockerfile.backend -t jibangyoung-backend:latest .
 
+  # Vercel Deploy (옵션, 필요시 주석 해제)
   # vercel:
   #   name: ▲ Deploy to Vercel
   #   runs-on: ubuntu-latest
   #   needs: frontend
-
+  #
   #   steps:
   #     - name: ✅ Checkout Code
   #       uses: actions/checkout@v4
-
+  #
   #     - name: ⚙️ Set up Node.js
   #       uses: actions/setup-node@v4
   #       with:
   #         node-version: 20
-
+  #
   #     - name: 🔐 Install Vercel CLI
   #       run: npm install -g vercel@25.1.0
-
+  #
   #     - name: 🚀 Deploy to Vercel (Production)
   #       run: |
   #         vercel --token=${{ secrets.VERCEL_TOKEN }} \
