@@ -1,5 +1,5 @@
-import { Comment } from "@/types/comment";
 import api from "@/libs/api/axios"; // axios 인스턴스 임포트
+import { Comment } from "@/types/comment";
 
 // 댓글 목록 조회 API
 export const fetchComments = async (postId: string): Promise<Comment[]> => {
@@ -16,8 +16,6 @@ export const postComment = async (
   const res = await api.post(`/api/community/posts/${postId}/comments`, {
     content,
     parentId,
-    userId: 1, // 하드코딩된 userId
-    author: "GuestUser", // 하드코딩된 author
   });
   return res.data;
 };

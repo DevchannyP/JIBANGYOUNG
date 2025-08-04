@@ -1,10 +1,11 @@
 package com.jibangyoung.domain.community.dto;
 
-import com.jibangyoung.domain.mypage.entity.Comment;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.jibangyoung.domain.mypage.entity.Comment;
+
+import lombok.Getter;
 
 @Getter
 public class CommentResponseDto {
@@ -16,22 +17,12 @@ public class CommentResponseDto {
     private final boolean isDeleted;
     private final List<CommentResponseDto> replies;
 
+    // 기본 생성자 (답글 없는 경우)
     public CommentResponseDto(Comment comment) {
-        this.id = comment.getId();
-        this.author = comment.getUser().getNickname();
-        this.parentId = comment.getParent() != null ? comment.getParent().getId() : null;
-        this.createdAt = comment.getCreatedAt();
-        this.isDeleted = comment.isDeleted();
-
-        if (comment.isDeleted()) {
-            this.content = "삭제된 댓글입니다.";
-            this.replies = List.of(); //
-        } else {
-            this.content = comment.getContent();
-            this.replies = List.of(); //
-        }
+        this(comment, List.of());
     }
 
+    // 메인 생성자 (답글 포함)
     public CommentResponseDto(Comment comment, List<CommentResponseDto> replies) {
         this.id = comment.getId();
         this.author = comment.getUser().getNickname();

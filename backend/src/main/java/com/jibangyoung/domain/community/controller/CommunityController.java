@@ -105,11 +105,14 @@ public class CommunityController {
     //댓글 작성
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<Void> createComment(
+            @AuthenticationPrincipal User user,
             @PathVariable Long postId,
             @RequestBody CommentRequestDto requestDto
     ) {
-        log.warn("댓글 작성 시 @AuthenticationPrincipal User 객체 사용 안 함. userId: {}, author: {}", requestDto.getUserId(), requestDto.getAuthor());
-        communityService.saveComment(postId, requestDto.getUserId(), requestDto.getAuthor(), requestDto);
+        Long userId = user.getId();         // 무조건 JWT 인증에서 추출
+        String author = user.getUsername(); // 혹은 닉네임 등
+        log.info("댓글 작성, userId: {}, author: {}", userId, author);
+        communityService.saveComment(postId, userId, author, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

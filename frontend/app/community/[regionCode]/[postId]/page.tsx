@@ -4,10 +4,9 @@ import {
   fetchPostsByRegion,
 } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
-import styles from "../components/BoardList.module.css";
 import RegionSelector from "../../components/RegionSelector";
-import { DetailProps } from "../../types";
 import BoardNavigation from "../components/BoardHeader";
+import styles from "../components/BoardList.module.css";
 import PopularPosts from "../components/PopularPosts";
 import PostDetail from "./PostDetail";
 import CommentSection from "./components/CommentSection";
@@ -24,7 +23,7 @@ interface Props {
 
 // ✅ SEO 메타데이터
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { regionCode } = params;
+  const { regionCode } = await params;
 
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
@@ -37,12 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function CommunityPostPage({ params }: Props) {
-  const { regionCode, postId } = params;
-  
+  const { regionCode, postId } = await params;
+
   // 데이터 페칭은 병렬로 처리하여 성능을 최적화합니다.
   const [detail, { posts }] = await Promise.all([
     fetchPostDetail(postId),
-    fetchPostsByRegion(regionCode, 1)
+    fetchPostsByRegion(regionCode, 1),
   ]);
 
   return (
