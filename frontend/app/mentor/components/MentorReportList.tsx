@@ -26,11 +26,6 @@ export function MentorReportList() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // "유저" 탭만 숨기기
-  const filteredTabOptions = REPORT_TAB_OPTIONS.filter(
-    (option) => option !== "유저"
-  );
-
   function formatDate(dateStr: string | null | undefined) {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -133,7 +128,7 @@ export function MentorReportList() {
       <AdminReportTab
         selectedType={selectedType}
         onSelectType={setSelectedType}
-        tabOptions={filteredTabOptions}
+        tabOptions={REPORT_TAB_OPTIONS.filter((opt) => opt !== "유저")}
       />
       <AdminSearch placeholder="제목/사유 검색" onSearch={handleSearch} />
       <div className={styles.tableWrapper}>
