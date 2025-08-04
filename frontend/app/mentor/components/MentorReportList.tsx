@@ -7,9 +7,10 @@ import {
   requestReportApproval,
 } from "@/libs/api/admin/adminMentor.api";
 import {
+  REPORT_TAB_OPTIONS,
   Report,
   ReportTabType,
-  reportTabToType, // 변환 맵은 타입 파일에서 import!
+  reportTabToType,
 } from "@/types/api/adMentorReport";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
@@ -25,7 +26,17 @@ export function MentorReportList() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // 신고내역 fetch
+  function formatDate(dateStr: string | null | undefined) {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr.replace("T", " ").slice(0, 10);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }
+
   useEffect(() => {
     fetchMentorReports(reportTabToType[selectedType])
       .then((data) => {
@@ -37,7 +48,6 @@ export function MentorReportList() {
       });
   }, [selectedType]);
 
-  // 통합 필터
   const filterData = useCallback(
     (regionCode: number, keyword: string) => {
       const trimmed = keyword.trim().toLowerCase();
@@ -55,7 +65,6 @@ export function MentorReportList() {
     [reports]
   );
 
-  // 지역 필터 핸들러
   const handleRegionChange = useCallback(
     (_region: string, code: number) => {
       setSelectedRegionCode(code);
@@ -64,7 +73,6 @@ export function MentorReportList() {
     [filterData, searchKeyword]
   );
 
-  // 검색 핸들러
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -73,24 +81,19 @@ export function MentorReportList() {
     [filterData, selectedRegionCode]
   );
 
-  // URL 클릭 핸들러
   const handleUrlClick = useCallback((e: React.MouseEvent, url?: string) => {
     e.stopPropagation();
     if (url) window.open(url, "_blank");
   }, []);
 
-  // 상태 변경(승인요청, 무시, 무효) 공통 핸들러
   const handleChangeStatus = useCallback(
     async (
       reportId: number,
-      nextStatus: "REQUESTED" | "IGNORED" | "INVALID"
+      nextStatus: "REQUESTED" | "IGNORED" | "INVALID" | "PENDING"
     ) => {
       if (!selectedReport) return;
       try {
-        // 서버 반영 (userId 필요 시 넘겨줌)
-        await requestReportApproval(reportId, nextStatus);
-
-        // 프론트 상태 동기화
+        await requestReportApproval(reportId, nextStatus as any);
         setReports((prev) =>
           prev.map((r) =>
             r.id === reportId ? { ...r, reviewResultCode: nextStatus } : r
@@ -102,11 +105,16 @@ export function MentorReportList() {
           )
         );
         setSelectedReport(null);
+
+        const data = await fetchMentorReports(reportTabToType[selectedType]);
+        setReports(data);
+        setSearchResult(data);
+        alert("처리 완료되었습니다.");
       } catch (e: any) {
         alert(e.message || "상태 변경 실패");
       }
     },
-    [selectedReport]
+    [selectedReport, selectedType]
   );
 
   const paginatedData = searchResult.slice(
@@ -120,6 +128,7 @@ export function MentorReportList() {
       <AdminReportTab
         selectedType={selectedType}
         onSelectType={setSelectedType}
+        tabOptions={REPORT_TAB_OPTIONS.filter((opt) => opt !== "유저")}
       />
       <AdminSearch placeholder="제목/사유 검색" onSearch={handleSearch} />
       <div className={styles.tableWrapper}>
@@ -173,27 +182,32 @@ export function MentorReportList() {
                   {selectedReport.reporterName ?? selectedReport.userId}
                 </p>
                 <p>
-                  <b>신고유형:</b> {selectedReport.targetType}
+                  <b>신고유형:</b> {selectedReport.reasonDescription}
                 </p>
                 <p>
-                  <b>신고일:</b> {selectedReport.createdAt}
+                  <b>신고일:</b> {formatDate(selectedReport.createdAt)}
                 </p>
                 <p>
-                  <b>상태:</b> {selectedReport.reviewResultCode}
+                  <b>담당자:</b> {selectedReport.reviewerName ?? "미지정"}
                 </p>
                 <p>
                   <b>신고사유:</b>{" "}
-                  {selectedReport.reasonDetail ?? selectedReport.reasonCode}
                 </p>
                 <textarea
-                  value={selectedReport.reasonDetail ?? ""}
+                  value={
+                    selectedReport.reasonDetail ??
+                    selectedReport.reasonCode ??
+                    ""
+                  }
                   readOnly
                   style={{ width: "100%", height: "100px" }}
                 />
               </div>
             }
             buttons={[
-              ...(selectedReport.reviewResultCode === "PENDING"
+              ...(["PENDING", "IGNORED", "INVALID"].includes(
+                selectedReport.reviewResultCode
+              )
                 ? [
                     {
                       label: "승인 요청",
@@ -201,6 +215,10 @@ export function MentorReportList() {
                         handleChangeStatus(selectedReport.id, "REQUESTED"),
                       type: "primary" as const,
                     },
+                  ]
+                : []),
+              ...(selectedReport.reviewResultCode === "PENDING"
+                ? [
                     {
                       label: "무시",
                       onClick: () =>
@@ -211,6 +229,28 @@ export function MentorReportList() {
                       label: "무효",
                       onClick: () =>
                         handleChangeStatus(selectedReport.id, "INVALID"),
+                      type: "danger" as const,
+                    },
+                  ]
+                : []),
+              ...(["IGNORED", "INVALID"].includes(
+                selectedReport.reviewResultCode
+              )
+                ? [
+                    {
+                      label: "검토중",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "PENDING"),
+                      type: "secondary" as const,
+                    },
+                  ]
+                : []),
+              ...(selectedReport.reviewResultCode === "REQUESTED"
+                ? [
+                    {
+                      label: "승인요청 취소",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "PENDING"),
                       type: "danger" as const,
                     },
                   ]

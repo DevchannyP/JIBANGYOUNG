@@ -13,22 +13,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class AdMentorReportDTO {
-    private Long id;              // 신고 id
-    private Long userId;          // 신고자 id
-    private String reporterName;  // 신고자 닉네임
-    private ReportTargetType targetType; // 신고타입(ENUM)
-    private Long targetId;        // 신고 대상 id (게시글/댓글 id)
-    private String targetTitle;   // 게시글: title, 댓글: content
-    private String reasonCode;    // 신고 사유코드
-    private String reasonDetail;  // 상세 사유
-    private LocalDateTime createdAt; // 신고일시
-    private ReviewResultCode reviewResultCode; // 상태(ENUM)
-    private LocalDateTime reviewedAt; // 검토일시
-    private String reviewerName;      // 검토자 닉네임
-    private Long regionId;            // 지역코드
-    private String url;               // URL
+    private Long id;
+    private Long userId;
+    private String reporterName;
+    private ReportTargetType targetType;
+    private Long targetId;
+    private String targetTitle;
+    private String reasonCode;
+    private String reasonDescription;    
+    private String reasonDetail;
+    private LocalDateTime createdAt;
+    private ReviewResultCode reviewResultCode;
+    private LocalDateTime reviewedAt;
+    private String reviewerName;
+    private Long regionId;
+    private String url;
 
-    // *** JPQL에서 사용될 생성자 (파라미터 순서/타입 일치 필수!) ***
+    // JPQL에서 사용될 생성자 (파라미터 순서/타입 일치 필수!)
     public AdMentorReportDTO(
         Long id,
         Long userId,
@@ -37,6 +38,7 @@ public class AdMentorReportDTO {
         Long targetId,
         String targetTitle,
         String reasonCode,
+        String reasonDescription,   
         String reasonDetail,
         LocalDateTime createdAt,
         ReviewResultCode reviewResultCode,
@@ -52,6 +54,7 @@ public class AdMentorReportDTO {
         this.targetId = targetId;
         this.targetTitle = targetTitle;
         this.reasonCode = reasonCode;
+        this.reasonDescription = reasonDescription;  
         this.reasonDetail = reasonDetail;
         this.createdAt = createdAt;
         this.reviewResultCode = reviewResultCode;

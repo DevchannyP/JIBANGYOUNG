@@ -59,8 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // ✅ 실무: 모두 공개 허용할 경로를 여기서 명확히 지정
         return uri.startsWith("/api/auth/")
                 || uri.startsWith("/api/public/")
-                || uri.startsWith("/api/admin/")
-                // 멘토 테스트
+                // 어드민/멘토 테스트
+                // || uri.startsWith("/api/admin/")
                 // || uri.startsWith("/api/mentor/")
                 || uri.startsWith("/api/community/")
                 || uri.startsWith("/api/survey/")

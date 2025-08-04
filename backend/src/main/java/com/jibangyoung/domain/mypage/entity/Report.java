@@ -72,6 +72,9 @@ public class Report {
     public void setReviewResultCode(ReviewResultCode reviewResultCode) {
         this.reviewResultCode = reviewResultCode;
     }
+    public void setReviewedAt(LocalDateTime reviewedAt){
+        this.reviewedAt = reviewedAt;
+    }
     public void setReviewedBy(Long reviewedBy) {
         this.reviewedBy = reviewedBy;
     }

@@ -27,6 +27,7 @@ public interface AdMentorReportRepository extends JpaRepository<Report, Long> {
                 ELSE null
             END,
             r.reasonCode,
+            rr.description,      
             r.reasonDetail,
             r.createdAt,
             r.reviewResultCode,
@@ -53,6 +54,7 @@ public interface AdMentorReportRepository extends JpaRepository<Report, Long> {
             LEFT JOIN Posts p ON r.targetType = com.jibangyoung.domain.mypage.entity.ReportTargetType.POST AND r.targetId = p.id
             LEFT JOIN Comment c ON r.targetType = com.jibangyoung.domain.mypage.entity.ReportTargetType.COMMENT AND r.targetId = c.id
             LEFT JOIN Posts p2 ON r.targetType = com.jibangyoung.domain.mypage.entity.ReportTargetType.COMMENT AND c.targetPostId = p2.id
+            LEFT JOIN ReportReason rr ON r.reasonCode = rr.code 
         WHERE (
             (r.targetType = com.jibangyoung.domain.mypage.entity.ReportTargetType.POST
                 AND SUBSTRING(CAST(p.regionId AS string), 1, 2) IN (:regionIds))

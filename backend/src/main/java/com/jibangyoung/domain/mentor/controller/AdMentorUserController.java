@@ -56,6 +56,7 @@ public class AdMentorUserController {
         @RequestParam("type") String type
     ) {
         Long mentorUserId = loginUser.getId();
+        System.out.println("멘토 userId: " + mentorUserId); // 👈 콘솔에 찍어서 확인
         return adMentorReportService.getReportsByMentorRegionAndType(mentorUserId, type);
     }
     // 멘토 데시보드_신고목록(상태변경)
