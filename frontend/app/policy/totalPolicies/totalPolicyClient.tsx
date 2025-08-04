@@ -197,7 +197,6 @@ export default function PolicyClient({ serverState }: PolicyClientProps) {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   }, [currentPage, totalPages]);
 
-  // --- 북마크 토글 & localStorage 저장 ---
   const handleBookmarkToggle = useCallback((policyId: number) => {
     setBookmarkedPolicyIds(prev => {
       let updated: number[];
