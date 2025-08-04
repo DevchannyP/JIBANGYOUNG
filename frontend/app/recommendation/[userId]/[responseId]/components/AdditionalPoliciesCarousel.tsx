@@ -23,7 +23,7 @@ const AdditionalPoliciesCarousel: React.FC<AdditionalPoliciesCarouselProps> = ({
 
   // 선택된 지역을 제외한 나머지 지역들의 정책들을 모두 가져오기
   const otherRegionsPolicies: PolicyCard[] = allRegionsData
-    .filter(region => region.rank !== selectedRegionRank)
+    .filter(region => region.rankGroup !== selectedRegionRank) // rankGroup으로 필터링
     .flatMap(region => region.policies);
 
   // 총 페이지 수 계산
@@ -43,9 +43,15 @@ const AdditionalPoliciesCarousel: React.FC<AdditionalPoliciesCarouselProps> = ({
     setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
   };
 
-  // 정책이 없으면 렌더링하지 않음
-  if (otherRegionsPolicies.length === 0) {
+  // 정책이 없거나 페이지가 0보다 작으면 렌더링하지 않음
+  if (otherRegionsPolicies.length === 0 || totalPages === 0) {
     return null;
+  }
+
+  // 페이지가 변경되었을 때 현재 페이지가 범위를 벗어나면 조정
+  const safePage = Math.min(currentPage, totalPages - 1);
+  if (safePage !== currentPage) {
+    setCurrentPage(safePage);
   }
 
   const containerStyle: React.CSSProperties = {
@@ -149,55 +155,57 @@ const AdditionalPoliciesCarousel: React.FC<AdditionalPoliciesCarouselProps> = ({
           itemsPerPage={POLICIES_PER_PAGE}
         />
 
-        <div style={navigationStyle}>
-          <button
-            style={currentPage === 0 ? disabledButtonStyle : buttonStyle}
-            onClick={handlePrevPage}
-            disabled={currentPage === 0}
-            onMouseEnter={(e) => {
-              if (currentPage !== 0) {
-                e.currentTarget.style.background = '#3367d6';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== 0) {
-                e.currentTarget.style.background = '#4285f4';
-              }
-            }}
-          >
-            ‹
-          </button>
+        {totalPages > 1 && (
+          <div style={navigationStyle}>
+            <button
+              style={currentPage === 0 ? disabledButtonStyle : buttonStyle}
+              onClick={handlePrevPage}
+              disabled={currentPage === 0}
+              onMouseEnter={(e) => {
+                if (currentPage !== 0) {
+                  e.currentTarget.style.background = '#3367d6';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== 0) {
+                  e.currentTarget.style.background = '#4285f4';
+                }
+              }}
+            >
+              ‹
+            </button>
 
-          <div style={pageIndicatorStyle}>
-            <span>{currentPage + 1} / {totalPages}</span>
-            <div style={dotContainerStyle}>
-              {Array.from({ length: totalPages }, (_, index) => (
-                <div
-                  key={index}
-                  style={dotStyle(index === currentPage)}
-                />
-              ))}
+            <div style={pageIndicatorStyle}>
+              <span>{currentPage + 1} / {totalPages}</span>
+              <div style={dotContainerStyle}>
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <div
+                    key={index}
+                    style={dotStyle(index === currentPage)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
 
-          <button
-            style={currentPage === totalPages - 1 ? disabledButtonStyle : buttonStyle}
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages - 1}
-            onMouseEnter={(e) => {
-              if (currentPage !== totalPages - 1) {
-                e.currentTarget.style.background = '#3367d6';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== totalPages - 1) {
-                e.currentTarget.style.background = '#4285f4';
-              }
-            }}
-          >
-            ›
-          </button>
-        </div>
+            <button
+              style={currentPage === totalPages - 1 ? disabledButtonStyle : buttonStyle}
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages - 1}
+              onMouseEnter={(e) => {
+                if (currentPage !== totalPages - 1) {
+                  e.currentTarget.style.background = '#3367d6';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== totalPages - 1) {
+                  e.currentTarget.style.background = '#4285f4';
+                }
+              }}
+            >
+              ›
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
