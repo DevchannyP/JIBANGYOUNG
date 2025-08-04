@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "posts")
-@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ?")  // 삭제 시 실제로는 UPDATE 실행
-@SQLRestriction("is_deleted = false")                               // 조회 시 항상 is_deleted = false 조건 자동 추가
+@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ?") // 삭제 시 실제로는 UPDATE 실행
+@SQLRestriction("is_deleted = false") // 조회 시 항상 is_deleted = false 조건 자동 추가
 public class Posts {
 
     // 기본 식별자
@@ -35,7 +35,7 @@ public class Posts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //사용자 및 지역
+    // 사용자 및 지역
     @Column(name = "user_id", nullable = false)
     private long userId;
 
@@ -101,6 +101,10 @@ public class Posts {
         this.views += 1;
     }
 
+    public void incrementLikes() {
+        this.likes += 1;
+    }
+
     // 내부 enum으로 카테고리 정의
     @Getter
     public enum PostCategory {
@@ -108,7 +112,9 @@ public class Posts {
         QUESTION("질문"),
         REVIEW("후기"),
         NOTICE("공지");
+
         private final String label;
+
         PostCategory(String label) {
             this.label = label;
         }

@@ -1,6 +1,7 @@
 import { formatDetailDate } from "@/libs/utils/date";
 import { DetailProps } from "../../types";
 import styles from "../components/BoardList.module.css";
+import RecommendationButtons from "./components/RecommendationButtons";
 
 interface Props {
   detail: DetailProps;
@@ -20,7 +21,8 @@ export default function PostDetail({ detail }: Props) {
         className={styles.postContent}
         dangerouslySetInnerHTML={{ __html: detail.content }}
       />
+      <RecommendationButtons postId={detail.id} />
     </div>
   );
 }
-1;
+

@@ -45,7 +45,11 @@ public enum ErrorCode {
 
     // [마이페이지/알림] 도메인별 추가 예시
     MYPAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MYPAGE_NOT_FOUND", "마이페이지 정보를 찾을 수 없습니다."),
-    ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "ALERT_NOT_FOUND", "알림을 찾을 수 없습니다.");
+    ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "ALERT_NOT_FOUND", "알림을 찾을 수 없습니다."),
+
+    // [커뮤니티/게시글] 관련 에러
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."),
+    ALREADY_RECOMMENDED(HttpStatus.CONFLICT, "ALREADY_RECOMMENDED", "이미 추천한 게시글입니다.");
 
     private final HttpStatus status;
     private final String code;

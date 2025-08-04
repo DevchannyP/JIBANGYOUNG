@@ -2,18 +2,23 @@ package com.jibangyoung.domain.community.controller;
 
 import java.util.List;
 
+import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.community.dto.*;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.jibangyoung.domain.community.service.CommunityService;
 @RestController
 @RequestMapping("/api/community")
 @RequiredArgsConstructor
+@Slf4j
 public class CommunityController {
 
     private final CommunityService communityService;
@@ -43,8 +48,12 @@ public class CommunityController {
     public Page<PostListDto> getPostsByRegion(
             @PathVariable String regionCode,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return communityService.getPostsByRegion(regionCode, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String searchType
+    ) {
+        return communityService.getPostsByRegion(regionCode, page, size, category, search, searchType);
     }
     // 게시글 상세
     @GetMapping("/post/{postId}")
@@ -79,5 +88,53 @@ public class CommunityController {
     @GetMapping("/popular/reviews")
     public List<PostListDto> getTopReviewPosts() {
         return communityService.getTopReviewPosts();
+    }
+
+    // 공지
+    @GetMapping("/notices")
+    public ResponseEntity<List<PostListDto>> getNotices() {
+        return ResponseEntity.ok(communityService.getNotices());
+    }
+
+    // 댓글 가져오기
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
+        return ResponseEntity.ok(communityService.findCommentsByPostId(postId));
+    }
+
+    //댓글 작성
+    @PostMapping("/posts/{postId}/comments")
+    public ResponseEntity<Void> createComment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long postId,
+            @RequestBody CommentRequestDto requestDto
+    ) {
+        Long userId = user.getId();         // 무조건 JWT 인증에서 추출
+        String author = user.getUsername(); // 혹은 닉네임 등
+        log.info("댓글 작성, userId: {}, author: {}", userId, author);
+        communityService.saveComment(postId, userId, author, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId
+    ) {
+        // 임시
+        Long userId = 1L;
+        communityService.deleteComment(commentId, userId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
+
+    // 게시글 추천
+    @PostMapping("/post/{postId}/recommend")
+    public ResponseEntity<Void> recommendPost(
+            @PathVariable Long postId,
+            @RequestBody @Valid RecommendationRequestDto requestDto,
+            @AuthenticationPrincipal User user
+    ) {
+        communityService.recommendPost(postId, user.getId(), requestDto.getType());
+        return ResponseEntity.ok().build();
     }
 }

@@ -30,4 +30,16 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     // Category 추천수 이상 글 목록
     List<Posts> findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory postCategory);
 
+    // 지역 및 카테고리별 게시글 조회
+    Page<Posts> findByRegionIdAndCategoryOrderByCreatedAtDesc(Long regionId, Posts.PostCategory category, Pageable pageable);
+
+    // 지역 및 제목으로 게시글 검색
+    Page<Posts> findByRegionIdAndTitleContainingOrderByCreatedAtDesc(Long regionId, String title, Pageable pageable);
+
+    // 지역 및 내용으로 게시글 검색
+    Page<Posts> findByRegionIdAndContentContainingOrderByCreatedAtDesc(Long regionId, String content, Pageable pageable);
+
+    // 공지사항 (isNotice = true) 중 최신 2개 조회
+    List<Posts> findTop2ByIsNoticeTrueOrderByCreatedAtDesc();
+
 }

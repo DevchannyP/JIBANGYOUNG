@@ -23,12 +23,14 @@ const BoardNavigation: React.FC = () => {
 
   const handleCategoryChange = (categoryId: string) => {
     const params = new URLSearchParams(searchParams);
+    const baseRegionPath = `/community/${regionCode}`;
+
     if (categoryId === "all") {
       params.delete("category");
     } else {
       params.set("category", categoryId);
     }
-    router.push(`/board?${params.toString()}`);
+    router.push(`${baseRegionPath}?${params.toString()}`);
   };
 
   const handleWrite = () => {

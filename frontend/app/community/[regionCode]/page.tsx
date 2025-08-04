@@ -57,7 +57,8 @@ export default async function BoardPage({ params, searchParams }: Props) {
     regionCode,
     currentPage,
     search,
-    searchType
+    searchType,
+    category // category 파라미터 추가
   );
 
   return (

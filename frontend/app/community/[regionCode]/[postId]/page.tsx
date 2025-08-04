@@ -4,12 +4,12 @@ import {
   fetchPostsByRegion,
 } from "@/libs/api/community/community.api";
 import { Metadata } from "next";
-import styles from "../components/BoardList.module.css";
 import RegionSelector from "../../components/RegionSelector";
-import { DetailProps } from "../../types";
 import BoardNavigation from "../components/BoardHeader";
+import styles from "../components/BoardList.module.css";
 import PopularPosts from "../components/PopularPosts";
 import PostDetail from "./PostDetail";
+import CommentSection from "./components/CommentSection";
 
 interface Props {
   params: Promise<{
@@ -21,9 +21,9 @@ interface Props {
   }>;
 }
 
-// ✅ SEO 메타데이터 - Next.js 15 방식으로 수정
-export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { regionCode } = await props.params;
+// ✅ SEO 메타데이터
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { regionCode } = await params;
 
   return {
     title: `${regionCode} 커뮤니티 - 지방청년`,
@@ -35,10 +35,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
-export default async function CommunityPage({ params }: Props) {
+export default async function CommunityPostPage({ params }: Props) {
   const { regionCode, postId } = await params;
-  const detail: DetailProps = await fetchPostDetail(postId);
-  const { posts, totalPages } = await fetchPostsByRegion(regionCode, 1);
+
+  // 데이터 페칭은 병렬로 처리하여 성능을 최적화합니다.
+  const [detail, { posts }] = await Promise.all([
+    fetchPostDetail(postId),
+    fetchPostsByRegion(regionCode, 1),
+  ]);
+
   return (
     <div className={styles.container}>
       <RegionSelector />
@@ -48,6 +53,7 @@ export default async function CommunityPage({ params }: Props) {
       <div className={styles.main}>
         <div className={styles.content}>
           <PostDetail detail={detail} />
+          <CommentSection postId={postId} />
         </div>
         <aside className={styles.sidebar}>
           <PopularPosts posts={posts} />

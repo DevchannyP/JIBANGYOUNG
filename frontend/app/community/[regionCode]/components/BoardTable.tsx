@@ -1,4 +1,6 @@
 // components/BoardTable.tsx (서버/클라이언트 호환)
+
+import { fetchNotices } from "@/libs/api/community/community.api";
 import { formatBoardDate } from "@/libs/utils/date";
 import Link from "next/link";
 import React from "react";
@@ -9,7 +11,7 @@ interface BoardTableProps {
   posts: PostListDto[];
 }
 
-const BoardTable: React.FC<BoardTableProps> = ({ posts }) => {
+const BoardTable: React.FC<BoardTableProps> = async ({ posts }) => {
   const categoryMap: { [key: string]: string } = {
     FREE: "자유",
     QUESTION: "질문",
@@ -18,37 +20,9 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts }) => {
     NOTICE: "공지",
   };
 
-  // 더미 데이터 추가
-  const dummyNotices: PostListDto[] = [
-    {
-      id: 9999,
-      title: "[필독] 지방청년 커뮤니티 이용 규칙 안내",
-      category: "NOTICE",
-      createdAt: new Date().toISOString(),
-      views: 1024,
-      likes: 50,
-      regionId: 1,
-      regionName: "",
-      userId: 0, // 추가
-      thumbnailUrl: "", // 추가
-      summary: "", // 추가
-    },
-    {
-      id: 9998,
-      title: "8월 커뮤니티 이벤트 당첨자 발표",
-      category: "NOTICE",
-      createdAt: new Date().toISOString(),
-      views: 512,
-      likes: 25,
-      regionId: 1,
-      regionName: "",
-      userId: 0, // 추가
-      thumbnailUrl: "", // 추가
-      summary: "", // 추가
-    },
-  ];
+  const notices = await fetchNotices();
 
-  const displayPosts = [...dummyNotices, ...posts];
+  const displayPosts = [...notices, ...posts];
 
   return (
     <div className={styles.tableContainer}>
