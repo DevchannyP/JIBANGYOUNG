@@ -8,6 +8,7 @@ import {
 } from "@/libs/api/admin/adminReport.api";
 import {
   Report,
+  REPORT_TAB_OPTIONS,
   reportTabToType,
   ReportTabType,
 } from "@/types/api/adMentorReport";
@@ -106,6 +107,7 @@ export function AdminReportList() {
       <AdminReportTab
         selectedType={selectedType}
         onSelectType={setSelectedType}
+        tabOptions={REPORT_TAB_OPTIONS}
       />
       <AdminSearch placeholder="사유 검색" onSearch={handleSearch} />
       <div className={styles.tableWrapper}>
