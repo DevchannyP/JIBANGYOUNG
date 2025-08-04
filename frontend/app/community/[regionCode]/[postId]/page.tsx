@@ -12,13 +12,13 @@ import PostDetail from "./PostDetail";
 import CommentSection from "./components/CommentSection";
 
 interface Props {
-  params: {
+  params: Promise<{
     regionCode: string;
     postId: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 }
 
 // ✅ SEO 메타데이터
