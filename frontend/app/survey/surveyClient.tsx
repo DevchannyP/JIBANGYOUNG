@@ -88,9 +88,22 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<{ [key: string]: AnswerObject | AnswerObject[] }>({});
   const [isHydrated, setIsHydrated] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     setIsHydrated(true);
+
+    // localStorage에서 userId 가져오기
+    if (typeof window !== 'undefined') {
+      try {
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(Number(storedUserId));
+        }
+      } catch {
+        setUserId(null);
+      }
+    }
   }, []);
 
   const handleAnswerSelect = (value: AnswerObject | AnswerObject[]) => {
@@ -113,13 +126,21 @@ export default function SurveyClient({ questions }: SurveyClientProps) {
   };
 
   const handleSaveAnswer = async () => {
+    if (userId === null) {
+      alert('로그인 정보가 없습니다. 다시 로그인 해주세요.');
+      return;
+    }
+
     try {
       const payload = transformToAnswerFormat(answers);
-      console.log('전송 payload:', payload);
+      // userId를 payload에 포함
+      const payloadWithUserId = { ...payload, userId };
 
-      const {userId, responseId} = await saveSurveyAnswers(payload);
+      console.log('전송 payload:', payloadWithUserId);
 
-      // 설문 저장 후 추천 생성
+      // userId를 포함한 객체 하나만 전달
+      const { responseId } = await saveSurveyAnswers(payloadWithUserId);
+
       await createRecommendations(userId, responseId);
 
       window.location.href = `../recommendation/${userId}/${responseId}`;

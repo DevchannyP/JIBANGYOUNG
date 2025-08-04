@@ -23,8 +23,11 @@ public class SurveyAnswerController {
     // 설문 응답 저장
     @PostMapping("/surveyAnswer")
     public ResponseEntity<Map<String, Long>> saveAnswers(@RequestBody AnswerJsonDto request) {
-        Long userId = 1001L; // 로그인 사용자 ID
-        Long responseId = service.saveSurveyAnswers(userId, request.getAnswers());
+        // request 객체에서 userId와 answers 추출
+        Long userId = request.getUserId();
+        var answers = request.getAnswers();
+
+        Long responseId = service.saveSurveyAnswers(userId, answers);
 
         Map<String, Long> body = Map.of(
                 "userId", userId,

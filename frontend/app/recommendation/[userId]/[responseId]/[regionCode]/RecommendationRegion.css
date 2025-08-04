@@ -1,31 +1,35 @@
 /**
- * 전체 컨테이너
+ * 전체 컨테이너 - 중앙 정렬 고정 배경
  */
 .recommendation-container {
-  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
   background: #f8fafc;
-  padding: 0;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 
-/* 헤더 */
+/* 헤더 - 일반 위치 */
 .header {
   background: white;
   border-bottom: 1px solid #e2e8f0;
-  padding: 12px 24px;
-  position: sticky;
-  top: 0;
+  padding: 10px 0;
+  position: relative;
   z-index: 100;
+  height: 50px;
 }
 
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 0 20px;
 }
 
 .nav-left {
@@ -92,14 +96,11 @@
 }
 
 /**
- * 레이아웃 최대 너비 고정
+ * 메인 콘텐츠 - 스크롤 가능한 내부 컨테이너
  */
-.main-content,
-.nav {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
+.main-content {
+  padding: 20px 0; /* 헤더가 없으므로 일반 패딩 */
+  position: relative;
 }
 
 /* 헤더 섹션 */
@@ -134,17 +135,23 @@
 /* 이유 카드들 */
 .reason-cards {
   margin-bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .reason-card {
   display: flex;
   align-items: flex-start;
-  padding: 24px 0;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 20px 24px;
+  background: white;               /* 배경 흰색 */
+  border-radius: 12px;            /* 둥근 모서리 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 부드러운 그림자 */
+  transition: box-shadow 0.3s ease;
 }
 
-.reason-card:last-child {
-  border-bottom: none;
+.reason-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* 호버시 그림자 강조 */
 }
 
 .reason-icon {
@@ -155,7 +162,7 @@
   align-items: center;
   justify-content: center;
   margin-right: 20px;
-  font-size: 20px;
+  font-size: 24px;
   flex-shrink: 0;
 }
 
@@ -180,15 +187,15 @@
 }
 
 .reason-content h3 {
-  font-weight: 600;
+  font-weight: 700;
   color: #1e293b;
   margin-bottom: 8px;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .reason-content p {
   color: #64748b;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.6;
   margin: 0;
 }
@@ -466,91 +473,6 @@
   background: #2563eb;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .recommendation-container {
-    padding: 10;
-  }
-}
-
-/* 고대비 모드 지원 */
-@media (prefers-contrast: high) {
-  .policy-card {
-    border-width: 2px;
-  }
-  
-  .action-button.secondary {
-    border-width: 2px;
-  }
-}
-
-.reason-cards {
-  margin-bottom: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.reason-card {
-  display: flex;
-  align-items: flex-start;
-  padding: 20px 24px;
-  background: white;               /* 배경 흰색 */
-  border-radius: 12px;            /* 둥근 모서리 */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* 부드러운 그림자 */
-  transition: box-shadow 0.3s ease;
-}
-
-.reason-card:hover {
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* 호버시 그림자 강조 */
-}
-
-.reason-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 20px;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.medical-icon {
-  background: #fef2f2;
-  color: #ef4444;
-}
-
-.housing-icon {
-  background: #eff6ff;
-  color: #3b82f6;
-}
-
-.education-icon {
-  background: #f0fdf4;
-  color: #22c55e;
-}
-
-.transport-icon {
-  background: #faf5ff;
-  color: #a855f7;
-}
-
-.reason-content h3 {
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-  font-size: 20px;
-}
-
-.reason-content p {
-  color: #64748b;
-  font-size: 16px;
-  line-height: 1.6;
-  margin: 0;
-}
-
 /* 페이지네이션 */
 .pagination-controls {
   display: flex;
@@ -573,4 +495,15 @@
 .pagination-controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .policy-card {
+    border-width: 2px;
+  }
+  
+  .action-button.secondary {
+    border-width: 2px;
+  }
 }

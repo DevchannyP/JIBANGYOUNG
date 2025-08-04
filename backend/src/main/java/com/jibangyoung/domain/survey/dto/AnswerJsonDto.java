@@ -1,10 +1,12 @@
 package com.jibangyoung.domain.survey.dto;
 
-import lombok.Data;
 import java.util.Map;
+
+import lombok.Data;
 
 @Data
 public class AnswerJsonDto {
+    private Long userId; // 추가
     private Map<String, Answer> answers;
     private Metadata metadata;
 

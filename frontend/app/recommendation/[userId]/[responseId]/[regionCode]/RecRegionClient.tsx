@@ -1,8 +1,10 @@
 'use client';
 
 import PolicyCardList from '@/app/policy/totalPolicies/components/PolicyCardList';
+import { syncBookmarkedPolicies } from '@/libs/api/policy/sync';
 import { fetchPolicies, fetchRegionReason } from '@/libs/api/recommendation.api';
 import { PolicyCard } from '@/types/api/policy.c';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import './RecommendationRegion.css';
 import { ActionButtons } from './components/ActionButtons';
@@ -51,21 +53,58 @@ function mapDtoToPolicyCard(dto: PolicyCardDto): PolicyCard {
 }
 
 const ITEMS_PER_PAGE = 4;
+const STORAGE_KEY = 'bookmarkedPolicyIds';
 
 export default function RecRegionClient({
   userId,
   responseId,
   regionCode,
 }: RecRegionClientProps) {
+  const router = useRouter();
   const [regionReason, setRegionReason] = useState<RecommendationRegionReasonDto | null>(null);
   const [policies, setPolicies] = useState<PolicyCard[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>([]);
 
   const totalPages = Math.ceil(policies.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentPolicies = policies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // localStorage에서 북마크 복원
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          setBookmarkedPolicyIds(JSON.parse(stored));
+        }
+      } catch {
+        // 무시
+      }
+    }
+  }, []);
+
+  // 5분마다 localStorage 북마크 동기화 서버 전송
+useEffect(() => {
+  const syncBookmarksToServer = async () => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem('bookmarkedPolicyIds');
+      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+
+      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
+    } catch (error) {
+      console.error('북마크 동기화 실패:', error);
+    }
+  };
+
+  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+
+  return () => clearInterval(intervalId);
+}, [userId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +116,7 @@ export default function RecRegionClient({
         ]);
 
         setRegionReason(reasonData);
-        setPolicies(policiesData.map(mapDtoToPolicyCard)); // DTO → UI 데이터 매핑
+        setPolicies(policiesData.map(mapDtoToPolicyCard));
       } catch (err) {
         setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
       } finally {
@@ -87,6 +126,26 @@ export default function RecRegionClient({
 
     fetchData();
   }, [userId, responseId, regionCode]);
+
+  const handleBookmarkToggle = (policyId: number) => {
+    setBookmarkedPolicyIds((prev) => {
+      const isBookmarked = prev.includes(policyId);
+      const updated = isBookmarked
+        ? prev.filter((id) => id !== policyId)
+        : [...prev, policyId];
+
+      // localStorage에 저장
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch {
+          // 무시
+        }
+      }
+
+      return updated;
+    });
+  };
 
   if (loading) {
     return (
@@ -130,7 +189,9 @@ export default function RecRegionClient({
           <>
             <PolicyCardList
               policies={currentPolicies}
-              onCardClick={(policyNo) => console.log('정책 클릭:', policyNo)}
+              onCardClick={(policyNo) => router.push(`/policy/policy_detail/${policyNo}`)}
+              bookmarkedPolicyIds={bookmarkedPolicyIds} // 북마크 상태 전달
+              onBookmarkToggle={handleBookmarkToggle}  // 토글 핸들러 전달
             />
 
             <div className="pagination-controls">

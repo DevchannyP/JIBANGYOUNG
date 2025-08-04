@@ -3,6 +3,7 @@ package com.jibangyoung.domain.policy.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -27,4 +28,12 @@ public interface PolicyRepository extends JpaRepository<Policy, Integer> {
     // recommend된 정책들 불러오기
     @Query("SELECT p FROM Policy p WHERE p.NO = :policyCode")
     Policy findByPlcyNo(String policyCode);
+
+    @Modifying
+    @Query("UPDATE Policy p SET p.favorites = p.favorites + 1 WHERE p.plcy_no = (SELECT p2.plcy_no FROM Policy p2 WHERE p2.NO = :policyId)")
+    void incrementFavoritesByPlcyNo(@Param("policyId") Long policyId);
+
+    @Modifying
+    @Query("UPDATE Policy p SET p.favorites = CASE WHEN p.favorites > 0 THEN p.favorites - 1 ELSE 0 END WHERE p.plcy_no = (SELECT p2.plcy_no FROM Policy p2 WHERE p2.NO = :policyId)")
+    void decrementFavoritesByPlcyNo(@Param("policyId") Long policyId);
 }

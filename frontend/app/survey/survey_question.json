@@ -144,14 +144,14 @@
   },
   {
     "question_code": "Q11",
-    "question_text": "1주일동안 대중교통을 얼마나 이용하시나요?",
+    "question_text": "대중교통을 얼마나 이용하시나요?",
     "infra": true,
     "db_field": "q10_option",
     "options": [
-      {"option_code": "A", "option_text": "매우 그렇다", "weight": 1.4},
-      {"option_code": "C", "option_text": "보통이다", "weight": 1.0},
-      {"option_code": "D", "option_text": "그렇지 않다", "weight": 0.8},
-      {"option_code": "E", "option_text": "매우 그렇지 않다", "weight": 0.6}
+      {"option_code": "A", "option_text": "매우 자주 이용한다", "weight": 1.4},
+      {"option_code": "C", "option_text": "적당히 이용한다", "weight": 1.0},
+      {"option_code": "D", "option_text": "적게 이용한다", "weight": 0.8},
+      {"option_code": "E", "option_text": "매우 적게 이용한다", "weight": 0.6}
     ]
   },
   {
