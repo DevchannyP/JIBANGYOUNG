@@ -1,4 +1,3 @@
-// MentorReportListRow.tsx
 import { Report, StatusType } from "@/types/api/adMentorReport";
 
 const STATUS_MAP: Record<StatusType, { label: string; color: string }> = {
@@ -10,13 +9,12 @@ const STATUS_MAP: Record<StatusType, { label: string; color: string }> = {
   REQUESTED: { label: "승인요청중", color: "#2986ff" },
 };
 
-interface MentorReportListRowProps {
+interface AdminReportListRowProps {
   report: Report;
   onClick: () => void;
   onUrlClick: (e: React.MouseEvent, url?: string) => void;
 }
 
-// 날짜 포맷 함수 (YYYY.MM.DD)
 function formatDate(dateStr: string | null | undefined) {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
@@ -28,10 +26,9 @@ function formatDate(dateStr: string | null | undefined) {
   });
 }
 
-export const MentorReportListRow: React.FC<MentorReportListRowProps> = ({
+export const AdminReportListRow: React.FC<AdminReportListRowProps> = ({
   report,
   onClick,
-  onUrlClick,
 }) => {
   const status = STATUS_MAP[report.reviewResultCode] ?? {
     label: report.reviewResultCode,
@@ -52,7 +49,10 @@ export const MentorReportListRow: React.FC<MentorReportListRowProps> = ({
       <td>
         {report.url ? (
           <button
-            onClick={(e) => onUrlClick(e, report.url)}
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(report.url, "_blank");
+            }}
             style={{
               cursor: "pointer",
               border: "none",
