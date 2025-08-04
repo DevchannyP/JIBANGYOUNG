@@ -23,7 +23,6 @@ public class PolicyFavoriteService {
 
     @Transactional
     public void syncBookmarks(Long userId, List<Long> incomingPolicyIds) {
-        userId = 1001L; // 테스트용 id
         // 1. DB에 저장된 현재 유저의 찜 목록
         List<PolicyFavorite> existingFavorites = policyFavoriteRepository.findAllByUserId(userId);
         Set<Long> existingPolicyIds = existingFavorites.stream()

@@ -24,10 +24,11 @@ interface ServerState {
 
 interface PolicyClientProps {
   serverState: ServerState;
-  userId: number;  // userId prop 추가
 }
 
-export default function PolicyClient({ serverState, userId }: PolicyClientProps) {
+export default function PolicyClient({ serverState }: PolicyClientProps) {
+  const [userId, setUserId] = useState<number | null>(null);
+
   const [policies, setPolicies] = useState<PolicyCard[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(serverState.currentPage);
@@ -36,7 +37,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
   const [sortBy, setSortBy] = useState(serverState.sortBy);
   const [searchQuery, setSearchQuery] = useState(serverState.searchQuery);
 
-  // --- localStorage에서 북마크 초기값 복원 ---
   const [bookmarkedPolicyIds, setBookmarkedPolicyIds] = useState<number[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -54,7 +54,20 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
 
   const router = useRouter();
 
-  // 초기 데이터 CSR 패칭
+  // ✅ userId를 localStorage에서 가져오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(Number(storedUserId));
+        }
+      } catch {
+        setUserId(null);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     const loadPolicies = async () => {
       setIsLoading(true);
@@ -78,7 +91,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     loadPolicies();
   }, []);
 
-  // 지역 변경 시 데이터 재패칭
   const fetchPoliciesByRegionChange = useCallback(async (newRegion: number) => {
     setIsLoading(true);
     setError(null);
@@ -119,7 +131,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     fetchPoliciesByRegionChange(region);
   }, [region, fetchPoliciesByRegionChange]);
 
-  // 검색 및 정렬 적용
   const filteredAndSortedPolicies = useMemo(() => {
     let filtered = [...policies];
 
@@ -148,7 +159,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     return filtered;
   }, [policies, searchQuery, searchType, sortBy]);
 
-  // 필터 변경 시 첫 페이지로 이동
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, sortBy, region]);
@@ -160,7 +170,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     currentPage * serverState.itemsPerPage
   );
 
-  // 이벤트 핸들러
   const handleCardClick = useCallback((id: number) => {
     router.push(`./policy_detail/${id}`);
   }, [router]);
@@ -182,7 +191,6 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   }, [currentPage, totalPages]);
 
-  // --- 북마크 토글 & localStorage 저장 ---
   const handleBookmarkToggle = useCallback((policyId: number) => {
     setBookmarkedPolicyIds(prev => {
       let updated: number[];
@@ -196,7 +204,7 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
         try {
           localStorage.setItem('bookmarkedPolicyIds', JSON.stringify(updated));
         } catch {
-          // localStorage error 무시
+          // ignore localStorage error
         }
       }
 
@@ -204,27 +212,26 @@ export default function PolicyClient({ serverState, userId }: PolicyClientProps)
     });
   }, []);
 
-  // --- 5분마다 localStorage 북마크 상태 서버 전송 ---
-useEffect(() => {
-  const syncBookmarksToServer = async () => {
-    if (typeof window === 'undefined') return;
+  // ✅ 북마크 서버 동기화 (userId 필요)
+  useEffect(() => {
+    const syncBookmarksToServer = async () => {
+      if (typeof window === 'undefined' || userId === null) return;
 
-    try {
-      const stored = localStorage.getItem('bookmarkedPolicyIds');
-      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+      try {
+        const stored = localStorage.getItem('bookmarkedPolicyIds');
+        const bookmarkedIds = stored ? JSON.parse(stored) : [];
 
-      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
-    } catch (error) {
-      console.error('북마크 동기화 실패:', error);
-    }
-  };
+        await syncBookmarkedPolicies(userId, bookmarkedIds);
+      } catch (error) {
+        console.error('북마크 동기화 실패:', error);
+      }
+    };
 
-  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+    const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, [userId]);
 
-  return () => clearInterval(intervalId);
-}, [1001]);
-
-  if (isLoading) {
+  if (userId === null || isLoading) {
     return <SkeletonLoader />;
   }
 

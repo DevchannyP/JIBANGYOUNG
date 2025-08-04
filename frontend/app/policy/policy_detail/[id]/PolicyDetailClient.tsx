@@ -14,19 +14,36 @@ import RelatedPoliciesSection from "./components/RelatedPoliciesSection";
 interface PolicyDetailClientProps {
   initialData: PolicyDetailDto[] | null;
   policyId: number;
-  userId: number;  // userId 추가
+  // userId prop 제거
 }
 
 export default function PolicyDetailClient({ 
   initialData, 
   policyId,
-  userId,         // userId 받기
 }: PolicyDetailClientProps) {
   const router = useRouter();
   const { id } = useParams();
+
+  // userId 상태 추가, localStorage에서 불러오기
+  const [userId, setUserId] = useState<number | null>(null);
+
   const [policy, setPolicy] = useState<PolicyDetailDto[] | null>(initialData);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
+
+  // localStorage에서 userId 가져오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+          setUserId(Number(storedUserId));
+        }
+      } catch {
+        setUserId(null);
+      }
+    }
+  }, []);
 
   // --- localStorage에서 해당 정책 북마크 상태 복원 ---
   const [isBookmarked, setIsBookmarked] = useState<boolean>(() => {
@@ -83,24 +100,24 @@ export default function PolicyDetailClient({
   }, [policy, policyId]);
 
   // 5분마다 localStorage 북마크 동기화 서버 전송 (userId 포함)
-useEffect(() => {
-  const syncBookmarksToServer = async () => {
-    if (typeof window === 'undefined') return;
+  useEffect(() => {
+    const syncBookmarksToServer = async () => {
+      if (typeof window === 'undefined' || userId === null) return;
 
-    try {
-      const stored = localStorage.getItem('bookmarkedPolicyIds');
-      const bookmarkedIds = stored ? JSON.parse(stored) : [];
+      try {
+        const stored = localStorage.getItem('bookmarkedPolicyIds');
+        const bookmarkedIds = stored ? JSON.parse(stored) : [];
 
-      await syncBookmarkedPolicies(userId, bookmarkedIds); // 💡 변경된 부분
-    } catch (error) {
-      console.error('북마크 동기화 실패:', error);
-    }
-  };
+        await syncBookmarkedPolicies(userId, bookmarkedIds);
+      } catch (error) {
+        console.error('북마크 동기화 실패:', error);
+      }
+    };
 
-  const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
+    const intervalId = setInterval(syncBookmarksToServer, 1 * 60 * 1000);
 
-  return () => clearInterval(intervalId);
-}, [userId]);
+    return () => clearInterval(intervalId);
+  }, [userId]);
 
   const handleBack = () => {
     router.back();

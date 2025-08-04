@@ -1,4 +1,5 @@
 export interface AnswerFormat {
+  userId: number;  // 추가
   answers: {
     [questionCode: string]: {
       value: string | string[]; // 항상 string 또는 string[]로 고정
