@@ -3,11 +3,13 @@ import { REPORT_TAB_OPTIONS, ReportTabType } from "@/types/api/adMentorReport";
 interface AdminReportTabProps {
   selectedType: ReportTabType;
   onSelectType: (type: ReportTabType) => void;
+  tabOptions: ReportTabType[];
 }
 
 export function AdminReportTab({
   selectedType,
   onSelectType,
+  tabOptions,
 }: AdminReportTabProps) {
   return (
     <div style={{ display: "flex", gap: "12px", marginBottom: "18px" }}>
