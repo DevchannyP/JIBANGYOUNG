@@ -16,20 +16,16 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
         SELECT new com.jibangyoung.domain.mentor.dto.AdMentorUserDTO(
             u.id,
             u.nickname,
-            u.role,  
+            u.role,
             m.warningCount,
             m.regionId,
             m.currentScore
         )
         FROM MentorTest m
         JOIN User u ON m.userId = u.id
-        WHERE m.regionId IN (
-            SELECT m2.regionId
-            FROM MentorTest m2
-            WHERE m2.userId = :userId
-        )
+        WHERE m.regionId IN :regionIds
     """)
-    List<AdMentorUserDTO> findUsersByMentorRegion(@Param("userId") Long userId);
+    List<AdMentorUserDTO> findUsersByMentorRegionIds(@Param("regionIds") List<Long> regionIds);
 
     // regionId(지역코드)를 userId로 조회하는 쿼리
     @Query("""
@@ -39,4 +35,3 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
     """)
     List<Long> findRegionIdByUserId(@Param("userId") Long userId);
 }
-

@@ -27,6 +27,7 @@ export interface Report {
   reviewerName?: string;
   regionId: number;
   url?: string;
+  targetUserStatus: string;
 }
 
 // 3. 옵션/상수 선언 (하단에)
