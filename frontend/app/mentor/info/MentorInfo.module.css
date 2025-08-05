@@ -1,0 +1,89 @@
+.pageContainer {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.pageHeader {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 2rem;
+}
+
+.tabContainer {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 2rem;
+}
+
+.tabLabel {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.tabButton {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tabButtonApproved {
+  background-color: #1e40af;
+  color: white;
+}
+
+.tabButtonPending {
+  background-color: #93c5fd;
+  color: white;
+}
+
+.tabButtonRejected {
+  background-color: white;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.tabButtonActive {
+  background-color: #6366f1;
+  color: white;
+}
+
+.tabButtonInactive {
+  background-color: transparent;
+  color: #666;
+}
+
+.tabButton:hover {
+  opacity: 0.8;
+}
+
+.contentContainer {
+  padding: 2rem 0;
+  line-height: 1.6;
+}
+
+.contentContainer p {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+.buttonContainer {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.applyButton {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.applyButton:hover {
+  background-color: #5856eb;
+}

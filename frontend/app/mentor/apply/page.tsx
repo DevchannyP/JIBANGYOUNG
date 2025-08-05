@@ -1,27 +1,20 @@
 import { Suspense } from "react";
-import MentorActions from "./components/MentorActions";
-import MentorHeader from "./components/MentorHeader";
-import MentorList from "./components/MentorList";
-import MentorTabs from "./components/MentorTabs";
+import MentorApplicationForm from "./components/MentorApplicationForm";
+import styles from "./MentorApply.module.css";
 
-export default function MentorPage() {
+export default function MentorApplyPage() {
   return (
-    <div>
-      <MentorHeader />
-
+    <div className={styles.pageContainer}>
       <div>
-        <MentorTabs />
+        <h1>멘토</h1>
+        <hr />
       </div>
-
-      <div>
-        <Suspense fallback={<div>멘토 정보를 불러오는 중...</div>}>
-          <MentorList />
-        </Suspense>
+      <div className={styles.pageHeader}>
+        <h2 className={styles.pageTitle}>멘토신청</h2>
       </div>
-
-      <div>
-        <MentorActions />
-      </div>
+      <Suspense fallback={<div>멘토 신청 폼을 불러오는 중...</div>}>
+        <MentorApplicationForm />
+      </Suspense>
     </div>
   );
 }
