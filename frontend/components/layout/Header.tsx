@@ -111,7 +111,7 @@ export default function Header() {
           <Link href="/community/main" className="header-nav-link">
             커뮤니티
           </Link>
-          <Link href="/recommendation" className="header-nav-link">
+          <Link href="/policy/recommendedList" className="header-nav-link">
             추천정책
           </Link>
           <div className="dropdown" ref={dropdownRef}>
