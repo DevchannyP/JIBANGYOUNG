@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import type { MentorNotice } from "@/libs/api/mentor/mentor.api";
 import { getMentorNotices } from "@/libs/api/mentor/mentor.api";
 import { getRegionsBoard } from "@/libs/api/region.api";
-import type { MentorNotice, PageResponse } from "@/libs/api/mentor/mentor.api";
 import type { Region } from "@/types/api/region.d";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import styles from "../MentorNotices.module.css";
 
 // HTML 태그를 제거하고 순수 텍스트만 추출하는 함수
@@ -157,7 +157,7 @@ export default function MentorNoticesDashboard() {
                 
                 <div className={styles.noticeInfo}>
                   <span className={styles.regionBadge}>
-                    {notice.regionName || "LV4 관리자"}
+                    {notice.regionName}
                   </span>
                   <span>📅 {notice.createdAt}</span>
                   <span>💬</span>

@@ -56,7 +56,7 @@ export default function MentorNoticeDetail({ noticeId }: Props) {
         
         <div className={styles.noticeInfo}>
           <span className={styles.regionBadge}>
-            {notice?.regionName || "LV4 관리자"}
+            {notice?.regionName}
           </span>
           <span>📅 {notice?.createdAt || "날짜 없음"}</span>
         </div>
