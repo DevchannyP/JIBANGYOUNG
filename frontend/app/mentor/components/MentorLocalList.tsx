@@ -2,7 +2,7 @@ import { AdminRegionTab } from "@/app/admin/components/AdminRegionTab";
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
 import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion";
-import { fetchMentorRegionUsers } from "@/libs/api/admin/admin.api";
+import { fetchMentorRegionUsers } from "@/libs/api/admin/adminMentor.api";
 import { AdMentorUser } from "@/types/api/adMentorUser";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
@@ -16,10 +16,11 @@ export function MentorLocalList() {
   const [selectedRegionCode, setSelectedRegionCode] = useState(0);
   const ITEMS_PER_PAGE = 10;
 
-  // 공통 지역탭 훅 사용
-  const { regionOptions, loading: regionLoading } = useAdminRegion();
+  // 전체 지역 옵션
+  const { regionOptions: allRegionOptions, loading: regionLoading } =
+    useAdminRegion();
 
-  // 데이터 fetch
+  // 멘토 목록 fetch
   useEffect(() => {
     fetchMentorRegionUsers()
       .then((data) => {
@@ -27,19 +28,28 @@ export function MentorLocalList() {
         setSearchResult(data);
       })
       .catch((e) => {
-        alert(e.message || "유저 목록 조회 실패");
+        alert(
+          e?.response?.data?.message || e?.message || "유저 목록 조회 실패"
+        );
       });
   }, []);
 
-  // 지역 선택 시
+  // 멘토 목록 기준, 사용된 region_id만 추출
+  const userRegionIds = Array.from(new Set(users.map((u) => u.region_id)));
+
+  // 지역탭 옵션: 멘토 목록에 등장하는 지역만 + '전체'
+  const filteredRegionOptions = [
+    { code: 0, name: "전체" },
+    ...allRegionOptions.filter((option) => userRegionIds.includes(option.code)),
+  ];
+
+  // 지역 선택 시 필터
   const handleSelectRegion = useCallback(
     (regionName: string, code: number) => {
       setSelectedRegionCode(code);
       setCurrentPage(1);
-      // 지역 필터 먼저 적용
       let filtered =
         code === 0 ? users : users.filter((u) => u.region_id === code);
-      // 검색어 있으면 추가 필터
       if (searchKeyword.trim()) {
         filtered = filtered.filter(
           (user) =>
@@ -58,7 +68,7 @@ export function MentorLocalList() {
     [users, searchKeyword]
   );
 
-  // 검색 시
+  // 검색 시 필터
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -95,8 +105,9 @@ export function MentorLocalList() {
     <div>
       <h1 className={styles.title}>내 지역 멘토목록</h1>
 
+      {/* 담당 지역만 노출! */}
       <AdminRegionTab
-        regionOptions={regionOptions}
+        regionOptions={filteredRegionOptions}
         selectedRegionCode={selectedRegionCode}
         onSelectRegion={handleSelectRegion}
       />
@@ -135,7 +146,7 @@ export function MentorLocalList() {
                   totalCount={searchResult.length}
                   ITEMS_PER_PAGE={ITEMS_PER_PAGE}
                   currentPage={currentPage}
-                  regionOptions={regionOptions}
+                  regionOptions={allRegionOptions}
                 />
               ))
             )}

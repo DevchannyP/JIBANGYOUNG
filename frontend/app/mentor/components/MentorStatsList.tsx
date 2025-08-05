@@ -1,180 +1,164 @@
+import { AdminRegionTab } from "@/app/admin/components/AdminRegionTab";
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
-import { useCallback, useEffect, useState } from "react";
-import styles from "../../admin/AdminPage.module.css";
+import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion";
+import { fetchAdMentorLogList } from "@/libs/api/admin/adminMentor.api";
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import styles from "../MentorStats.module.css";
+import { MentorStatsCard } from "./MentorStatsCard";
 
-// 타입 정의
-export interface MentorLog {
-  id: number;
-  level: string;
-  region: string;
-  postCount: number;
-  commentCount: number;
-  answerDone: number;
-  answerNotDone: number;
-  reportDone: number;
-  reportProcess: number;
-  reportPending: number;
-}
-
-// 더미 데이터 (실제 DB 연동 시 이 부분만 API로 대체)
-const dummyMentorLogs: MentorLog[] = [
-  {
-    id: 3,
-    level: "Lv.4.운영자",
-    region: "서울",
-    postCount: 150,
-    commentCount: 230,
-    answerDone: 220,
-    answerNotDone: 30,
-    reportDone: 200,
-    reportProcess: 40,
-    reportPending: 10,
-  },
-  {
-    id: 2,
-    level: "Lv.3.실버멤버",
-    region: "서울",
-    postCount: 100,
-    commentCount: 120,
-    answerDone: 90,
-    answerNotDone: 30,
-    reportDone: 60,
-    reportProcess: 30,
-    reportPending: 10,
-  },
-  {
-    id: 1,
-    level: "Lv.2.초보자",
-    region: "서울",
-    postCount: 60,
-    commentCount: 80,
-    answerDone: 45,
-    answerNotDone: 35,
-    reportDone: 20,
-    reportProcess: 10,
-    reportPending: 10,
-  },
-];
-
-// row 컴포넌트
-export function MentorLogRow({
-  log,
-  index,
-  ITEMS_PER_PAGE,
-  currentPage,
-}: {
-  log: MentorLog;
-  index: number;
-  ITEMS_PER_PAGE: number;
-  currentPage: number;
-}) {
-  // 번호는 최신순(내림차순)
-  const order = (currentPage - 1) * ITEMS_PER_PAGE + index + 1;
-  return (
-    <tr>
-      <td>{order}</td>
-      <td>{log.level}</td>
-      <td>{log.region}</td>
-      <td>{log.postCount}</td>
-      <td>{log.commentCount}</td>
-      <td>
-        {log.answerDone + log.answerNotDone}
-        <div style={{ fontSize: 12, color: "#888" }}>
-          (완료: {log.answerDone}, 미완료: {log.answerNotDone})
-        </div>
-      </td>
-      <td>
-        {log.reportDone + log.reportProcess + log.reportPending}
-        <div style={{ fontSize: 12, color: "#888" }}>
-          (완료: {log.reportDone}, 진행중: {log.reportProcess}, 기각:{" "}
-          {log.reportPending})
-        </div>
-      </td>
-    </tr>
-  );
-}
+const MENTOR_ROLES = ["MENTOR_A", "MENTOR_B", "MENTOR_C"];
 
 export function MentorStatsList() {
-  const [logs, setLogs] = useState<MentorLog[]>([]);
-  const [searchResult, setSearchResult] = useState<MentorLog[]>([]);
+  const [logs, setLogs] = useState<AdMentorLogList[]>([]);
+  const [searchResult, setSearchResult] = useState<AdMentorLogList[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRegion, setSelectedRegion] = useState<number>(0);
   const ITEMS_PER_PAGE = 10;
 
-  useEffect(() => {
-    setLogs(dummyMentorLogs);
-    setSearchResult(dummyMentorLogs);
-  }, []);
+  // 전체 지역 목록
+  const { regionOptions: allRegionOptions } = useAdminRegion();
 
-  // 검색
+  // logs/searchResult에 등장하는 지역만 추출
+  const regionIdsInStats = useMemo(
+    () => Array.from(new Set(logs.map((l) => l.regionId))),
+    [logs]
+  );
+
+  // 담당 지역만 노출할 옵션 + '전체' 탭 추가
+  const filteredRegionOptions = [
+    { code: 0, name: "전체" },
+    ...allRegionOptions.filter((opt) => regionIdsInStats.includes(opt.code)),
+  ];
+
+  // regionId → 지역명 매핑 함수
+  const regionCodeToName = useCallback(
+    (code: number) => {
+      const found = allRegionOptions.find((r) => r.code === code);
+      return found ? found.name : String(code);
+    },
+    [allRegionOptions]
+  );
+
+  // API 연동
+  useEffect(() => {
+    fetchAdMentorLogList()
+      .then((data: AdMentorLogList[]) => {
+        setLogs(data);
+        setSearchResult(data);
+      })
+      .catch(() => {
+        setLogs([]);
+        setSearchResult([]);
+      });
+  }, [allRegionOptions]);
+
+  // 지역 필터
+  const handleSelectRegion = useCallback(
+    (_regionName: string, regionId: number) => {
+      setSelectedRegion(regionId);
+      setCurrentPage(1);
+      let filtered =
+        regionId === 0 ? logs : logs.filter((l) => l.regionId === regionId);
+      if (searchKeyword.trim()) {
+        filtered = filtered.filter(
+          (log) =>
+            log.role.includes(searchKeyword.trim()) ||
+            regionCodeToName(log.regionId).includes(searchKeyword.trim())
+        );
+      }
+      setSearchResult(filtered);
+    },
+    [logs, searchKeyword, regionCodeToName]
+  );
+
+  // 검색 (등급, 지역명)
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
-      let filtered = logs;
+      let filtered = selectedRegion
+        ? logs.filter((l) => l.regionId === selectedRegion)
+        : logs;
       if (keyword.trim()) {
-        filtered = logs.filter((log) => log.level.includes(keyword.trim()));
+        filtered = filtered.filter(
+          (log) =>
+            log.role.includes(keyword.trim()) ||
+            regionCodeToName(log.regionId).includes(keyword.trim())
+        );
       }
       setSearchResult(filtered);
       setCurrentPage(1);
     },
-    [logs]
+    [logs, selectedRegion, regionCodeToName]
   );
 
-  const goToPage = (page: number) => setCurrentPage(page);
-
-  const totalPages = Math.ceil(searchResult.length / ITEMS_PER_PAGE);
-  const paginatedData = searchResult.slice(
+  // 지역별 그룹
+  const groupedRegions = Array.from(
+    new Set(searchResult.map((l) => l.regionId))
+  );
+  const paginatedRegions = groupedRegions.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+  const totalPages = Math.ceil(groupedRegions.length / ITEMS_PER_PAGE);
 
   return (
     <div>
       <h1 className={styles.title}>멘토 활동 통계</h1>
-      <AdminSearch placeholder="등급 검색" onSearch={handleSearch} />
-      <div className={styles.tableWrapper}>
-        <table className={styles.userTable}>
-          <thead>
-            <tr>
-              <th>NO</th>
-              <th>등급</th>
-              <th>지역</th>
-              <th>게시글 작성수</th>
-              <th>댓글 작성수</th>
-              <th>멘티 답변 완료수</th>
-              <th>신고 처리</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={7}
-                  style={{ textAlign: "center", padding: "20px" }}
-                >
-                  일치하는 정보가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              paginatedData.map((log, idx) => (
-                <MentorLogRow
-                  key={log.id}
-                  log={log}
-                  index={idx}
-                  ITEMS_PER_PAGE={ITEMS_PER_PAGE}
-                  currentPage={currentPage}
+      <AdminRegionTab
+        regionOptions={filteredRegionOptions} // 담당 지역만!
+        selectedRegionCode={selectedRegion}
+        onSelectRegion={handleSelectRegion}
+      />
+      <AdminSearch
+        placeholder="멘토 등급/지역명 검색"
+        onSearch={handleSearch}
+      />
+      <div className={styles.statsGrid}>
+        {paginatedRegions.length === 0 ? (
+          <div style={{ padding: "30px 0", textAlign: "center" }}>
+            일치하는 정보가 없습니다.
+          </div>
+        ) : (
+          paginatedRegions.flatMap((regionId) =>
+            MENTOR_ROLES.map((role) => {
+              const data = searchResult.find(
+                (l) => l.regionId === regionId && l.role === role
+              );
+              return (
+                <MentorStatsCard
+                  key={`${regionId}-${role}`}
+                  log={
+                    data ?? {
+                      userId: 0,
+                      nickname: "",
+                      role,
+                      regionId,
+                      noticeCount: 0,
+                      postCount: 0,
+                      commentCount: 0,
+                      approvedCount: 0,
+                      ignoredCount: 0,
+                      invalidCount: 0,
+                      pendingCount: 0,
+                      rejectedCount: 0,
+                      requestedCount: 0,
+                    }
+                  }
+                  regionName={regionCodeToName(regionId)}
                 />
-              ))
-            )}
-          </tbody>
-        </table>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={goToPage}
-        />
+              );
+            })
+          )
+        )}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

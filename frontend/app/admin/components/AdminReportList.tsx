@@ -5,7 +5,8 @@ import { Pagination } from "@/app/admin/components/Pagination";
 import {
   adminApproveOrRejectReport,
   fetchAdminReports,
-} from "@/libs/api/admin/adminReport.api";
+} from "@/libs/api/admin/admin.api";
+//import { changeUserStatus } from "@/libs/api/admin/user.api"; // ✅ 추가!
 import {
   Report,
   REPORT_TAB_OPTIONS,
@@ -16,6 +17,13 @@ import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
 import { AdminReportListRow } from "./AdminReportListRow";
 
+const USER_STATUS_OPTIONS = [
+  { value: "ACTIVE", label: "활성" },
+  { value: "DEACTIVATED", label: "비활성" },
+  { value: "SUSPENDED", label: "정지" },
+  { value: "DELETED", label: "삭제" },
+];
+
 export function AdminReportList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [searchResult, setSearchResult] = useState<Report[]>([]);
@@ -23,18 +31,8 @@ export function AdminReportList() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [userStatus, setUserStatus] = useState("");
   const ITEMS_PER_PAGE = 10;
-
-  function formatDate(dateStr: string | null | undefined) {
-    if (!dateStr) return "-";
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr.replace("T", " ").slice(0, 10);
-    return date.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  }
 
   // 탭(신고유형) 변경 시마다 fetch (type 전달)
   useEffect(() => {
@@ -47,6 +45,13 @@ export function AdminReportList() {
         alert(e.message || "신고 목록 조회 실패");
       });
   }, [selectedType]);
+
+  // 신고 row 클릭시, 유저 신고면 상태 셀렉트값 초기화
+  useEffect(() => {
+    if (selectedReport && selectedReport.targetType === "USER") {
+      setUserStatus(selectedReport.targetUserStatus || "ACTIVE");
+    }
+  }, [selectedReport]);
 
   // 검색 필터
   const filterData = useCallback(
@@ -80,7 +85,10 @@ export function AdminReportList() {
 
   // 승인/반려 처리
   const handleChangeStatus = useCallback(
-    async (reportId: number, nextStatus: "APPROVED" | "REJECTED") => {
+    async (
+      reportId: number,
+      nextStatus: "APPROVED" | "REJECTED" | "REQUESTED"
+    ) => {
       if (!selectedReport) return;
       try {
         await adminApproveOrRejectReport(reportId, nextStatus);
@@ -95,6 +103,18 @@ export function AdminReportList() {
     },
     [selectedReport, selectedType]
   );
+
+  // 유저 상태 변경 핸들러
+  // const handleUserStatusChange = async () => {
+  //   if (!selectedReport) return;
+  //   try {
+  //     await changeUserStatus(selectedReport.targetId, userStatus);
+  //     alert("유저 상태가 변경되었습니다.");
+  //     setSelectedReport(null);
+  //   } catch (e: any) {
+  //     alert(e.message || "유저 상태 변경 실패");
+  //   }
+  // };
 
   const paginatedData = searchResult.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -115,6 +135,7 @@ export function AdminReportList() {
           <thead>
             <tr>
               <th>NO</th>
+              <th>신고대상</th>
               <th>신고유형</th>
               <th>신고일자</th>
               <th>처리상태</th>
@@ -161,10 +182,40 @@ export function AdminReportList() {
                   {selectedReport.reporterName ?? selectedReport.userId}
                 </p>
                 <p>
-                  <b>신고유형:</b> {selectedReport.reasonDescription}
+                  <b>신고대상:</b> {selectedReport.targetTitle}
                 </p>
+                {selectedReport.targetType === "USER" && (
+                  <div style={{ marginBottom: 12 }}>
+                    <b>유저 상태:</b>{" "}
+                    <select
+                      value={userStatus}
+                      onChange={(e) => setUserStatus(e.target.value)}
+                      style={{ marginLeft: 8, marginRight: 8 }}
+                    >
+                      {USER_STATUS_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {/* <button
+                      onClick={handleUserStatusChange}
+                      style={{
+                        marginLeft: 8,
+                        padding: "3px 12px",
+                        background: "#0091ff",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      저장
+                    </button> */}
+                  </div>
+                )}
                 <p>
-                  <b>신고일:</b> {formatDate(selectedReport.createdAt)}
+                  <b>신고유형:</b> {selectedReport.reasonDescription}
                 </p>
                 <p>
                   <b>담당자:</b> {selectedReport.reviewerName ?? "미지정"}
@@ -183,25 +234,41 @@ export function AdminReportList() {
                 />
               </div>
             }
-            buttons={[
-              {
-                label: "승인",
-                onClick: () =>
-                  handleChangeStatus(selectedReport.id, "APPROVED"),
-                type: "primary" as const,
-              },
-              {
-                label: "반려",
-                onClick: () =>
-                  handleChangeStatus(selectedReport.id, "REJECTED"),
-                type: "danger" as const,
-              },
-              {
-                label: "닫기",
-                onClick: () => setSelectedReport(null),
-                type: "secondary" as const,
-              },
-            ]}
+            buttons={
+              selectedReport.reviewResultCode === "APPROVED"
+                ? [
+                    {
+                      label: "승인취소",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "REQUESTED"),
+                      type: "danger" as const,
+                    },
+                    {
+                      label: "닫기",
+                      onClick: () => setSelectedReport(null),
+                      type: "secondary" as const,
+                    },
+                  ]
+                : [
+                    {
+                      label: "승인",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "APPROVED"),
+                      type: "primary" as const,
+                    },
+                    {
+                      label: "반려",
+                      onClick: () =>
+                        handleChangeStatus(selectedReport.id, "REJECTED"),
+                      type: "danger" as const,
+                    },
+                    {
+                      label: "닫기",
+                      onClick: () => setSelectedReport(null),
+                      type: "secondary" as const,
+                    },
+                  ]
+            }
             onClose={() => setSelectedReport(null)}
           />
         )}

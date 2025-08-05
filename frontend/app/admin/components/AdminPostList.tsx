@@ -1,8 +1,8 @@
-import { featchAllPost } from "@/libs/api/admin/admin.api";
 import { AdminPost } from "@/types/api/adminPost";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../AdminPage.module.css";
 
+import { featchAllPost } from "@/libs/api/admin/admin.api";
 import { Pagination } from "../components/Pagination";
 import { useAdminRegion } from "../hooks/useAdminRegion";
 import { AdminPostRow } from "./AdminPostRow";

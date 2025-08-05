@@ -1,23 +1,32 @@
 import api from "@/libs/api/axios";
+import { AdMentorLogList } from "@/types/api/adMentorLogList";
 import { Report } from "@/types/api/adMentorReport";
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
+import { AdMentorUser } from "@/types/api/adMentorUser";
 
-// 1. 멘토/관리자 신고내역 리스트 조회
+// 1. 내 지역 멘토 목록
+export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
+  const res = await api.get("/api/mentor/local");
+  return res.data;
+}
+
+// 2. 멘토 신고 목록
 export async function fetchMentorReports(type?: string): Promise<Report[]> {
-  const res = await api.get(`${BASE}/api/mentor/report`, {
+  const res = await api.get("/api/mentor/report", {
     params: type ? { type } : {},
   });
   return res.data;
 }
 
-// 2. 신고 상태 변경 (승인요청/무시/무효 등)
+// 3. 신고 상태 변경
 export async function requestReportApproval(
   id: number,
   status: "REQUESTED" | "IGNORED" | "INVALID" | "PENDING"
 ): Promise<void> {
-  await api.patch(`${BASE}/api/mentor/report/${id}/status`, {
-    status,
-  });
+  await api.patch(`/api/mentor/report/${id}/status`, { status });
 }
 
-// (관리자 전용 블라인드 처리 등도 여기에 추가하면 됨)
+// 4. 활동로그 리스트
+export async function fetchAdMentorLogList(): Promise<AdMentorLogList[]> {
+  const res = await api.get("/api/mentor/logList");
+  return res.data;
+}
