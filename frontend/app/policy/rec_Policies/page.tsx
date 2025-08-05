@@ -1,5 +1,5 @@
+import RecommendedListWrapper from '../recommendedList/recommendedListWrapper';
 import styles from '../total_policy.module.css';
-import PolicyFavoritesWrapper from './PolicyFavoritesWrapper';
 
 export const metadata = {
   title: "찜 정책 리스트",
@@ -22,7 +22,7 @@ export default function TotalPolicyPage() {
         {/* 이 부분은 SSR로 렌더링 */}
         <h1 className={styles.headerTitle}>찜 정책</h1>
         {/* 나머지는 CSR */}
-        <PolicyFavoritesWrapper serverState={serverState} />
+        <RecommendedListWrapper serverState={serverState} />
       </div>
     </div>
   );
