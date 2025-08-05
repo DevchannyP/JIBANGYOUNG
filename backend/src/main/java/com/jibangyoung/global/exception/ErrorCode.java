@@ -49,7 +49,12 @@ public enum ErrorCode {
 
     // [커뮤니티/게시글] 관련 에러
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."),
-    ALREADY_RECOMMENDED(HttpStatus.CONFLICT, "ALREADY_RECOMMENDED", "이미 추천한 게시글입니다.");
+    ALREADY_RECOMMENDED(HttpStatus.CONFLICT, "ALREADY_RECOMMENDED", "이미 추천한 게시글입니다."),
+    
+    // [멘토]
+    ALREADY_APPLIED_MENTOR(HttpStatus.CONFLICT, "ALREADY_APPLIED_MENTOR", "이미 멘토 신청을 하셨습니다."),
+    NOTICE_NOT_MENTOR(HttpStatus.CONFLICT, "NOTICE_NOT_MENTOR", "공지사항을 찾을 수 없습니다.");
+
 
     private final HttpStatus status;
     private final String code;

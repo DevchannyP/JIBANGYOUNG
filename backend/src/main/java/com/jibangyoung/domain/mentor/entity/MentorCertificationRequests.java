@@ -21,9 +21,15 @@ public class MentorCertificationRequests {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 멘토 신청자
+    // 멘토 신청자 정보
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "user_email")
+    private String userEmail;
 
     // 멘토 증빙 서류 URL
     @Column(name = "document_url")
@@ -60,6 +66,11 @@ public class MentorCertificationRequests {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @Getter
     public enum Status {
