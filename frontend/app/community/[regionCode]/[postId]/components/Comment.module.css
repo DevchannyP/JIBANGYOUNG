@@ -3,19 +3,23 @@
 }
 
 .commentItem {
-  padding: 0.75rem 0; /* 상하 패딩 유지, 좌우 패딩은 내부 요소에서 처리 */
-  /* border-top: 1px solid #eee; */ /* 구분선 제거 */
-  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
-  width: 100%; /* 부모 요소의 전체 너비를 사용하도록 */
+  padding: 1rem 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* 모든 댓글에 하단 구분선 - 강제 적용 */
+.commentItem {
+  border-bottom: 1px solid #e9ecef !important;
+}
+
+/* 대댓글도 동일한 구분선 */
+.replies .commentItem {
+  border-bottom: 1px solid #e9ecef !important;
 }
 
 .commentItemSeparator {
-  border-top: 1px solid #eee; /* 새로운 구분선 */
-  margin-bottom: 0.75rem; /* 내용과의 간격 */
-}
-
-.commentList > .commentItem:first-child .commentItemSeparator {
-  border-top: none; /* 첫 번째 댓글의 상단 구분선 제거 */
+  display: none;
 }
 
 .commentHeader {
@@ -23,27 +27,28 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
 }
 
 .deleteButton {
   background: none;
   border: none;
-  color: #dc3545; /* 빨간색 */
+  color: #dc3545;
   cursor: pointer;
-  padding: 0;
+  padding: 0.25rem 0.5rem;
   font-size: 0.8rem;
-  margin-left: 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .deleteButton:hover {
-  text-decoration: underline;
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
 }
 
 .commentAuthor {
-  font-weight: normal; /* 닉네임 폰트 굵기 조정 */
-  color: #888; /* 닉네임 색상 조정 */
-  font-size: 0.9rem; /* 닉네임 크기 조정 */
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
 }
 
 .authorLabel {
@@ -60,84 +65,116 @@
 
 .commentContent {
   margin: 0 0 0.5rem 0;
-  color: #000; /* 본문 텍스트 검정색 */
-  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
+  color: #212529;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .commentContent.deleted {
-  color: #aaa; /* 삭제된 댓글 흐린 회색 */
-  font-style: italic;
-  font-weight: normal; /* 삭제된 댓글 굵기 조정 */
+  color: #6c757d;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  text-align: center;
 }
 
 .replyButton {
   background: none;
   border: none;
-  color: #888;
+  color: #6c757d;
   cursor: pointer;
-  padding: 0;
+  padding: 0.25rem 0.5rem;
   font-size: 0.8rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .replyButton:hover {
-  text-decoration: underline;
+  background-color: #e9ecef;
+  color: #495057;
 }
 
 .replies {
-  margin-left: 0; /* 들여쓰기 공백 축소 */
-  padding-left: 1.5rem; /* L자 화살표 공간 확보 및 들여쓰기 */
-  position: relative; /* 가상 요소 위치 지정을 위해 */
-}
-
-.replies > .commentItem { /* 대댓글 항목의 상대 위치 지정 */
+  margin-left: 2rem;
   position: relative;
 }
 
-.replies > .commentItem::before { /* 각 대댓글 항목 앞의 L자 화살표 */
-  content: '';
+.replies > .commentItem {
+  position: relative;
+  padding-left: 0;
+  /* 세로선 제거 - 가로선만 유지 */
+}
+
+.replies > .commentItem::before {
+  content: '↳';
   position: absolute;
-  left: 0.5rem; /* L자 화살표의 시작 위치 */
-  top: 1rem; /* L자 화살표의 세로 위치 */
-  width: 0.75rem; /* L자 화살표의 가로 길이 */
-  height: 0.75rem; /* L자 화살표의 세로 길이 */
-  border-left: 2px solid #ccc;
-  border-bottom: 2px solid #ccc;
-  border-bottom-left-radius: 4px; /* 선택 사항: 모서리 둥글게 */
+  left: -1.5rem;
+  top: 1rem;
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .commentForm {
   display: flex;
   margin-top: 1.5rem;
+  padding: 1rem;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .commentTextarea {
   flex-grow: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
   border-radius: 4px;
   resize: vertical;
+  min-height: 60px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.commentTextarea:focus {
+  outline: none;
+  border-color: #facc15;
 }
 
 .commentSubmitButton {
-  padding: 0.5rem 1rem;
-  margin-left: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  margin-left: 0.75rem;
   border: none;
   background-color: #facc15;
-  color: white;
+  color: #000;
+  font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-end;
+}
+
+.commentSubmitButton:hover {
+  background-color: #f59e0b;
 }
 
 .commentActions {
   display: flex;
-  justify-content: space-between; /* 날짜와 답글 달기 버튼을 양 끝으로 정렬 */
+  justify-content: space-between;
   align-items: center;
   margin-top: 0.5rem;
-  padding-left: 1rem; /* 내용의 왼쪽 패딩 */
 }
 
 .commentSection {
-  margin-top: 2rem; /* 기존 마진 유지 */
-  border-top: 1px solid #eee; /* 구분선 */
-  padding-top: 2rem; /* 구분선 위쪽 여백 */
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 2rem;
+}
+
+.commentTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
 }
