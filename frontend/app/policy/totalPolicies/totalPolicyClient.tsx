@@ -153,6 +153,12 @@ export default function PolicyClient({ serverState }: PolicyClientProps) {
         const dDayB = (new Date(b.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         return dDayA - dDayB;
       }
+
+        if (sortBy === "favorite_asc") {
+        const favA = a.favorites ?? 0;
+        const favB = b.favorites ?? 0;
+      return favB - favA; // ❤️ 많은 순으로 내림차순
+     }
       return 0;
     });
 

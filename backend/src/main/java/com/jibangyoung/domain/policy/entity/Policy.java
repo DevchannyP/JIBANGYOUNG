@@ -98,5 +98,5 @@ public class Policy {
     private String job_cd;
 
     @Column(name = "favorites", nullable = false)
-    private int favorites;
+    private int favorites; // 총 추천 개수
 }
