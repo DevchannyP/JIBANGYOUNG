@@ -1,6 +1,7 @@
 "use client";
 
 import { loginWithEmail } from "@/libs/api/auth/auth.api";
+import { fetchUserBookmarkedPolicyCodes } from "@/libs/api/policy/sync";
 import { useAuthStore } from "@/store/authStore";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -41,7 +42,7 @@ function LoginForm() {
   const loginMutation = useMutation({
     mutationFn: () => loginWithEmail(username.trim(), password),
     retry: 0,
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       const {
         user,
         accessToken,
@@ -71,6 +72,12 @@ function LoginForm() {
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("userId", user.id?.toString() ?? "");
         localStorage.removeItem("sessionExpired"); // 이전 만료플래그 초기화
+      try {
+        const bookmarked = await fetchUserBookmarkedPolicyCodes(user.id);
+        localStorage.setItem("bookmarkedPolicyIds", JSON.stringify(bookmarked));
+        } catch (e) {
+          console.warn("찜한 정책 가져오기 실패", e);
+         }
       }
 
       setIsLoggingInNow(true);

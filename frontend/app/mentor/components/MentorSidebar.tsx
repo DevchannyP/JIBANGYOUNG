@@ -14,7 +14,7 @@ export function MentorSidebar({
       <ul>
         <li>
           <a
-            href="/mentorNotice"
+            href="/mentor/notices/write"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.noticeMenu}

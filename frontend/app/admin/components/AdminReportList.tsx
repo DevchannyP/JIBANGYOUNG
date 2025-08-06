@@ -4,25 +4,28 @@ import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
 import {
   adminApproveOrRejectReport,
+  changeUserStatus,
   fetchAdminReports,
 } from "@/libs/api/admin/admin.api";
-//import { changeUserStatus } from "@/libs/api/admin/user.api"; // ✅ 추가!
 import {
   Report,
   REPORT_TAB_OPTIONS,
   reportTabToType,
   ReportTabType,
 } from "@/types/api/adMentorReport";
+import { ChangeUserStatusPayload } from "@/types/api/adminUser";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
 import { AdminReportListRow } from "./AdminReportListRow";
+import { AdUserStatusControl } from "./AdUserStatusControl";
 
-const USER_STATUS_OPTIONS = [
-  { value: "ACTIVE", label: "활성" },
-  { value: "DEACTIVATED", label: "비활성" },
-  { value: "SUSPENDED", label: "정지" },
-  { value: "DELETED", label: "삭제" },
-];
+// 유효한 상태값으로 변환
+const VALID_STATUS = ["ACTIVE", "DEACTIVATED", "SUSPENDED", "DELETED"] as const;
+function toValidStatus(status?: string): ChangeUserStatusPayload["status"] {
+  return VALID_STATUS.includes(status as any)
+    ? (status as ChangeUserStatusPayload["status"])
+    : "ACTIVE";
+}
 
 export function AdminReportList() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -31,7 +34,11 @@ export function AdminReportList() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [userStatus, setUserStatus] = useState("");
+
+  // "유저" 신고 선택 시, select 값 관리
+  const [userStatus, setUserStatus] =
+    useState<ChangeUserStatusPayload["status"]>("ACTIVE");
+
   const ITEMS_PER_PAGE = 10;
 
   // 탭(신고유형) 변경 시마다 fetch (type 전달)
@@ -46,10 +53,10 @@ export function AdminReportList() {
       });
   }, [selectedType]);
 
-  // 신고 row 클릭시, 유저 신고면 상태 셀렉트값 초기화
+  // 신고 row 클릭 시, userStatus 초기값도 설정
   useEffect(() => {
     if (selectedReport && selectedReport.targetType === "USER") {
-      setUserStatus(selectedReport.targetUserStatus || "ACTIVE");
+      setUserStatus(toValidStatus(selectedReport.targetUserStatus));
     }
   }, [selectedReport]);
 
@@ -77,44 +84,64 @@ export function AdminReportList() {
     },
     [filterData]
   );
+
   // URL 클릭 핸들러
   const handleUrlClick = useCallback((e: React.MouseEvent, url?: string) => {
     e.stopPropagation();
     if (url) window.open(url, "_blank");
   }, []);
 
-  // 승인/반려 처리
-  const handleChangeStatus = useCallback(
-    async (
-      reportId: number,
-      nextStatus: "APPROVED" | "REJECTED" | "REQUESTED"
-    ) => {
-      if (!selectedReport) return;
-      try {
-        await adminApproveOrRejectReport(reportId, nextStatus);
-        const data = await fetchAdminReports(reportTabToType[selectedType]);
-        setReports(data);
-        setSearchResult(data);
-        setSelectedReport(null);
-        alert("처리 완료되었습니다.");
-      } catch (e: any) {
-        alert(e.message || "상태 변경 실패");
+  // 승인(+유저 상태 변경) 처리
+  const handleApprove = useCallback(async () => {
+    if (!selectedReport) return;
+    try {
+      // 유저 신고일 때만 유저 상태 변경
+      if (selectedReport.targetType === "USER") {
+        await changeUserStatus(selectedReport.targetId, userStatus);
       }
-    },
-    [selectedReport, selectedType]
-  );
+      // 신고 승인 처리
+      await adminApproveOrRejectReport(selectedReport.id, "APPROVED");
 
-  // 유저 상태 변경 핸들러
-  // const handleUserStatusChange = async () => {
-  //   if (!selectedReport) return;
-  //   try {
-  //     await changeUserStatus(selectedReport.targetId, userStatus);
-  //     alert("유저 상태가 변경되었습니다.");
-  //     setSelectedReport(null);
-  //   } catch (e: any) {
-  //     alert(e.message || "유저 상태 변경 실패");
-  //   }
-  // };
+      // 목록 갱신
+      const data = await fetchAdminReports(reportTabToType[selectedType]);
+      setReports(data);
+      setSearchResult(data);
+      setSelectedReport(null);
+      alert("유저 상태 변경 및 승인 완료!");
+    } catch (e: any) {
+      alert(e.message || "승인 처리 실패");
+    }
+  }, [selectedReport, userStatus, selectedType]);
+
+  // 반려 처리 (기존대로)
+  const handleReject = useCallback(async () => {
+    if (!selectedReport) return;
+    try {
+      await adminApproveOrRejectReport(selectedReport.id, "REJECTED");
+      const data = await fetchAdminReports(reportTabToType[selectedType]);
+      setReports(data);
+      setSearchResult(data);
+      setSelectedReport(null);
+      alert("반려 처리 완료!");
+    } catch (e: any) {
+      alert(e.message || "반려 처리 실패");
+    }
+  }, [selectedReport, selectedType]);
+
+  // 승인취소 처리 (기존대로)
+  const handleRequest = useCallback(async () => {
+    if (!selectedReport) return;
+    try {
+      await adminApproveOrRejectReport(selectedReport.id, "REQUESTED");
+      const data = await fetchAdminReports(reportTabToType[selectedType]);
+      setReports(data);
+      setSearchResult(data);
+      setSelectedReport(null);
+      alert("승인 취소 완료!");
+    } catch (e: any) {
+      alert(e.message || "승인취소 실패");
+    }
+  }, [selectedReport, selectedType]);
 
   const paginatedData = searchResult.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -147,7 +174,7 @@ export function AdminReportList() {
             {paginatedData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   style={{ textAlign: "center", padding: "20px" }}
                 >
                   일치하는 정보가 없습니다.
@@ -184,35 +211,12 @@ export function AdminReportList() {
                 <p>
                   <b>신고대상:</b> {selectedReport.targetTitle}
                 </p>
+                {/* 유저 신고일 때만 select 렌더링 */}
                 {selectedReport.targetType === "USER" && (
-                  <div style={{ marginBottom: 12 }}>
-                    <b>유저 상태:</b>{" "}
-                    <select
-                      value={userStatus}
-                      onChange={(e) => setUserStatus(e.target.value)}
-                      style={{ marginLeft: 8, marginRight: 8 }}
-                    >
-                      {USER_STATUS_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                    {/* <button
-                      onClick={handleUserStatusChange}
-                      style={{
-                        marginLeft: 8,
-                        padding: "3px 12px",
-                        background: "#0091ff",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      저장
-                    </button> */}
-                  </div>
+                  <AdUserStatusControl
+                    value={userStatus}
+                    onChange={setUserStatus}
+                  />
                 )}
                 <p>
                   <b>신고유형:</b> {selectedReport.reasonDescription}
@@ -239,8 +243,7 @@ export function AdminReportList() {
                 ? [
                     {
                       label: "승인취소",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "REQUESTED"),
+                      onClick: handleRequest,
                       type: "danger" as const,
                     },
                     {
@@ -252,14 +255,12 @@ export function AdminReportList() {
                 : [
                     {
                       label: "승인",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "APPROVED"),
+                      onClick: handleApprove,
                       type: "primary" as const,
                     },
                     {
                       label: "반려",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "REJECTED"),
+                      onClick: handleReject,
                       type: "danger" as const,
                     },
                     {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jibangyoung.domain.admin.dto.AdPostDTO;
 import com.jibangyoung.domain.admin.dto.AdRegionDTO;
 import com.jibangyoung.domain.admin.dto.AdReportDto;
+import com.jibangyoung.domain.admin.dto.AdReportUserStatus;
 import com.jibangyoung.domain.admin.dto.AdUserDTO;
 import com.jibangyoung.domain.admin.dto.AdUserRoleDTO;
 import com.jibangyoung.domain.admin.service.AdPostService;
@@ -51,6 +52,18 @@ public class AdminController {
     public List<AdUserDTO> getAllUsers(@AuthenticationPrincipal CustomUserPrincipal loginUser) {
         checkAdmin(loginUser);
         return userService.getAllUsers();
+    }
+
+    // [신고유저 상태관리]
+    @PatchMapping("/users/{userId}/status")
+    public ResponseEntity<Void> updateUserStatus(
+            @PathVariable Long userId,
+            @RequestBody AdReportUserStatus request,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser
+    ) {
+        checkAdmin(loginUser);
+        userService.updateUserStatus(userId, request.getStatus());
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/users/roles")

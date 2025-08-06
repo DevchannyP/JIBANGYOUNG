@@ -1,5 +1,6 @@
 "use client";
 
+import { syncBookmarkedPolicies } from "@/libs/api/policy/sync";
 import { useAuthStore } from "@/store/authStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,14 +16,15 @@ const dropdownItems = [
   { label: "설문 응답", path: "/survey" },
   { label: "추천 결과", path: "/recommendation" },
   { label: "정책 리스트", path: "/policy/totalPolicies" },
-  { label: "찜한 정책", path: "/policy/favorites" },
+  { label: "찜한 정책", path: "/policy/rec_Policies" },
   { label: "통합 검색", path: "/search" },
   { label: "커뮤니티 홈", path: "/community" },
-  { label: "멘토 신청", path: "/mentor" },
+  { label: "멘토 신청", path: "/mentor/info" },
   { label: "공지 대시보드", path: "/notice" },
   { label: "공지 상세", path: "/notice/detail" },
   { label: "신고 내역", path: "/mypage/reports" },
   { label: "관리자 페이지", path: "/admin" },
+  { label: "멘토 관리자 페이지", path: "/mentor" },
 ];
 
 export default function Header() {
@@ -36,6 +38,20 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      // 1. localStorage에서 필요한 값 직접 꺼냄
+      const userIdStr = localStorage.getItem("userId");
+      const bookmarkedStr = localStorage.getItem("bookmarkedPolicyIds");
+
+      const userId = userIdStr ? parseInt(userIdStr, 10) : null;
+      const bookmarkedPolicyIds: number[] = bookmarkedStr
+      ? JSON.parse(bookmarkedStr)
+      : [];
+
+    if (userId && bookmarkedPolicyIds.length > 0) {
+      // 로그아웃 전에 찜한 정책 서버에 동기화
+      await syncBookmarkedPolicies(userId, bookmarkedPolicyIds);
+      console.log("✅ 찜한 정책 동기화 완료");
+    }
       if (refreshToken) await logoutApi(refreshToken);
     } catch {
       // 에러 무시하고 강제 로그아웃 진행
@@ -46,6 +62,7 @@ export default function Header() {
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("userId");
         localStorage.removeItem("sessionExpired");
+        localStorage.removeItem("bookmarkedPolicyIds");
         // 필요시 sessionStorage.clear(); react-query 캐시도 클리어 가능
       }
       logout(); // Zustand 상태 초기화
@@ -95,7 +112,7 @@ export default function Header() {
           <Link href="/community/main" className="header-nav-link">
             커뮤니티
           </Link>
-          <Link href="/recommendation" className="header-nav-link">
+          <Link href="/policy/recommendedList" className="header-nav-link">
             추천정책
           </Link>
           <div className="dropdown" ref={dropdownRef}>

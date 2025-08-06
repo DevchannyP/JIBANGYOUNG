@@ -11,6 +11,16 @@ export function AdminSidebar({
   return (
     <div className={styles.sidebar}>
       <ul>
+        <li>
+          <a
+            href="/mentor/notices/write"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.noticeMenu}
+          >
+            멘토 공지사항
+          </a>
+        </li>
         <li
           className={selectedMenu === "user" ? styles.active : ""}
           onClick={() => setSelectedMenu("user")}

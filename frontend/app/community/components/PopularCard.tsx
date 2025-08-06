@@ -20,9 +20,7 @@ export default function PopularCard({ title, posts }: Props) {
           <li key={p.id}>
             <div className={styles["rank"]}>{idx + 1}</div>
             <div className={styles["title"]}>
-              <Link href={`/community/${String(p.regionId).slice(0, 2)}/${p.id}`}>
-                {p.title}
-              </Link>
+              <Link href={`/community/${p.regionId}/${p.id}`}>{p.title}</Link>
             </div>
             <div className={styles["like-count"]}>
               <span>👍 {p.likes}</span> <span>👁️ {p.views}</span>

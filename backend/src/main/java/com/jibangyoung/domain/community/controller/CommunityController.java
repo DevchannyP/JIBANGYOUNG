@@ -109,7 +109,7 @@ public class CommunityController {
             @PathVariable Long postId,
             @RequestBody CommentRequestDto requestDto
     ) {
-        Long userId = user.getId();         // 무조건 JWT 인증에서 추출
+        Long userId = 2L;
         String author = user.getUsername(); // 혹은 닉네임 등
         log.info("댓글 작성, userId: {}, author: {}", userId, author);
         communityService.saveComment(postId, userId, author, requestDto);

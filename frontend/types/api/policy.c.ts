@@ -7,4 +7,5 @@ export interface PolicyCard {
   plcy_no: string;
   deadline: string;       // 마감일 (YYYY-MM-DD)
   d_day: number;          // 마감까지 남은 일수
+  favorites: number;      // 총 추천 개수
 }

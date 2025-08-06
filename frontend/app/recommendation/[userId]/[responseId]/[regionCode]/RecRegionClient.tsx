@@ -36,6 +36,7 @@ interface PolicyCardDto {
   plcy_no: string;
   deadline: string;
   d_day: number;
+  favorites: number;
 }
 
 // 변환 함수: DTO → UI 컴포넌트용 PolicyCard
@@ -49,6 +50,7 @@ function mapDtoToPolicyCard(dto: PolicyCardDto): PolicyCard {
     plcy_no: dto.plcy_no,
     deadline: dto.deadline,
     d_day: dto.d_day,
+    favorites: dto.favorites,
   };
 }
 

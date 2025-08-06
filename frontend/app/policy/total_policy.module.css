@@ -525,21 +525,41 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  overflow: hidden;              /* 전체 키워드가 넘칠 경우 감추기 */
 }
 
 .hashtag {
   display: inline-block;
   background-color: #f0f8ff;
   color: #1e40af;
-  padding: 4px 8px;
-  margin: 2px 4px 2px 0;
+  padding: 2px 6px;               /* 줄어든 padding */
   border-radius: 9999px;
-  font-size: 0.8rem;
+  font-size: 0.65rem;             /* 절반 크기 조정 */
   font-weight: 500;
+  white-space: nowrap;           /* 줄바꿈 방지 */
+  overflow: hidden;              /* 넘치는 텍스트 숨김 */
+  text-overflow: ellipsis;       /* 말줄임 처리 */
+  max-width: 100px;              /* 최대 너비 제한 */
 }
 
 .cardMeta {
   margin-top: 8px;
-  min-height: 24px; /* 키워드 없을 때 높이 유지하고 싶다면 */
+  min-height: 20px;
+  max-height: 48px;              /* 2줄 제한 */
+  overflow: hidden;
 }
 
+/* 총 추천개수 */
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.favoriteCount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

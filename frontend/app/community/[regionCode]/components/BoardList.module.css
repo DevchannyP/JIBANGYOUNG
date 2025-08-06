@@ -234,6 +234,21 @@
   line-height: 1.7;
 }
 
+/* 게시글 내용 내 이미지 크기 조절 */
+.postContent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+}
+
+/* 큰 이미지의 경우 최대 높이 제한 */
+.postContent img {
+  max-height: 600px;
+  object-fit: contain;
+}
+
 /* ================================
    테이블 스타일 (옐로우 테마)
    ================================ */

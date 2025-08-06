@@ -16,7 +16,7 @@ const BoardTable: React.FC<BoardTableProps> = async ({ posts }) => {
     FREE: "자유",
     QUESTION: "질문",
     INFO: "정보",
-    SETTLEMENT_REVIEW: "후기",
+    REVIEW: "후기",
     NOTICE: "공지",
   };
 

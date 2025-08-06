@@ -1,68 +1,24 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import styles from "../CommunitySection.module.css";
+import { usePolicyHotTop10Query } from "./usePolicyHotTop10Query";
 
 export default function PolicyHotTable() {
-  const rows = [
-    {
-      no: "01",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "서울",
-      value: "56",
-    },
-    {
-      no: "02",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "부산",
-      value: "56",
-    },
-    {
-      no: "03",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "04",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "05",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "06",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "07",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "08",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "09",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-    {
-      no: "10",
-      name: "쏘애플 청년정책에 뛰어들어 많은 관심...",
-      region: "광주",
-      value: "56",
-    },
-  ];
+  const { data, isLoading, isError } = usePolicyHotTop10Query();
+  const router = useRouter();
+
+  // 상세 페이지 이동 함수 (tr 클릭/엔터/스페이스 지원)
+  const handlePolicyClick = (id: number) => {
+    router.push(`/policy/policy_detail/${id}`);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>, id: number) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handlePolicyClick(id);
+    }
+  };
 
   return (
     <div className={styles.tableCard}>
@@ -81,14 +37,44 @@ export default function PolicyHotTable() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.no}>
-                <td>{row.no}</td>
-                <td>{row.name}</td>
-                <td>{row.region}</td>
-                <td className={styles.hot}>{row.value}</td>
+            {isLoading ? (
+              Array.from({ length: 10 }).map((_, i) => (
+                <tr key={i}>
+                  <td colSpan={4}>
+                    <div className={styles.skeletonRow} />
+                  </td>
+                </tr>
+              ))
+            ) : isError ? (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", color: "#888" }}>
+                  데이터를 불러올 수 없습니다.
+                </td>
               </tr>
-            ))}
+            ) : data && data.length > 0 ? (
+              data.map((row) => (
+                <tr
+                  key={row.no}
+                  className={styles.dataRow} // ✅ 행 전체 hover/focus 효과
+                  tabIndex={0}
+                  onClick={() => handlePolicyClick(row.id)}
+                  onKeyDown={(e) => handleKeyDown(e, row.id)}
+                  aria-label={`${row.name} 상세 페이지로 이동`}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td>{row.no}</td>
+                  <td className={styles.region}>{row.name}</td>
+                  <td className={styles.region}>{row.region}</td>
+                  <td className={styles.hot}>{row.value}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center", color: "#aaa" }}>
+                  인기 정책 데이터가 없습니다.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
