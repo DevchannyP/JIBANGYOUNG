@@ -82,6 +82,7 @@ public class CommunityService {
     // 지역 코드
     // 지역 시도
     // 지역 군구 - (없으면 시도)
+    @Transactional
     public List<RegionResponseDto> getAllRegionsBoard() {
         List<Region> regions = regionRepository.findAllByOrderByRegionCode();
 
@@ -120,6 +121,7 @@ public class CommunityService {
 
     // 카테고리가 정착후기인 게시글 중,
     // 추천 수 기준 상위 10개를 내림차 순 조회.
+    @Transactional
     public List<PostListDto> getTopReviews() {
         return postRepository
                 .findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory.REVIEW)
@@ -130,12 +132,13 @@ public class CommunityService {
 
     // 최근 since 시점 이후 작성된 게시글 중,
     // 추천 수 기준 상위 10개를 내림차 순 조회.
+    @Transactional
     public List<PostListDto> getRecentTop10(LocalDateTime since) {
         return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
                 .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public List<PostListDto> getCachedTop10ByPeriod(String period) {
         String key = switch (period.toLowerCase()) {
             case "week" -> "top10WeeklyPosts";
@@ -158,12 +161,14 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public Page<PostListDto> getPopularPostsPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Posts> postPage = postRepository.findByLikesGreaterThanEqualOrderByIdDesc(10, pageable);
         return postPage.map(PostListDto::from); // ✅ now it's correct
     }
 
+    @Transactional
     public Page<PostListDto> getPostsByRegion(String regionCode, int page, int size, String category, String search,
             String searchType) {
         int pageIndex = page - 1; // PageRequest는 0-based
@@ -184,9 +189,6 @@ public class CommunityService {
                             pageable);
                     break;
                 case "author":
-                    // TODO: 작성자 검색 로직 추가 (User 엔티티의 닉네임 필드 사용)
-                    // 현재 Posts 엔티티에 닉네임 필드가 직접 없으므로, User 엔티티와 조인하여 검색해야 함
-                    // 임시로 제목 검색으로 대체하거나, 복잡한 쿼리 작성이 필요
                     postPage = postRepository.findByRegionIdAndTitleContainingOrderByCreatedAtDesc(regionId, search,
                             pageable); // 임시
                     break;
@@ -216,6 +218,7 @@ public class CommunityService {
         return PostDetailDto.from(post);
     }
 
+    @Transactional(readOnly = true)
     public void write(PostCreateRequestDto request) {
         String content = request.getContent();
 
@@ -257,6 +260,7 @@ public class CommunityService {
         postRepository.save(post);
     }
 
+    @Transactional
     public Page<PostListDto> getPostsByRegionPopular(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
         Pageable pageable = PageRequest.of(pageIndex, size);
@@ -266,6 +270,7 @@ public class CommunityService {
     }
 
     // 인기 후기
+    @Transactional
     public List<PostListDto> getTopReviewPosts() {
         String redisKey = "top10ReviewPosts";
 
@@ -282,6 +287,7 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<PostListDto> getNotices() {
         return postRepository.findTop2ByIsNoticeTrueOrderByCreatedAtDesc()
                 .stream()
@@ -289,9 +295,7 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    // ===================================================================
     // 댓글 관련 로직 추가
-    // ===================================================================
 
     @Transactional(readOnly = true)
     public List<CommentResponseDto> findCommentsByPostId(Long postId) {

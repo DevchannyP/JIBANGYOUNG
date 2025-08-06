@@ -1,0 +1,151 @@
+.container {
+  width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #ddd;
+  margin: 2rem 0;
+}
+
+.writeHeader {
+  margin-bottom: 2rem;
+}
+
+.writeTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.label {
+  font-weight: bold;
+  color: #333;
+  min-width: 80px;
+}
+
+.regionSelect {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  min-width: 150px;
+}
+
+.titleInput {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.editorContainer {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 400px;
+}
+
+/* CKEditor 스타일 조정 */
+.editorContainer :global(.ck-editor__editable) {
+  min-height: 400px;
+}
+
+.editorContainer :global(.ck-toolbar) {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.editorContainer :global(.ck-editor__editable) {
+  border-radius: 0 0 4px 4px;
+}
+
+/* 에디터 내 이미지 크기 조절 */
+.editorContainer :global(.ck-editor__editable img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+}
+
+/* 큰 이미지의 경우 최대 높이 제한 */
+.editorContainer :global(.ck-editor__editable img) {
+  max-height: 600px;
+  object-fit: contain;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.submitButton {
+  padding: 0.75rem 2rem;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.submitButton:hover {
+  background-color: #5856eb;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 0.75rem 2rem;
+  background-color: #f3f4f6;
+  color: #666;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.cancelButton:hover {
+  background-color: #e5e7eb;
+}

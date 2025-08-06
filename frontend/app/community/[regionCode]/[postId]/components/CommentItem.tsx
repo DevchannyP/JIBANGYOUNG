@@ -30,7 +30,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
       {comment.isDeleted ? (
         // 삭제된 댓글일 때는 삭제 메시지만 표시
         <p className={`${styles.commentContent} ${styles.deleted}`}>
-          삭제된 댓글입니다.
+          작성자가 삭제한, 블라인드 처리된 댓글입니다.
         </p>
       ) : (
         // 삭제되지 않은 댓글일 때만 모든 UI 요소 표시
