@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 import com.jibangyoung.domain.mypage.entity.ReportTargetType;
 import com.jibangyoung.domain.mypage.entity.ReviewResultCode;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor //QueryDSL Tuple 매핑이나, Builder 사용 모두 대응
 @Builder
 public class AdMentorReportDTO {
     private Long id;
@@ -20,7 +22,7 @@ public class AdMentorReportDTO {
     private Long targetId;
     private String targetTitle;
     private String reasonCode;
-    private String reasonDescription;    
+    private String reasonDescription;
     private String reasonDetail;
     private LocalDateTime createdAt;
     private ReviewResultCode reviewResultCode;
@@ -28,39 +30,4 @@ public class AdMentorReportDTO {
     private String reviewerName;
     private Long regionId;
     private String url;
-
-    // JPQL에서 사용될 생성자 (파라미터 순서/타입 일치 필수!)
-    public AdMentorReportDTO(
-        Long id,
-        Long userId,
-        String reporterName,
-        ReportTargetType targetType,
-        Long targetId,
-        String targetTitle,
-        String reasonCode,
-        String reasonDescription,   
-        String reasonDetail,
-        LocalDateTime createdAt,
-        ReviewResultCode reviewResultCode,
-        LocalDateTime reviewedAt,
-        String reviewerName,
-        Long regionId,
-        String url
-    ) {
-        this.id = id;
-        this.userId = userId;
-        this.reporterName = reporterName;
-        this.targetType = targetType;
-        this.targetId = targetId;
-        this.targetTitle = targetTitle;
-        this.reasonCode = reasonCode;
-        this.reasonDescription = reasonDescription;  
-        this.reasonDetail = reasonDetail;
-        this.createdAt = createdAt;
-        this.reviewResultCode = reviewResultCode;
-        this.reviewedAt = reviewedAt;
-        this.reviewerName = reviewerName;
-        this.regionId = regionId;
-        this.url = url;
-    }
 }

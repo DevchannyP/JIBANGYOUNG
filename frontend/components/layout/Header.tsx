@@ -19,11 +19,12 @@ const dropdownItems = [
   { label: "찜한 정책", path: "/policy/rec_Policies" },
   { label: "통합 검색", path: "/search" },
   { label: "커뮤니티 홈", path: "/community" },
-  { label: "멘토 신청", path: "/mentor" },
+  { label: "멘토 신청", path: "/mentor/info" },
   { label: "공지 대시보드", path: "/notice" },
   { label: "공지 상세", path: "/notice/detail" },
   { label: "신고 내역", path: "/mypage/reports" },
   { label: "관리자 페이지", path: "/admin" },
+  { label: "멘토 관리자 페이지", path: "/mentor" },
 ];
 
 export default function Header() {

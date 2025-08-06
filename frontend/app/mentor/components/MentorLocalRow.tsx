@@ -11,7 +11,7 @@ interface Props {
   totalCount: number;
   ITEMS_PER_PAGE: number;
   currentPage: number;
-  regionOptions: RegionOption[];
+  regionOptions: RegionOption[]; // 전체 지역 옵션 (지역명 표시용)
 }
 export function MentorLocalRow({
   user,
@@ -25,13 +25,13 @@ export function MentorLocalRow({
 
   // region_id로 지역명 찾기
   const region = regionOptions.find((r) => r.code === user.region_id);
-  const regionName = region ? region.name : user.region_id;
+  const regionName = region ? region.name : String(user.region_id);
 
   return (
     <tr>
       <td>{order}</td>
       <td>{user.nickname}</td>
-      <td>{user.role}</td>
+      <td>{user.roleDescription}</td>
       <td>{user.warning_count}</td>
       <td>{regionName}</td>
       <td>{user.current_score}</td>

@@ -119,4 +119,8 @@ public class Posts {
             this.label = label;
         }
     }
+    // 관리자_데시보드_신고게시글 복구
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

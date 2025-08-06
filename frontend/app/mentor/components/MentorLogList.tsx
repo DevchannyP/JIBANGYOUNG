@@ -2,7 +2,7 @@ import { AdminRegionTab } from "@/app/admin/components/AdminRegionTab";
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
 import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion";
-import { fetchAdMentorLogList } from "@/libs/api/admin/admin.api";
+import { fetchAdMentorLogList } from "@/libs/api/admin/adminMentor.api";
 import { AdMentorLogList } from "@/types/api/adMentorLogList";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
@@ -16,10 +16,10 @@ export function MentorLogList() {
   const [selectedRegion, setSelectedRegion] = useState<number>(0);
   const ITEMS_PER_PAGE = 10;
 
-  // 지역 옵션 가져오기
-  const { regionOptions, loading: regionLoading } = useAdminRegion();
+  // 전체 지역 옵션
+  const { regionOptions: allRegionOptions } = useAdminRegion();
 
-  // 1. 활동로그 API 데이터 가져오기
+  // 활동로그 API 데이터 가져오기
   useEffect(() => {
     fetchAdMentorLogList()
       .then((data) => {
@@ -32,13 +32,25 @@ export function MentorLogList() {
       });
   }, []);
 
-  // 2. 지역코드→지역명 매핑 함수 (for 리스트)
-  const regionCodeToName = useMemo(() => {
-    const map = new Map(regionOptions.map((r) => [r.code, r.name]));
-    return (code: number) => map.get(code) ?? String(code);
-  }, [regionOptions]);
+  // logs에 등장하는 regionId만 추출 (중복 제거)
+  const logRegionIds = useMemo(
+    () => Array.from(new Set(logs.map((l) => l.regionId))),
+    [logs]
+  );
 
-  // 3. 지역 탭 선택 필터링
+  // 담당 지역만 필터링한 regionOptions + '전체'
+  const filteredRegionOptions = [
+    { code: 0, name: "전체" },
+    ...allRegionOptions.filter((option) => logRegionIds.includes(option.code)),
+  ];
+
+  // 지역코드→지역명 매핑 함수
+  const regionCodeToName = useMemo(() => {
+    const map = new Map(allRegionOptions.map((r) => [r.code, r.name]));
+    return (code: number) => map.get(code) ?? String(code);
+  }, [allRegionOptions]);
+
+  // 지역 탭 선택 필터링
   const handleSelectRegion = useCallback(
     (regionName: string, regionId: number) => {
       setSelectedRegion(regionId);
@@ -57,7 +69,7 @@ export function MentorLogList() {
     [logs, searchKeyword]
   );
 
-  // 4. 검색
+  // 검색
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -77,7 +89,7 @@ export function MentorLogList() {
     [logs, selectedRegion]
   );
 
-  // 5. 페이지네이션
+  // 페이지네이션
   const goToPage = (page: number) => setCurrentPage(page);
 
   const totalPages = Math.ceil(searchResult.length / ITEMS_PER_PAGE);
@@ -90,8 +102,9 @@ export function MentorLogList() {
     <div>
       <h1 className={styles.title}>멘토 활동로그</h1>
 
+      {/* 담당 지역만 지역탭에 노출 */}
       <AdminRegionTab
-        regionOptions={regionOptions}
+        regionOptions={filteredRegionOptions}
         selectedRegionCode={selectedRegion}
         onSelectRegion={handleSelectRegion}
       />
@@ -123,10 +136,9 @@ export function MentorLogList() {
             ) : (
               paginatedData.map((log, idx) => (
                 <MentorLogRow
-                  key={`${log.id}-${log.regionId}`}
+                  key={`${log.userId}-${log.regionId}`}
                   log={{
                     ...log,
-                    // 지역명 추가 (MentorLogRow에서 사용 시)
                     regionName: regionCodeToName(log.regionId),
                   }}
                   index={idx}
