@@ -21,19 +21,19 @@
   display: flex;
   width: 1200px;
   justify-content: center;
-  gap: 5px;
+  gap: 2px;
   margin: 0;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
   flex-wrap: wrap;
 }
 .regionr-navigation button {
   font-weight: bold;
   height: 35px;
-  width: 70px;
+  width: 68px;
   padding: 2px 2px;
   border: 1px solid #ccc;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 3px;
   color: #3a3c3f89;
   cursor: pointer;
   transition: background-color 0.2s;
