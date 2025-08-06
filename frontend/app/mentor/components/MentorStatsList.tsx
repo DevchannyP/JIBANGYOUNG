@@ -135,6 +135,7 @@ export function MentorStatsList() {
                       userId: 0,
                       nickname: "",
                       role,
+                      roleDescription: "",
                       regionId,
                       noticeCount: 0,
                       postCount: 0,
