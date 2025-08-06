@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PolicyCardDto {
-    
+
     @JsonProperty("NO")
     private Integer NO;
     private String plcy_nm;
@@ -20,4 +20,5 @@ public class PolicyCardDto {
     private String plcy_no;
     private LocalDate deadline;
     private long d_day; // 마감까지 남은 일수
+    private int favorites; // 총 추천수
 }

@@ -16,3 +16,4 @@ const PolicyClient = dynamic(() => import("./totalPolicyClient"), {
 export default function PolicyClientWrapper({ serverState }: { serverState: any }) {
   return <PolicyClient serverState={serverState} />;
 }
+

@@ -99,28 +99,35 @@ const PolicyCard: React.FC<PolicyCardProps> = memo(({
             type="button"
           >
             <Heart
-            className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
-            fill={isBookmarked ? '#6366f1' : 'none'}
-          />
+              className={`${styles.heartIcon} ${isBookmarked ? styles.bookmarked : ''}`}
+              fill={isBookmarked ? '#6366f1' : 'none'}
+            />
           </button>
         )}
       </div>
 
       <div className={styles.cardContent}>
-      <h3 className={styles.itemTitle}>
-      {policy.plcy_nm}
+        <h3 className={styles.itemTitle}>
+          {policy.plcy_nm}
         </h3>
 
-      <div className={styles.cardMeta}>
-        {hashtags.length > 0 && (
-      <div className={styles.keywordInfo}>
-        {hashtags.map((tag, index) => (
-          <span key={index} className={styles.hashtag}>#{tag}</span>
-        ))}
+        <div className={styles.cardMeta}>
+          {hashtags.length > 0 && (
+            <div className={styles.keywordInfo}>
+              {hashtags.map((tag, index) => (
+                <span key={index} className={styles.hashtag}>#{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 추천 개수 표시 */}
+        <div className={styles.cardFooter}>
+          <span className={styles.favoriteCount} aria-label={`총 추천 ${policy.favorites ?? 0}개`}>
+            ❤️ {policy.favorites ?? 0}
+          </span>
+        </div>
       </div>
-      )}
-    </div>
-  </div>
     </article>
   );
 });

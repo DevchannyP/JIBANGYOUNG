@@ -67,7 +67,8 @@ public class PolicyService {
                             p.getPlcy_kywd_nm(), // 정책 키워드
                             p.getPlcy_no(),
                             deadline, // 변환된 마감일
-                            d_day // 마감까지 남은 일수
+                            d_day, // 마감까지 남은 일수
+                            p.getFavorites() // 총 추천수
                     );
                 })
                 .filter(dto -> dto != null) // null 제거 (마감일이 없거나 지난 정책 제외)
@@ -136,7 +137,9 @@ public class PolicyService {
                             p.getPlcy_kywd_nm(),
                             p.getPlcy_no(),
                             deadline,
-                            d_day);
+                            d_day,
+                            p.getFavorites() // 총 추천수
+                    );
                 })
                 .filter(dto -> dto != null)
                 .collect(Collectors.toList());
@@ -183,7 +186,9 @@ public class PolicyService {
                             p.getPlcy_kywd_nm(),
                             p.getPlcy_no(),
                             deadline,
-                            d_day);
+                            d_day,
+                            p.getFavorites() // 총 추천수
+                    );
                 })
                 .filter(dto -> dto != null)
                 .collect(Collectors.toList());

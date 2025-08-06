@@ -36,4 +36,7 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
                             WHERE r.regionCode = :regionCodeStr
                         """)
         List<Object[]> getDescriptionByGrade(@Param("regionCodeStr") String regionCodeStr);
+
+        // user의 추천 정책 전체 로드
+        List<Recommendation> findByUserId(Long userId);
 }

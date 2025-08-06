@@ -53,4 +53,9 @@ public class PolicyFavoriteService {
             policyRepository.decrementFavoritesByPlcyNo(policyId);
         }
     }
+
+    // 찜 정책 로그인시 로컬 스토리지에 전송
+    public List<Long> findPolicyCodesByUserId(Long userId) {
+        return policyFavoriteRepository.findPolicyCodesByUserId(userId);
+    }
 }
