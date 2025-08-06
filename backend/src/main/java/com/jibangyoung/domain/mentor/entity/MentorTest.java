@@ -2,9 +2,14 @@ package com.jibangyoung.domain.mentor.entity;
 
 import java.time.LocalDateTime;
 
+import com.jibangyoung.domain.auth.entity.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +48,7 @@ public class MentorTest {
     @Column(name = "region_id")
     private Long regionId; // BIGINT
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

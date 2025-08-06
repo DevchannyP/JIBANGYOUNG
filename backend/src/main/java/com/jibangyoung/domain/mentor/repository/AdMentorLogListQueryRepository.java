@@ -39,18 +39,18 @@ public class AdMentorLogListQueryRepository {
         // 1. Mentor-User 조인(집계 대상 추출)
         List<Tuple> mentors = queryFactory
                 .select(
-                        m.userId,
+                        m.user.id,
                         u.nickname,
                         u.role,
                         m.regionId
                 )
                 .from(m)
-                .join(u).on(m.userId.eq(u.id))
+                .join(u).on(m.user.id.eq(u.id))
                 .where(m.regionId.in(regionIds))
                 .fetch();
 
         List<Long> userIds = mentors.stream()
-                .map(row -> row.get(m.userId))
+                .map(row -> row.get(m.user.id))
                 .collect(Collectors.toList());
 
         // 2. postCount, noticeCount
@@ -114,7 +114,7 @@ public class AdMentorLogListQueryRepository {
         // 5. DTO 조립 (for문)
         List<AdMentorLogListDTO> result = new ArrayList<>();
         for (Tuple row : mentors) {
-            Long userId = row.get(m.userId);
+            Long userId = row.get(m.user.id);
             String nickname = row.get(u.nickname);
 
             // UserRole enum 타입 처리!

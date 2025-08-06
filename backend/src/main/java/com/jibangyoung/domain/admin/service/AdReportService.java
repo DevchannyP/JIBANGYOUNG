@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jibangyoung.domain.admin.dto.AdReportDto;
+import com.jibangyoung.domain.admin.entity.AdminPosts;
+import com.jibangyoung.domain.admin.repository.AdPostRepository;
 import com.jibangyoung.domain.admin.repository.AdReportQueryRepository;
 import com.jibangyoung.domain.admin.repository.AdReportRepository;
-import com.jibangyoung.domain.community.entity.Posts;
-import com.jibangyoung.domain.community.repository.PostRepository;
 import com.jibangyoung.domain.mypage.entity.Comment;
 import com.jibangyoung.domain.mypage.entity.Report;
 import com.jibangyoung.domain.mypage.entity.ReportTargetType;
@@ -24,15 +24,15 @@ import lombok.RequiredArgsConstructor;
 public class AdReportService {
     private final AdReportQueryRepository adReportQueryRepository;
     private final AdReportRepository adReportRepository;
-    private final PostRepository postRepository;
+    private final AdPostRepository adPostRepository;
     private final CommentRepository commentRepository;
 
     // 1. REQUESTED 상태인 신고만 DTO로 반환 (JPQL)
     public List<AdReportDto> getRequestedReports(Long adminUserId, String type) {
         if (type == null || type.isBlank()) {
-            return adReportQueryRepository.findRequestedReports(null);
+            return adReportQueryRepository.findRequestedReports(null, false);
         } else {
-            return adReportQueryRepository.findRequestedReports(ReportTargetType.valueOf(type));
+            return adReportQueryRepository.findRequestedReports(ReportTargetType.valueOf(type), false);
         }
     }
 
@@ -48,9 +48,9 @@ public class AdReportService {
         // 승인 처리(논리적 삭제)
         if ("APPROVED".equals(status)) {
             if (report.getTargetType() == ReportTargetType.POST) {
-                Posts post = postRepository.findById(report.getTargetId())
+                AdminPosts post = adPostRepository.findById(report.getTargetId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다: " + report.getTargetId()));
-                postRepository.delete(post); // soft delete (@SQLDelete)
+                adPostRepository.delete(post); // soft delete (@SQLDelete)
             }
             if (report.getTargetType() == ReportTargetType.COMMENT) {
                 Comment comment = commentRepository.findById(report.getTargetId())
@@ -61,16 +61,17 @@ public class AdReportService {
 
         // 승인취소 처리(복구)
         if ("REQUESTED".equals(status)) { // 승인취소 상태가 REQUESTED라고 가정
-            // if (report.getTargetType() == ReportTargetType.POST) {
-            //     Posts post = postRepository.findById(report.getTargetId())
-            //         .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다: " + report.getTargetId()));
-            //     post.setIsDeleted(false);
-
-            // }
+            if (report.getTargetType() == ReportTargetType.POST) {
+                AdminPosts post = adPostRepository.findById(report.getTargetId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다: " + report.getTargetId()));
+                post.setIsDeleted(false);
+                adPostRepository.save(post);
+            }
             if (report.getTargetType() == ReportTargetType.COMMENT) {
                 Comment comment = commentRepository.findById(report.getTargetId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다: " + report.getTargetId()));
                 comment.setIsDeleted(false);
+                commentRepository.save(comment);
             }
         }
     }

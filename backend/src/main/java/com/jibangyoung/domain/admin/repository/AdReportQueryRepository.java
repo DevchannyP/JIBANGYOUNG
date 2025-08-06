@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 import com.jibangyoung.domain.admin.dto.AdReportDto;
+import com.jibangyoung.domain.admin.entity.QAdminPosts;
 import com.jibangyoung.domain.auth.entity.QUser;
 import com.jibangyoung.domain.auth.entity.UserStatus;
-import com.jibangyoung.domain.community.entity.QPosts;
 import com.jibangyoung.domain.mypage.entity.QComment;
 import com.jibangyoung.domain.mypage.entity.QReport;
 import com.jibangyoung.domain.mypage.entity.ReportTargetType;
@@ -28,14 +28,14 @@ public class AdReportQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<AdReportDto> findRequestedReports(ReportTargetType type) {
+    public List<AdReportDto> findRequestedReports(ReportTargetType type, boolean includeDeletedPosts) {
         QReport r = QReport.report;
         QUser u = QUser.user;              // 신고자
         QUser ur = new QUser("ur");        // 담당자(처리자)
         QUser targetUser = new QUser("targetUser"); // 신고대상 유저
-        QPosts p = QPosts.posts;
+        QAdminPosts p = QAdminPosts.adminPosts;     // 관리자용 게시글
         QComment c = QComment.comment;
-        QPosts p2 = new QPosts("p2");
+        QAdminPosts p2 = new QAdminPosts("p2");
         QReportReason rr = QReportReason.reportReason;
 
         var reviewStatusList = Arrays.asList(ReviewResultCode.REQUESTED, ReviewResultCode.APPROVED);
@@ -44,8 +44,13 @@ public class AdReportQueryRepository {
             whereBuilder = whereBuilder.and(r.targetType.eq(type));
         }
 
-        // 게시글 조인에 isDeleted 조건 명시적으로 추가!
-        // (댓글 조인은 기존과 동일)
+        // isDeleted 조건을 동적으로 추가!
+        var postJoinCondition = r.targetType.eq(ReportTargetType.POST)
+                .and(r.targetId.eq(p.id));
+        if (!includeDeletedPosts) {
+            postJoinCondition = postJoinCondition.and(p.isDeleted.eq(false));
+        }
+
         List<Tuple> tuples = queryFactory
                 .select(
                         r.id,
@@ -53,7 +58,6 @@ public class AdReportQueryRepository {
                         u.nickname,
                         r.targetType,
                         r.targetId,
-                        // CASE문으로 게시글, 댓글, 유저 모두 대응
                         new CaseBuilder()
                                 .when(r.targetType.eq(ReportTargetType.POST)).then(p.title)
                                 .when(r.targetType.eq(ReportTargetType.COMMENT)).then(c.content)
@@ -66,12 +70,10 @@ public class AdReportQueryRepository {
                         r.reviewResultCode,
                         r.reviewedAt,
                         ur.nickname,
-                        // regionId: 정책에 따라 필요시 추가 분기
                         new CaseBuilder()
                                 .when(r.targetType.eq(ReportTargetType.POST)).then(p.regionId)
                                 .when(r.targetType.eq(ReportTargetType.COMMENT)).then(p2.regionId)
                                 .otherwise((Long) null),
-                        // URL: 게시글, 댓글용
                         new CaseBuilder()
                                 .when(r.targetType.eq(ReportTargetType.POST)).then(
                                         Expressions.stringTemplate("CONCAT('/community/', {0}, '/', {1})", p.regionId, p.id)
@@ -88,14 +90,10 @@ public class AdReportQueryRepository {
                 .leftJoin(u).on(r.user.id.eq(u.id))
                 .leftJoin(ur).on(r.reviewedBy.eq(ur.id))
                 .leftJoin(targetUser).on(
-                    r.targetType.eq(ReportTargetType.USER)
-                    .and(r.targetId.eq(targetUser.id))
+                        r.targetType.eq(ReportTargetType.USER)
+                                .and(r.targetId.eq(targetUser.id))
                 )
-                // ✅ 게시글에 isDeleted 조건 추가!
-                .leftJoin(p).on(r.targetType.eq(ReportTargetType.POST)
-                                .and(r.targetId.eq(p.id))
-                                .and(p.isDeleted.eq(false))
-                )
+                .leftJoin(p).on(postJoinCondition)     // ★ isDeleted 포함/제외 동적으로!
                 .leftJoin(c).on(r.targetType.eq(ReportTargetType.COMMENT).and(r.targetId.eq(c.id)))
                 .leftJoin(p2).on(r.targetType.eq(ReportTargetType.COMMENT).and(c.targetPostId.eq(p2.id)))
                 .leftJoin(rr).on(r.reasonCode.eq(rr.code))
@@ -103,9 +101,8 @@ public class AdReportQueryRepository {
                 .orderBy(r.createdAt.desc())
                 .fetch();
 
-        // Tuple → DTO 매핑
         return tuples.stream().map(t -> {
-            UserStatus userStatus = t.get(15, UserStatus.class); 
+            UserStatus userStatus = t.get(15, UserStatus.class);
             String targetUserStatus = userStatus != null ? userStatus.name() : null;
 
             return AdReportDto.builder()
@@ -114,7 +111,7 @@ public class AdReportQueryRepository {
                     .reporterName(t.get(u.nickname))
                     .targetType(t.get(r.targetType))
                     .targetId(t.get(r.targetId))
-                    .targetTitle(t.get(5, String.class)) 
+                    .targetTitle(t.get(5, String.class))
                     .reasonCode(t.get(r.reasonCode))
                     .reasonDescription(t.get(rr.description))
                     .reasonDetail(t.get(r.reasonDetail))
@@ -127,6 +124,5 @@ public class AdReportQueryRepository {
                     .targetUserStatus(targetUserStatus)
                     .build();
         }).collect(Collectors.toList());
-
     }
 }
