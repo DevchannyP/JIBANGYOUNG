@@ -12,7 +12,12 @@ type PostListDto = _PostListDto & { thumbnailUrl?: string };
 const rankEmoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 const FALLBACK = "/default-profile.webp";
 
-export default function TodayPopularCard() {
+interface TodayPopularCardProps {
+  isActive?: boolean;
+  onStateChange?: (active: boolean) => void;
+}
+
+export default function TodayPopularCard({ isActive = false, onStateChange }: TodayPopularCardProps) {
   const { data, isLoading, isError } = usePopularPostsQuery();
   // ✅ posts를 useMemo로!
   const posts: PostListDto[] = useMemo(() => data?.posts ?? [], [data]);
@@ -25,6 +30,19 @@ export default function TodayPopularCard() {
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const firstItemRef = useRef<HTMLLIElement>(null);
+
+  // 외부 상태와 동기화
+  useEffect(() => {
+    if (isActive !== open) {
+      setOpen(isActive);
+      setFixed(isActive);
+    }
+  }, [isActive, open]);
+
+  // 상태 변경 알림
+  useEffect(() => {
+    onStateChange?.(open && fixed);
+  }, [open, fixed, onStateChange]);
 
   // --- 외부 클릭 시 드롭다운 해제 (고정이 아닐 때만)
   useEffect(() => {

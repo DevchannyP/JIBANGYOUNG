@@ -7,8 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// 변경: Posts로 import
+import com.jibangyoung.domain.community.entity.Posts;
 import com.jibangyoung.domain.mypage.dto.PostPreviewDto;
-import com.jibangyoung.domain.mypage.entity.Post;
 import com.jibangyoung.domain.mypage.repository.MyPostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostListResponse getMyPosts(long userId, int page, int size) {
-        Page<Post> postPage = postRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(
+        Page<Posts> postPage = postRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(
                 userId, PageRequest.of(page - 1, size));
         List<PostPreviewDto> posts = postPage.map(PostPreviewDto::from).getContent();
         long totalCount = postPage.getTotalElements();

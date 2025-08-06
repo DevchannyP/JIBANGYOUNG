@@ -2,8 +2,9 @@ package com.jibangyoung.domain.mypage.dto;
 
 import java.time.LocalDateTime;
 
-import com.jibangyoung.domain.mypage.entity.Post;
-import com.jibangyoung.domain.mypage.entity.PostCategory;
+// 변경: Posts로 import
+import com.jibangyoung.domain.community.entity.Posts;
+import com.jibangyoung.domain.community.entity.Posts.PostCategory; // 카테고리도 Posts 내부 enum 사용
 
 import lombok.Builder;
 
@@ -18,7 +19,9 @@ public record PostPreviewDto(
         boolean isNotice,
         boolean isMentorOnly,
         LocalDateTime createdAt) {
-    public static PostPreviewDto from(Post post) {
+
+    // 변경: Post → Posts
+    public static PostPreviewDto from(Posts post) {
         return PostPreviewDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
