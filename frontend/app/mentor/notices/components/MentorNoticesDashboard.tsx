@@ -11,11 +11,11 @@ import styles from "../MentorNotices.module.css";
 // HTML 태그를 제거하고 순수 텍스트만 추출하는 함수
 const stripHtmlTags = (html: string): string => {
   return html
-    .replace(/<[^>]*>/g, '') // HTML 태그 제거
-    .replace(/&nbsp;/g, ' ') // &nbsp; 공백 문자 변환
-    .replace(/&amp;/g, '&') // &amp; 변환
-    .replace(/&lt;/g, '<') // &lt; 변환
-    .replace(/&gt;/g, '>') // &gt; 변환
+    .replace(/<[^>]*>/g, "") // HTML 태그 제거
+    .replace(/&nbsp;/g, " ") // &nbsp; 공백 문자 변환
+    .replace(/&amp;/g, "&") // &amp; 변환
+    .replace(/&lt;/g, "<") // &lt; 변환
+    .replace(/&gt;/g, ">") // &gt; 변환
     .replace(/&quot;/g, '"') // &quot; 변환
     .replace(/&#39;/g, "'") // &#39; 변환
     .trim();
@@ -84,7 +84,7 @@ export default function MentorNoticesDashboard() {
   };
 
   const handleWriteClick = () => {
-    const regionParam = selectedRegion ? `?regionId=${selectedRegion}` : '';
+    const regionParam = selectedRegion ? `?regionId=${selectedRegion}` : "";
     router.push(`/mentor/notices/write${regionParam}`);
   };
 
@@ -92,7 +92,7 @@ export default function MentorNoticesDashboard() {
     const pages = [];
     const start = Math.max(1, currentPage - 2);
     const end = Math.min(totalPages, currentPage + 2);
-    
+
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
@@ -123,7 +123,7 @@ export default function MentorNoticesDashboard() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             className={styles.searchInput}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
           />
           <button onClick={handleSearch} className={styles.searchButton}>
             검색
@@ -137,24 +137,22 @@ export default function MentorNoticesDashboard() {
 
       {/* 공지 목록 */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          로딩 중...
-        </div>
+        <div style={{ textAlign: "center", padding: "2rem" }}>로딩 중...</div>
       ) : (
         <>
           <div className={styles.noticeGrid}>
             {notices.map((notice) => (
-              <div 
-                key={notice.id} 
+              <div
+                key={notice.id}
                 className={styles.noticeCard}
                 onClick={() => handleNoticeClick(notice.id)}
               >
                 <div className={styles.commentIcon}>
                   <span>💬</span>
                 </div>
-                
+
                 <h3 className={styles.noticeTitle}>{notice.title}</h3>
-                
+
                 <div className={styles.noticeInfo}>
                   <span className={styles.regionBadge}>
                     {notice.regionName}
@@ -162,9 +160,9 @@ export default function MentorNoticesDashboard() {
                   <span>📅 {notice.createdAt}</span>
                   <span>💬</span>
                 </div>
-                
+
                 <div className={styles.noticeContent}>
-                  {truncateText(stripHtmlTags(notice.content), 80)}
+                  {truncateText(stripHtmlTags(notice.content), 40)}
                 </div>
               </div>
             ))}
@@ -179,17 +177,17 @@ export default function MentorNoticesDashboard() {
             >
               &lt;
             </button>
-            
+
             {getPageNumbers().map((page) => (
               <button
                 key={page}
                 onClick={() => handlePageChange(page)}
-                className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
+                className={`${styles.pageButton} ${currentPage === page ? styles.active : ""}`}
               >
                 {page}
               </button>
             ))}
-            
+
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
