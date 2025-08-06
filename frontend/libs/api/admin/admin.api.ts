@@ -1,196 +1,78 @@
-// libs/api/admin.api.ts
-
-import { AdMentorLogList } from "@/types/api/adMentorLogList";
-import { AdMentorUser } from "@/types/api/adMentorUser";
+import api from "@/libs/api/axios";
+import { Report } from "@/types/api/adMentorReport";
 import { AdminPost } from "@/types/api/adminPost";
 import { AdminRegion } from "@/types/api/adminRegion";
-import { AdminUser } from "@/types/api/adminUser";
+import { AdminUser, ChangeUserStatusPayload } from "@/types/api/adminUser";
 import { AdminUserRole } from "@/types/api/adminUserRole";
 
-export interface ApiError {
-  code?: string;
-  message: string;
-}
-
-// 공통 fetch + 에러 처리
-async function safeFetch(
-  input: RequestInfo,
-  init?: RequestInit
-): Promise<Response> {
-  try {
-    return await fetch(input, init);
-  } catch (e: any) {
-    throw new Error("네트워크 연결 실패 (서버 미응답)");
-  }
-}
-
-// 관리자 데시보드_사용자 리스트 조회 API
-export async function fetchAllUsers(): Promise<AdminUser[]> {
-  const response = await safeFetch("http://localhost:8080/api/admin/users", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include", // 쿠기전달
-  });
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "유저 목록 조회 실패" };
-
-    try {
-      apiError = await response.json();
-    } catch {
-      // JSON 파싱 불가 (502, CORS 등)
-    }
-
-    throw new Error(apiError.message || "유저 목록 조회 실패");
-  }
-
-  return response.json();
-}
-
-// 관리자 데시보드_사용자 권한 변경 API
-export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
-  const response = await safeFetch(
-    "http://localhost:8080/api/admin/users/roles",
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    }
-  );
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "유저 권한 변경 실패" };
-
-    try {
-      apiError = await response.json();
-    } catch {
-      // JSON 파싱 불가
-    }
-
-    throw new Error(apiError.message || "유저 권한 변경 실패");
-  }
-}
-
-// 관리자 데시보드_게시글 리스트 조회 API
-export async function featchAllPost(): Promise<AdminPost[]> {
-  const response = await safeFetch("http://localhost:8080/api/admin/posts", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "게시글 목록 조회 실패" };
-
-    try {
-      apiError = await response.json();
-    } catch {
-      // JSON 파싱 불가
-    }
-
-    throw new Error(apiError.message || "게시글 목록 조회 실패");
-  }
-  return response.json();
-}
-
-// 관리자 데시보드_게시글 삭제 API
-export async function deletePostById(id: number): Promise<void> {
-  const response = await safeFetch(
-    "http://localhost:8080/api/admin/posts/${id}",
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    }
-  );
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "게시글 삭제 실패" };
-
-    try {
-      apiError = await response.json();
-    } catch {
-      // JSON 파싱 불가
-    }
-
-    throw new Error(apiError.message || "게시글 삭제 실패");
-  }
-}
-
-// 관리자 데시보드_시/도 리스트 조회 API
+// 관리자 데시보드_지역 탭
 export async function fetchAdminRegion(): Promise<AdminRegion[]> {
-  const response = await safeFetch("http://localhost:8080/api/admin/region", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "지역 목록 조회 실패" };
-    try {
-      apiError = await response.json();
-    } catch {
-      // JSON 파싱 불가
-    }
-    throw new Error(apiError.message || "지역 목록 조회 실패");
+  try {
+    const response = await api.get("/api/admin/region");
+    return response.data;
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "지역 목록 조회 실패";
+    throw new Error(msg);
   }
-  return response.json();
 }
 
-// 멘토 데시보드_내 지역멘토 리스트 API
-export async function fetchMentorRegionUsers(): Promise<AdMentorUser[]> {
-  const token = localStorage.getItem("accessToken"); // JWT 토큰 가져오기
-
-  const response = await safeFetch("http://localhost:8080/api/mentor/local", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+// 관리자 데시보드_신고 목록(승인요청/승인)
+export async function fetchAdminReports(type?: string): Promise<Report[]> {
+  const res = await api.get("/api/admin/report", {
+    params: type ? { type } : {},
   });
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "멘토 지역 유저 목록 조회 실패" };
-    try {
-      apiError = await response.json();
-    } catch {}
-    throw new Error(apiError.message || "멘토 지역 유저 목록 조회 실패");
-  }
-
-  return response.json();
+  return res.data;
 }
 
-// 멘토 데시보드_멘토 활동로그 리스트 API
-export async function fetchAdMentorLogList(): Promise<AdMentorLogList[]> {
-  const token = localStorage.getItem("accessToken");
-
-  const response = await safeFetch("http://localhost:8080/api/mentor/logList", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    let apiError: ApiError = { message: "멘토 활동로그 리스트 조회 실패" };
-    try {
-      apiError = await response.json();
-    } catch {}
-    throw new Error(apiError.message || "멘토 활동로그 리스트 조회 실패");
+// 관리자 데시보드_신고자 상태관리
+export async function changeUserStatus(
+  userId: number,
+  status: ChangeUserStatusPayload["status"]
+): Promise<void> {
+  try {
+    await api.patch(`/api/admin/users/${userId}/status`, { status });
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "유저 상태 변경 실패";
+    throw new Error(msg);
   }
+}
 
-  return response.json();
+// 관리자 데시보드_신고목록_처리상태(승인/반려)
+export async function adminApproveOrRejectReport(
+  id: number,
+  status: "APPROVED" | "REJECTED" | "REQUESTED"
+): Promise<void> {
+  await api.patch(`/api/admin/report/${id}/status`, { status });
+}
+
+// 관리자 데시보드_사용자 관리
+export async function fetchAllUsers(): Promise<AdminUser[]> {
+  try {
+    const response = await api.get("/api/admin/users");
+    return response.data;
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "유저 목록 조회 실패";
+    throw new Error(msg);
+  }
+}
+
+// 관리자 데시보드_사용자 관리_권한변경
+export async function updateUserRoles(payload: AdminUserRole[]): Promise<void> {
+  try {
+    await api.put("/api/admin/users/roles", payload);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "유저 권한 변경 실패";
+    throw new Error(msg);
+  }
+}
+
+// 관리자 데시보드_게시글 관리_리스트
+export async function featchAllPost(): Promise<AdminPost[]> {
+  try {
+    const response = await api.get("/api/admin/posts");
+    return response.data;
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "게시글 목록 조회 실패";
+    throw new Error(msg);
+  }
 }

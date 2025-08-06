@@ -24,7 +24,23 @@ export function MentorReportList() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const ITEMS_PER_PAGE = 10;
+
+  // r유저 role 가져오기 (localStorage)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("auth-store-v2");
+        if (raw) {
+          const user = JSON.parse(raw)?.state?.user;
+          setUserRole(user?.role);
+        }
+      } catch (e) {
+        setUserRole(undefined);
+      }
+    }
+  }, []);
 
   function formatDate(dateStr: string | null | undefined) {
     if (!dateStr) return "-";
@@ -117,6 +133,102 @@ export function MentorReportList() {
     [selectedReport, selectedType]
   );
 
+  // 버튼 role별 분기 함수
+  function getModalButtons(
+    selectedReport: Report,
+    userRole: string | undefined
+  ) {
+    if (!userRole) return [];
+    if (userRole === "MENTOR_C") {
+      return [
+        {
+          label: "닫기",
+          onClick: () => setSelectedReport(null),
+          type: "secondary" as const,
+        },
+      ];
+    }
+    if (userRole === "MENTOR_B") {
+      if (selectedReport.reviewResultCode === "PENDING") {
+        return [
+          {
+            label: "무시",
+            onClick: () => handleChangeStatus(selectedReport.id, "IGNORED"),
+            type: "secondary" as const,
+          },
+          {
+            label: "무효",
+            onClick: () => handleChangeStatus(selectedReport.id, "INVALID"),
+            type: "danger" as const,
+          },
+          {
+            label: "닫기",
+            onClick: () => setSelectedReport(null),
+            type: "secondary" as const,
+          },
+        ];
+      }
+      return [
+        {
+          label: "닫기",
+          onClick: () => setSelectedReport(null),
+          type: "secondary" as const,
+        },
+      ];
+    }
+    // MENTOR_A (전부 허용)
+    return [
+      ...(["PENDING", "IGNORED", "INVALID"].includes(
+        selectedReport.reviewResultCode
+      )
+        ? [
+            {
+              label: "승인 요청",
+              onClick: () => handleChangeStatus(selectedReport.id, "REQUESTED"),
+              type: "primary" as const,
+            },
+          ]
+        : []),
+      ...(selectedReport.reviewResultCode === "PENDING"
+        ? [
+            {
+              label: "무시",
+              onClick: () => handleChangeStatus(selectedReport.id, "IGNORED"),
+              type: "secondary" as const,
+            },
+            {
+              label: "무효",
+              onClick: () => handleChangeStatus(selectedReport.id, "INVALID"),
+              type: "danger" as const,
+            },
+          ]
+        : []),
+      ...(["IGNORED", "INVALID"].includes(selectedReport.reviewResultCode)
+        ? [
+            {
+              label: "검토중",
+              onClick: () => handleChangeStatus(selectedReport.id, "PENDING"),
+              type: "secondary" as const,
+            },
+          ]
+        : []),
+      ...(selectedReport.reviewResultCode === "REQUESTED"
+        ? [
+            {
+              label: "승인요청 취소",
+              onClick: () => handleChangeStatus(selectedReport.id, "PENDING"),
+              type: "danger" as const,
+            },
+          ]
+        : []),
+      {
+        label: "닫기",
+        onClick: () => setSelectedReport(null),
+        type: "secondary" as const,
+      },
+    ];
+  }
+
   const paginatedData = searchResult.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -204,63 +316,7 @@ export function MentorReportList() {
                 />
               </div>
             }
-            buttons={[
-              ...(["PENDING", "IGNORED", "INVALID"].includes(
-                selectedReport.reviewResultCode
-              )
-                ? [
-                    {
-                      label: "승인 요청",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "REQUESTED"),
-                      type: "primary" as const,
-                    },
-                  ]
-                : []),
-              ...(selectedReport.reviewResultCode === "PENDING"
-                ? [
-                    {
-                      label: "무시",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "IGNORED"),
-                      type: "secondary" as const,
-                    },
-                    {
-                      label: "무효",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "INVALID"),
-                      type: "danger" as const,
-                    },
-                  ]
-                : []),
-              ...(["IGNORED", "INVALID"].includes(
-                selectedReport.reviewResultCode
-              )
-                ? [
-                    {
-                      label: "검토중",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "PENDING"),
-                      type: "secondary" as const,
-                    },
-                  ]
-                : []),
-              ...(selectedReport.reviewResultCode === "REQUESTED"
-                ? [
-                    {
-                      label: "승인요청 취소",
-                      onClick: () =>
-                        handleChangeStatus(selectedReport.id, "PENDING"),
-                      type: "danger" as const,
-                    },
-                  ]
-                : []),
-              {
-                label: "닫기",
-                onClick: () => setSelectedReport(null),
-                type: "secondary" as const,
-              },
-            ]}
+            buttons={getModalButtons(selectedReport, userRole)}
             onClose={() => setSelectedReport(null)}
           />
         )}

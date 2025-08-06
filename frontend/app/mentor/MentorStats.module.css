@@ -1,0 +1,59 @@
+.title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.statsGrid {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.statsCard {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  padding: 24px 18px 20px 18px;
+  min-width: 260px;
+  max-width: 320px;
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.cardHeader {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.role {
+  color: #2986ff;
+}
+.region {
+  color: #444;
+  font-size: 0.93rem;
+}
+.nickname {
+  color: #bbb;
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cardSection {
+  background: #f7fafd;
+  border-radius: 10px;
+  padding: 10px 8px 12px 8px;
+}
+.sectionTitle {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #156bc1;
+}

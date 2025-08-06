@@ -38,6 +38,7 @@ export const AdminReportListRow: React.FC<AdminReportListRowProps> = ({
   return (
     <tr onClick={onClick} style={{ cursor: "pointer" }}>
       <td>{report.id}</td>
+      <td>{report.targetTitle}</td>
       <td>{report.reasonDescription}</td>
       <td>{formatDate(report.createdAt)}</td>
       <td>

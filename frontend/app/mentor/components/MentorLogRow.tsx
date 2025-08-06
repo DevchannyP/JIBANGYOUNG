@@ -15,19 +15,17 @@ export function MentorLogRow({
 }: MentorLogRowProps) {
   return (
     <tr>
-      {/* NO 컬럼: 전체순번 */}
       <td>
         {(ITEMS_PER_PAGE * (currentPage - 1) + index + 1)
           .toString()
           .padStart(2, "0")}
       </td>
       <td>{log.nickname}</td>
-      <td>{log.role}</td>
-      {/* 지역명 먼저, 없으면 코드 출력 */}
+      <td>{log.roleDescription}</td>
       <td>{log.regionName ?? log.regionId}</td>
       <td>{log.postCount}</td>
       <td>{log.commentCount}</td>
-      <td>{log.reportProcessed}</td>
+      <td>{log.approvedCount}</td>
     </tr>
   );
 }

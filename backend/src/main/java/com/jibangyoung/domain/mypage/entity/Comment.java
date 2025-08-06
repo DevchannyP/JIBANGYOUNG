@@ -85,4 +85,10 @@ public class Comment {
         this.content = content;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // 관리자_데시보드_신고댓글 복구
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
