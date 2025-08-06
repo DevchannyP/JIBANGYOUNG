@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,7 +25,6 @@ import com.jibangyoung.domain.admin.service.AdPostService;
 import com.jibangyoung.domain.admin.service.AdRegionService;
 import com.jibangyoung.domain.admin.service.AdReportService;
 import com.jibangyoung.domain.admin.service.AdUserService;
-import com.jibangyoung.domain.auth.entity.UserRole;
 import com.jibangyoung.global.security.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
@@ -33,24 +32,17 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')") // 클래스 레벨에 ADMIN 권한 체크
 public class AdminController {
 
     private final AdUserService userService;
     private final AdPostService postService;
     private final AdRegionService regionService;
-    private final AdReportService adReportService; 
-
-    // 어드민 권한 체크 유틸
-    private void checkAdmin(CustomUserPrincipal loginUser) {
-        if (!UserRole.ADMIN.equals(loginUser.getRole())) {
-            throw new AccessDeniedException("관리자만 접근 가능합니다.");
-        }
-    }
+    private final AdReportService adReportService;
 
     // [유저관리]
     @GetMapping("/users")
     public List<AdUserDTO> getAllUsers(@AuthenticationPrincipal CustomUserPrincipal loginUser) {
-        checkAdmin(loginUser);
         return userService.getAllUsers();
     }
 
@@ -59,18 +51,15 @@ public class AdminController {
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable Long userId,
             @RequestBody AdReportUserStatus request,
-            @AuthenticationPrincipal CustomUserPrincipal loginUser
-    ) {
-        checkAdmin(loginUser);
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
         userService.updateUserStatus(userId, request.getStatus());
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/users/roles")
     public ResponseEntity<Void> updateUserRoles(
-        @RequestBody List<AdUserRoleDTO> roleList,
-        @AuthenticationPrincipal CustomUserPrincipal loginUser) {
-        checkAdmin(loginUser);
+            @RequestBody List<AdUserRoleDTO> roleList,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
         userService.updateRoles(roleList);
         return ResponseEntity.ok().build();
     }
@@ -78,7 +67,6 @@ public class AdminController {
     // [게시글관리]
     @GetMapping("/posts")
     public List<AdPostDTO> getAllPosts(@AuthenticationPrincipal CustomUserPrincipal loginUser) {
-        checkAdmin(loginUser);
         return postService.getAllPosts();
     }
 
@@ -91,10 +79,8 @@ public class AdminController {
     // [신고관리] 1. 요청된(REQUESTED) 신고 목록 조회 (관리자)
     @GetMapping("/report")
     public List<AdReportDto> getRequestedReports(
-        @AuthenticationPrincipal CustomUserPrincipal loginUser,
-        @RequestParam("type") String type
-    ) {
-        checkAdmin(loginUser);
+            @AuthenticationPrincipal CustomUserPrincipal loginUser,
+            @RequestParam("type") String type) {
         Long adminUserId = loginUser.getId();
         return adReportService.getRequestedReports(adminUserId, type);
     }
@@ -104,9 +90,7 @@ public class AdminController {
     public ResponseEntity<?> updateReportStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> request,
-            @AuthenticationPrincipal CustomUserPrincipal loginUser
-    ) {
-        checkAdmin(loginUser);
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
         String status = request.get("status");
         Long adminId = loginUser.getId();
         adReportService.updateReportStatus(id, status, adminId);

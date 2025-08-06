@@ -27,10 +27,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-        String uri = request.getRequestURI();
-        log.debug("[JWT FILTER] 요청 URI = {}", uri);
 
-        if (isPermitAllUri(request)) {
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        log.debug("[JWT FILTER] {} {}", method, uri);
+
+        // 공개 경로는 토큰 검증 스킵
+        if (isPublicUri(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -54,23 +57,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isPermitAllUri(HttpServletRequest request) {
+    private boolean isPublicUri(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        // GET /api/policy/policy.c는 항상 공개 (permitAll)
-        if ("GET".equals(method) && "/api/policy/policy.c".equals(uri))
+
+        // OPTIONS 요청은 항상 허용
+        if ("OPTIONS".equals(method)) {
             return true;
-        // 아래 경로는 모두 공개
-        return uri.startsWith("/api/auth/")
-                || uri.startsWith("/api/public/")
-                // 어드민/멘토 테스트
-                // || uri.startsWith("/api/admin/")
-                // || uri.startsWith("/api/mentor/")
-                || uri.startsWith("/api/community/")
-                || uri.startsWith("/api/survey/")
-                || uri.startsWith("/api/policy/")
-                || uri.startsWith("/api/dashboard/")
-                || uri.startsWith("/api/recommendation");
+        }
+
+        // 인증 관련 API는 모두 공개
+        if (uri.startsWith("/api/auth/")) {
+            return true;
+        }
+
+        // 공개 API
+        if (uri.startsWith("/api/public/")) {
+            return true;
+        }
+
+        // 커뮤니티 GET 요청만 공개
+        if (uri.startsWith("/api/community/") && "GET".equals(method)) {
+            return true;
+        }
+
+        // 정책 GET 요청 중 일부는 공개
+        if (uri.startsWith("/api/policy/") && "GET".equals(method)) {
+            // 찜 관련과 추천 리스트를 제외한 나머지는 공개
+            if (!uri.contains("/favorites") && !uri.contains("/recList")) {
+                return true;
+            }
+        }
+
+        // 대시보드는 모두 공개
+        if (uri.startsWith("/api/dashboard/")) {
+            return true;
+        }
+
+        return false;
     }
 
     private String resolveToken(HttpServletRequest request) {

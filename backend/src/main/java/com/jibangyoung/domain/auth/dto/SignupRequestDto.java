@@ -2,10 +2,22 @@
 package com.jibangyoung.domain.auth.dto;
 
 import java.time.LocalDate;
-import jakarta.validation.constraints.*;
-import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SignupRequestDto {
     @NotBlank(message = "사용자명을 입력해주세요.")
     private String username;
@@ -25,7 +37,11 @@ public class SignupRequestDto {
 
     private String phone;
     private String profileImageUrl;
+
+    // ✅ 커스텀 데시리얼라이저 적용!
+    @JsonDeserialize(using = EmptyStringToNullLocalDateDeserializer.class)
     private LocalDate birthDate;
+
     private String gender;
     private String region;
 
