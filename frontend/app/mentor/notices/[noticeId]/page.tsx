@@ -8,7 +8,8 @@ interface Props {
   }>;
 }
 
-export default function MentorNoticeDetailPage({ params }: Props) {
+export default async function MentorNoticeDetailPage({ params }: Props) {
+  const { noticeId } = await params;
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -17,7 +18,7 @@ export default function MentorNoticeDetailPage({ params }: Props) {
       </div>
 
       <Suspense fallback={<div>공지사항을 불러오는 중...</div>}>
-        <MentorNoticeDetail noticeId={Number(params.noticeId)} />
+        <MentorNoticeDetail noticeId={Number(noticeId)} />
       </Suspense>
     </div>
   );
