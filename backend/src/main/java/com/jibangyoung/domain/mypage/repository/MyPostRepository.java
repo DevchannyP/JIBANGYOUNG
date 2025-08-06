@@ -4,8 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.jibangyoung.domain.mypage.entity.Post;
+// 변경: Posts로 import
+import com.jibangyoung.domain.community.entity.Posts;
 
-public interface MyPostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(long userId, Pageable pageable);
+public interface MyPostRepository extends JpaRepository<Posts, Long> {
+    Page<Posts> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(long userId, Pageable pageable);
 }
