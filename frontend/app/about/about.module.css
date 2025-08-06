@@ -1,0 +1,33 @@
+.container {
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #fffdf3, #fffbe1);
+}
+
+.contentBox {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #ffc107;
+  margin-bottom: 15px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+.mainText {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #343a40;
+}

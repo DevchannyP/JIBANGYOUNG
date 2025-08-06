@@ -1,0 +1,35 @@
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #212529;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 15px;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: #343a40;
+}
+
+.content {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #495057;
+}
+
+.content p {
+  margin-bottom: 15px;
+}

@@ -43,14 +43,14 @@ export default function Header() {
 
       const userId = userIdStr ? parseInt(userIdStr, 10) : null;
       const bookmarkedPolicyIds: number[] = bookmarkedStr
-      ? JSON.parse(bookmarkedStr)
-      : [];
+        ? JSON.parse(bookmarkedStr)
+        : [];
 
-    if (userId && bookmarkedPolicyIds.length > 0) {
-      // 로그아웃 전에 찜한 정책 서버에 동기화
-      await syncBookmarkedPolicies(userId, bookmarkedPolicyIds);
-      console.log("✅ 찜한 정책 동기화 완료");
-    }
+      if (userId && bookmarkedPolicyIds.length > 0) {
+        // 로그아웃 전에 찜한 정책 서버에 동기화
+        await syncBookmarkedPolicies(userId, bookmarkedPolicyIds);
+        console.log("✅ 찜한 정책 동기화 완료");
+      }
       if (refreshToken) await logoutApi(refreshToken);
     } catch {
       // 에러 무시하고 강제 로그아웃 진행
@@ -114,7 +114,11 @@ export default function Header() {
           <Link href="/policy/recommendedList" className="header-nav-link">
             추천정책
           </Link>
-          <div className="dropdown" ref={dropdownRef}>
+          <Link href="/policy/totalPolicies" className="header-nav-link">
+            전체정책
+          </Link>
+          {/* 개발용 URL 버튼 */}
+          {/* <div className="dropdown" ref={dropdownRef}>
             <button
               type="button"
               className="dropdown-btn"
@@ -140,7 +144,7 @@ export default function Header() {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
         </nav>
         <div
           className="header-actions"
