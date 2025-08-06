@@ -9,3 +9,8 @@ export interface AdminUser {
   gender: string;
   region: string;
 }
+
+// 유저 상태 변경용 payload
+export interface ChangeUserStatusPayload {
+  status: "ACTIVE" | "DEACTIVATED" | "SUSPENDED" | "DELETED";
+}

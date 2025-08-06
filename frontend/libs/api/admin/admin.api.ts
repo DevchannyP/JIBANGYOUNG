@@ -2,7 +2,7 @@ import api from "@/libs/api/axios";
 import { Report } from "@/types/api/adMentorReport";
 import { AdminPost } from "@/types/api/adminPost";
 import { AdminRegion } from "@/types/api/adminRegion";
-import { AdminUser } from "@/types/api/adminUser";
+import { AdminUser, ChangeUserStatusPayload } from "@/types/api/adminUser";
 import { AdminUserRole } from "@/types/api/adminUserRole";
 
 // 관리자 데시보드_지역 탭
@@ -22,6 +22,19 @@ export async function fetchAdminReports(type?: string): Promise<Report[]> {
     params: type ? { type } : {},
   });
   return res.data;
+}
+
+// 관리자 데시보드_신고자 상태관리
+export async function changeUserStatus(
+  userId: number,
+  status: ChangeUserStatusPayload["status"]
+): Promise<void> {
+  try {
+    await api.patch(`/api/admin/users/${userId}/status`, { status });
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "유저 상태 변경 실패";
+    throw new Error(msg);
+  }
 }
 
 // 관리자 데시보드_신고목록_처리상태(승인/반려)

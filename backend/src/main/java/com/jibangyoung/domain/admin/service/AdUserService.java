@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.jibangyoung.domain.admin.dto.AdUserDTO;
 import com.jibangyoung.domain.admin.dto.AdUserRoleDTO;
 import com.jibangyoung.domain.admin.repository.AdUserRepository;
 import com.jibangyoung.domain.auth.entity.UserRole;
+import com.jibangyoung.domain.auth.entity.UserStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +54,18 @@ public class AdUserService {
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
             // entity/User 메소드 추가 
             user.changeRole(UserRole.valueOf(dto.getRole())); 
+        }
+    }
+
+        // 유저 상태 변경
+    @Transactional
+    public void updateUserStatus(Long userId, String status) {
+        var user = adUserRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+        try {
+            user.changeStatus(UserStatus.valueOf(status));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("유효하지 않은 상태값입니다.");
         }
     }
 }
