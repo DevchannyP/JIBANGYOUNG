@@ -22,7 +22,7 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
             m.currentScore
         )
         FROM MentorTest m
-        JOIN User u ON m.user.id = u.id
+        JOIN User u ON m.userId = u.id
         WHERE m.regionId IN :regionIds
     """)
     List<AdMentorUserDTO> findUsersByMentorRegionIds(@Param("regionIds") List<Long> regionIds);
@@ -31,7 +31,7 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
     @Query("""
         SELECT m.regionId
         FROM MentorTest m
-        WHERE m.user.id = :userId
+        WHERE m.userId = :userId
     """)
     List<Long> findRegionIdByUserId(@Param("userId") Long userId);
 }
