@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import type { SidebarMenuItem, Tab, UserRole } from "@/types/api/mypage.types";
+import { useRouter } from "next/navigation";
 import styles from "../MyPageLayout.module.css";
 
 
@@ -33,9 +33,9 @@ const QUICKLINKS: SidebarMenuItem[] = [
   },
   {
     key: "regionRecommend",
-    label: "추천지역 바로가기",
+    label: "추천정책 바로가기",
     external: true,
-    path: "/region/recommend",
+    path: "/policy/recommendedList",
   },
 ];
 
