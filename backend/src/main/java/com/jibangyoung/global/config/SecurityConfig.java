@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
         private final CustomUserDetailsService customUserDetailsService;
@@ -49,11 +51,10 @@ public class SecurityConfig {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(Arrays.asList(
                                 "http://localhost:3000",
-                                "https://jibangyoung.kr" // 운영 도메인
-                ));
+                                "https://jibangyoung.kr"));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-                config.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
+                config.setAllowedHeaders(Arrays.asList("*"));
+                config.setExposedHeaders(Arrays.asList("Authorization", "Refresh-Token"));
                 config.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -66,28 +67,58 @@ public class SecurityConfig {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf.disable())
-                                // 세션 사용 안 함 (JWT 방식)
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                                // 엔드포인트별 인가정책 (PERMIT ALL → 실제 운영시에는 일부 API만 허용!)
                                 .authorizeHttpRequests(auth -> auth
+                                                // OPTIONS 요청은 모두 허용
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                .requestMatchers(
-                                                                "/api/auth/**",
-                                                                "/api/public/**",
-                                                                "/api/admin/**",
-                                                                "/api/mentor/**",
-                                                                "/api/community/**",
-                                                                "/api/policy/**",
-                                                                "/api/survey/**",
-                                                                "/api/dashboard/**",
-                                                                "/api/recommendation/**")
-                                                .permitAll()
+
+                                                // 인증 관련 API는 모두 공개
+                                                .requestMatchers("/api/auth/**").permitAll()
+
+                                                // 공개 API
+                                                .requestMatchers("/api/public/**").permitAll()
+
+                                                // 커뮤니티 - 조회는 공개, 작성/수정/삭제는 인증 필요
+                                                .requestMatchers(HttpMethod.GET, "/api/community/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/community/write")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.POST, "/api/community/posts/*/comments")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.DELETE, "/api/community/comments/*")
+                                                .authenticated()
+                                                .requestMatchers(HttpMethod.POST, "/api/community/post/*/recommend")
+                                                .authenticated()
+
+                                                // 정책 - 대부분 공개, 찜 관련은 인증 필요
+                                                .requestMatchers(HttpMethod.GET, "/api/policy/policy.c").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/policy/**").permitAll()
+                                                .requestMatchers("/api/policy/sync").authenticated()
+                                                .requestMatchers("/api/policy/favorites/**").authenticated()
+                                                .requestMatchers("/api/policy/recList").authenticated()
+
+                                                // 설문 - 인증 필요
+                                                .requestMatchers("/api/survey/**").authenticated()
+
+                                                // 추천 - 인증 필요
+                                                .requestMatchers("/api/recommendation/**").authenticated()
+
+                                                // 대시보드 - 공개
+                                                .requestMatchers("/api/dashboard/**").permitAll()
+
+                                                // 관리자 API - ADMIN 권한 필요 (메소드 레벨에서 체크)
+                                                .requestMatchers("/api/admin/**").authenticated()
+
+                                                // 멘토 API - 인증 필요 (권한은 메소드 레벨에서 체크)
+                                                .requestMatchers("/api/mentor/**").authenticated()
+
+                                                // 사용자 API - 인증 필요
+                                                .requestMatchers("/api/users/**").authenticated()
+
+                                                // 나머지 모든 요청은 인증 필요
                                                 .anyRequest().authenticated())
-                                // 인증 실패 핸들러 (JWT 토큰 문제시 401)
                                 .exceptionHandling(ex -> ex
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
-                                // 🔥 JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
                                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();

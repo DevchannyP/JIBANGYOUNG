@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,6 +92,7 @@ public class CommunityController {
 
     // 글작성
     @PostMapping("/write")
+    @PreAuthorize("isAuthenticated()") // 로그인한 사용자만
     public void writePost(@RequestBody @Valid PostCreateRequestDto request) {
         communityService.write(request);
     }
@@ -123,6 +125,7 @@ public class CommunityController {
 
     // 댓글 작성
     @PostMapping("/posts/{postId}/comments")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> createComment(
             @AuthenticationPrincipal User user,
             @PathVariable Long postId,
@@ -136,6 +139,7 @@ public class CommunityController {
 
     // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId) {
         // 임시
@@ -146,6 +150,7 @@ public class CommunityController {
 
     // 게시글 추천
     @PostMapping("/post/{postId}/recommend")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> recommendPost(
             @PathVariable Long postId,
             @RequestBody @Valid RecommendationRequestDto requestDto,
