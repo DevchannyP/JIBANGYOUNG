@@ -90,6 +90,7 @@ main {
   margin-right: 24px;
   display: flex;
   align-items: center;
+  -webkit-user-select: none;
   user-select: none;
   white-space: nowrap;
   transition: font-size 0.18s;
