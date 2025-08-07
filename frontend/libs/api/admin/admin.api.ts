@@ -76,3 +76,22 @@ export async function featchAllPost(): Promise<AdminPost[]> {
     throw new Error(msg);
   }
 }
+
+// 관리자 데시보드_게시글 관리_논리삭제
+export async function deleteAdminPost(id: number): Promise<void> {
+  try {
+    await api.patch(`/api/admin/posts/${id}/delete`);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "게시글 삭제 실패";
+    throw new Error(msg);
+  }
+}
+// 관리자 데시보드_게시글 복구
+export async function restoreAdminPost(id: number): Promise<void> {
+  try {
+    await api.patch(`/api/admin/posts/${id}/restore`);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "게시글 복구 실패";
+    throw new Error(msg);
+  }
+}

@@ -2,7 +2,11 @@ import { AdminPost } from "@/types/api/adminPost";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../AdminPage.module.css";
 
-import { featchAllPost } from "@/libs/api/admin/admin.api";
+import {
+  deleteAdminPost,
+  featchAllPost,
+  restoreAdminPost,
+} from "@/libs/api/admin/admin.api";
 import { Pagination } from "../components/Pagination";
 import { useAdminRegion } from "../hooks/useAdminRegion";
 import { AdminPostRow } from "./AdminPostRow";
@@ -16,11 +20,10 @@ export function AdminPostList() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+  const [processingId, setProcessingId] = useState<number | null>(null);
 
-  // 지역 목록 fetch
   const { regionOptions, loading: regionLoading } = useAdminRegion();
 
-  // 최초 게시글 불러오기
   useEffect(() => {
     featchAllPost()
       .then((data) => {
@@ -32,40 +35,28 @@ export function AdminPostList() {
       });
   }, []);
 
-  // 게시글 지역 및 키워드로 필터링하는 함수
   const filterData = useCallback(
     (regionCode: number, keyword: string) => {
       const trimmed = keyword.trim().toLowerCase();
       const filtered = posts.filter((p) => {
-        // 게시글의 지역 코드에서 앞 2자리만 추출하여 1000단위로 정규화 (예: 36110 → 36000)
         const codePrefix = Math.floor(p.region_id / 1000) * 1000;
-
-        // 선택된 지역 코드도 동일하게 1000단위로 정규화
         const normalizedRegionCode =
           regionCode === 0 ? 0 : Math.floor(regionCode / 1000) * 1000;
-
-        // 지역 필터: 전체(0)이거나 지역코드 일치 여부 확인
         const matchRegion =
           normalizedRegionCode === 0 || codePrefix === normalizedRegionCode;
-
-        // 키워드 필터: 제목, 작성자ID, 작성일자에 포함 여부
         const matchKeyword =
           trimmed === "" ||
           p.title.toLowerCase().includes(trimmed) ||
           p.nickname.toString().includes(trimmed) ||
           String(p.created_at).toLowerCase().includes(trimmed);
-
         return matchRegion && matchKeyword;
       });
-
-      // 결과 반영
       setSearchResult(filtered);
-      setCurrentPage(1); // 페이지 초기화
+      setCurrentPage(1);
     },
     [posts]
   );
 
-  // 지역 변경 핸들러
   const handleRegionChange = useCallback(
     (_region: string, code: number) => {
       setSelectedRegionCode(code);
@@ -74,7 +65,6 @@ export function AdminPostList() {
     [filterData, searchKeyword]
   );
 
-  // 검색어 입력 핸들러
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -83,9 +73,44 @@ export function AdminPostList() {
     [filterData, selectedRegionCode]
   );
 
-  // 삭제 기능
+  // 삭제 기능 (논리삭제)
   const handleDelete = async (id: number) => {
-    alert("게시글 삭제 실패");
+    if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+    setProcessingId(id);
+    try {
+      await deleteAdminPost(id);
+      setPosts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, deleted: true } : p))
+      );
+      setSearchResult((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, deleted: true } : p))
+      );
+      alert("게시글이 삭제되었습니다.");
+    } catch (error: any) {
+      alert(error.message || "게시글 삭제 실패");
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  // 복구 기능
+  const handleRestore = async (id: number) => {
+    if (!window.confirm("정말 이 게시글을 복구하시겠습니까?")) return;
+    setProcessingId(id);
+    try {
+      await restoreAdminPost(id);
+      setPosts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, deleted: false } : p))
+      );
+      setSearchResult((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, deleted: false } : p))
+      );
+      alert("게시글이 복구되었습니다.");
+    } catch (error: any) {
+      alert(error.message || "게시글 복구 실패");
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   // 페이징
@@ -100,15 +125,12 @@ export function AdminPostList() {
   return (
     <div>
       <h1 className={styles.title}>게시글 목록</h1>
-
       <AdminRegionTab
         regionOptions={regionOptions}
         selectedRegionCode={selectedRegionCode}
         onSelectRegion={handleRegionChange}
       />
-
       <AdminSearch placeholder="제목, 작성자 검색" onSearch={handleSearch} />
-
       <div className={styles.tableWrapper}>
         <table className={styles.userTable}>
           <thead>
@@ -144,12 +166,13 @@ export function AdminPostList() {
                   ITEMS_PER_PAGE={ITEMS_PER_PAGE}
                   regionOptions={regionOptions}
                   onDelete={handleDelete}
+                  onRestore={handleRestore}
+                  processing={processingId === p.id}
                 />
               ))
             )}
           </tbody>
         </table>
-
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

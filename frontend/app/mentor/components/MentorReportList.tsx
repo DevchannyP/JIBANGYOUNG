@@ -250,6 +250,7 @@ export function MentorReportList() {
           <thead>
             <tr>
               <th>NO</th>
+              <th>신고대상</th>
               <th>신고유형</th>
               <th>신고일자</th>
               <th>처리상태</th>
@@ -261,7 +262,7 @@ export function MentorReportList() {
             {paginatedData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   style={{ textAlign: "center", padding: "20px" }}
                 >
                   일치하는 정보가 없습니다.
@@ -294,6 +295,9 @@ export function MentorReportList() {
                 <p>
                   <b>신고자:</b>{" "}
                   {selectedReport.reporterName ?? selectedReport.userId}
+                </p>
+                <p>
+                  <b>신고대상:</b> {selectedReport.targetTitle}
                 </p>
                 <p>
                   <b>신고유형:</b> {selectedReport.reasonDescription}

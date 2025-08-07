@@ -7,4 +7,5 @@ export interface AdminPost {
   views: number;
   likes: number;
   nickname: string;
+  deleted: boolean;
 }

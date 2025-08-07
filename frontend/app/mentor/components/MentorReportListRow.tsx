@@ -41,11 +41,26 @@ export const MentorReportListRow: React.FC<MentorReportListRowProps> = ({
   return (
     <tr onClick={onClick} style={{ cursor: "pointer" }}>
       <td>{report.id}</td>
+      <td>{report.targetTitle}</td>
       <td>{report.reasonDescription}</td>
       <td>{formatDate(report.createdAt)}</td>
       <td>
-        <span style={{ color: status.color, fontWeight: 700 }}>
-          • {status.label}
+        {/* 뱃지 스타일 적용 */}
+        <span
+          style={{
+            padding: "4px 10px",
+            borderRadius: "12px",
+            fontWeight: 600,
+            background: "#f4f4f5",
+            color: status.color,
+            border: `1px solid ${status.color}`,
+            fontSize: "0.95em",
+            display: "inline-block",
+            minWidth: 70,
+            textAlign: "center",
+          }}
+        >
+          {status.label}
         </span>
       </td>
       <td>{report.reviewerName ?? "미지정"}</td>

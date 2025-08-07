@@ -23,14 +23,14 @@ export function MentorSidebar({
           </a>
         </li>
         <li
-          className={selectedMenu === "MentorList" ? styles.active : ""}
-          onClick={() => setSelectedMenu("MentorList")}
+          className={selectedMenu === "mentorRequestList" ? styles.active : ""}
+          onClick={() => setSelectedMenu("mentorRequestList")}
         >
           멘토 신청목록
         </li>
         <li
-          className={selectedMenu === "mentorReport" ? styles.active : ""}
-          onClick={() => setSelectedMenu("mentorReport")}
+          className={selectedMenu === "mentorReportList" ? styles.active : ""}
+          onClick={() => setSelectedMenu("mentorReportList")}
         >
           신고목록
         </li>

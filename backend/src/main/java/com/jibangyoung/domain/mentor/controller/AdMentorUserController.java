@@ -29,6 +29,7 @@ import com.jibangyoung.domain.mentor.dto.MentorNoticeDto;
 import com.jibangyoung.domain.mentor.dto.MentorNoticeNavigationDto;
 import com.jibangyoung.domain.mentor.service.AdMentorLogListService;
 import com.jibangyoung.domain.mentor.service.AdMentorReportService;
+import com.jibangyoung.domain.mentor.service.AdMentorRequestService;
 import com.jibangyoung.domain.mentor.service.AdMentorUserService;
 import com.jibangyoung.domain.mentor.service.MentorApplicationService;
 import com.jibangyoung.domain.mentor.service.MentorNoticeService;
@@ -46,6 +47,7 @@ public class AdMentorUserController {
     private final AdMentorUserService adMentorUserService;
     private final AdMentorLogListService adMentorLogListService;
     private final AdMentorReportService adMentorReportService;
+    private final AdMentorRequestService adMentorRequestService; 
     private final MentorApplicationService mentorApplicationService;
     private final PresignedUrlService presignedUrlService;
     private final MentorNoticeService mentorNoticeService;
@@ -80,6 +82,15 @@ public class AdMentorUserController {
         adMentorReportService.updateReportStatus(id, request.get("status"), loginUser.getId());
         return ResponseEntity.ok().build();
     }
+
+    // 멘토 신청 목록조회
+    @GetMapping("/request/list")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR_A', 'MENTOR_B', 'MENTOR_C')")
+    public ResponseEntity<ApiResponse<List<MentorApplicationResponseDto>>> getMentorApplicationList() {
+        List<MentorApplicationResponseDto> list = adMentorRequestService.getAllMentorRequests();
+        return ResponseEntity.ok(ApiResponse.success(list));
+    }
+
 
     // 🔓 일반 사용자 권한
     @PostMapping("/application")

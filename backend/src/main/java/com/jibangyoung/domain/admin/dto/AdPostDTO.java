@@ -18,4 +18,5 @@ public class AdPostDTO {
     private int views;
     private int likes;
     private String nickname;
+    private boolean isDeleted;
 }

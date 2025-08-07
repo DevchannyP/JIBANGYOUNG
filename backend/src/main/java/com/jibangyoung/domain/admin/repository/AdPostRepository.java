@@ -11,11 +11,11 @@ import com.jibangyoung.domain.admin.entity.AdminPosts;
 
 @Repository
 public interface AdPostRepository extends JpaRepository<AdminPosts, Long> {
-    // 게시글 작성자 + userId 없으면 : 탈퇴회원 처리
     @Query("SELECT new com.jibangyoung.domain.admin.dto.AdPostDTO(" +
-        "p.id, p.title, u.id, p.createdAt, p.regionId, p.views, p.likes, COALESCE(u.nickname, '탈퇴회원')) " +
+        "p.id, p.title, u.id, p.createdAt, p.regionId, p.views, p.likes, COALESCE(u.nickname, '탈퇴회원'), p.isDeleted) " + // isDeleted 추가!
         "FROM AdminPosts p LEFT JOIN com.jibangyoung.domain.auth.entity.User u ON p.userId = u.id " +
         "ORDER BY p.createdAt DESC")
     List<AdPostDTO> findAllPostWithNickname();
 }
+
 

@@ -47,9 +47,9 @@ public class AdReportQueryRepository {
         // isDeleted 조건을 동적으로 추가!
         var postJoinCondition = r.targetType.eq(ReportTargetType.POST)
                 .and(r.targetId.eq(p.id));
-        if (!includeDeletedPosts) {
-            postJoinCondition = postJoinCondition.and(p.isDeleted.eq(false));
-        }
+        // if (!includeDeletedPosts) {
+        //     postJoinCondition = postJoinCondition.and(p.isDeleted.eq(false));
+        // }
 
         List<Tuple> tuples = queryFactory
                 .select(

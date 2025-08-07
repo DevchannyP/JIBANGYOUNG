@@ -70,6 +70,24 @@ public class AdminController {
         return postService.getAllPosts();
     }
 
+    // [게시글관리] 게시글 논리삭제 (isDeleted = true)
+    @PatchMapping("/posts/{id}/delete")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        postService.deletePost(id);
+        return ResponseEntity.ok().build();
+    }
+
+    // [게시글관리] 게시글 복구 (isDeleted = false)
+    @PatchMapping("/posts/{id}/restore")
+    public ResponseEntity<Void> restorePost(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        postService.restorePost(id);
+        return ResponseEntity.ok().build();
+    }
+
     // [시/도 목록 반환-멘토/관리자 공통기능]
     @PreAuthorize("permitAll()")
     @GetMapping("/region")
