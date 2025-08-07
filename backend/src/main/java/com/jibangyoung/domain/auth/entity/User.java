@@ -27,7 +27,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false, length = 50)
@@ -78,8 +79,8 @@ public class User {
 
     // 정적 팩토리 메서드 (권한 구분)
     public static User createUser(String username, String email, String password,
-                                 String nickname, String phone, String profileImageUrl,
-                                 LocalDate birthDate, String gender, String region, UserRole role) {
+            String nickname, String phone, String profileImageUrl,
+            LocalDate birthDate, String gender, String region, UserRole role) {
         User user = new User();
         user.username = username;
         user.email = email;
@@ -96,9 +97,10 @@ public class User {
     }
 
     public static User createUser(String username, String email, String password,
-                                 String nickname, String phone, String profileImageUrl,
-                                 LocalDate birthDate, String gender, String region) {
-        return createUser(username, email, password, nickname, phone, profileImageUrl, birthDate, gender, region, UserRole.USER);
+            String nickname, String phone, String profileImageUrl,
+            LocalDate birthDate, String gender, String region) {
+        return createUser(username, email, password, nickname, phone, profileImageUrl, birthDate, gender, region,
+                UserRole.USER);
     }
 
     // 비즈니스 메서드
@@ -107,31 +109,64 @@ public class User {
         this.phone = phone;
         this.profileImageUrl = profileImageUrl;
     }
-    public void updatePassword(String newPassword) { this.password = newPassword; }
-    public void updateLastLogin() { this.lastLoginAt = LocalDateTime.now(); }
-    public void deactivate() { this.status = UserStatus.DEACTIVATED; }
-    public void activate() { this.status = UserStatus.ACTIVE; }
-    public boolean isActive() { return this.status == UserStatus.ACTIVE; }
-    public boolean isAdmin() { return this.role == UserRole.ADMIN; }
-    public boolean isMentorA() { return this.role == UserRole.MENTOR_A; }
-    public boolean isMentorB() { return this.role == UserRole.MENTOR_B; }
-    public boolean isMentorC() { return this.role == UserRole.MENTOR_C; }
-    public boolean isMentor() {
-        return this.role == UserRole.MENTOR_A
-            || this.role == UserRole.MENTOR_B
-            || this.role == UserRole.MENTOR_C;
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
     }
 
+    public void updateLastLogin() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public void deactivate() {
+        this.status = UserStatus.DEACTIVATED;
+    }
+
+    public void activate() {
+        this.status = UserStatus.ACTIVE;
+    }
+
+    public boolean isActive() {
+        return this.status == UserStatus.ACTIVE;
+    }
+
+    public boolean isAdmin() {
+        return this.role == UserRole.ADMIN;
+    }
+
+    public boolean isMentorA() {
+        return this.role == UserRole.MENTOR_A;
+    }
+
+    public boolean isMentorB() {
+        return this.role == UserRole.MENTOR_B;
+    }
+
+    public boolean isMentorC() {
+        return this.role == UserRole.MENTOR_C;
+    }
+
+    public boolean isMentor() {
+        return this.role == UserRole.MENTOR_A
+                || this.role == UserRole.MENTOR_B
+                || this.role == UserRole.MENTOR_C;
+    }
 
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
+
     // 관리자페이지_사용자관리(권한변경)
     public void changeRole(UserRole newRole) {
         this.role = newRole;
     }
+
     // 관리자페이지_신고유저 상태(활성/비활성/정지/삭제)
     public void changeStatus(UserStatus newStatus) {
         this.status = newStatus;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 }
