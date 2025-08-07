@@ -6,11 +6,10 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.repository.UserRepository;
 import com.jibangyoung.domain.mypage.dto.UserProfileDto;
-import com.jibangyoung.domain.mypage.entity.UserProfile;
 import com.jibangyoung.domain.mypage.exception.MyPageException;
-import com.jibangyoung.domain.mypage.repository.UserProfileRepository;
 import com.jibangyoung.global.exception.ErrorCode;
 import com.jibangyoung.global.exception.NotFoundException;
 
@@ -20,31 +19,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfileService {
 
-    private final UserProfileRepository userProfileRepository;
     private final UserRepository userRepository;
 
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9\\-]{7,16}$");
 
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfile(Long userId) {
-        UserProfile profile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "프로필 정보를 찾을 수 없습니다."));
-        return UserProfileDto.from(profile);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다."));
+        return UserProfileDto.from(user); // User → UserProfileDto
     }
 
     @Transactional
     public void updateUserProfile(Long userId, String nickname, String phone, String profileImageUrl, String region) {
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "사용자가 없습니다."));
-
-        UserProfile profile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, "프로필 정보를 찾을 수 없습니다."));
 
         validateNickname(nickname);
         validatePhone(phone);
 
-        profile.updateProfile(nickname, phone, profileImageUrl, region);
-        userProfileRepository.save(profile);
+        // User 엔티티의 updateProfile 메서드와 setRegion 메서드 활용
+        user.updateProfile(nickname, phone, profileImageUrl);
+        user.setRegion(region);
+        // JPA Dirty Checking → 별도 save 필요 없음(변경 감지)
     }
 
     private void validateNickname(String nickname) {

@@ -4,7 +4,7 @@ package com.jibangyoung.domain.mypage.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.jibangyoung.domain.mypage.entity.UserProfile;
+import com.jibangyoung.domain.auth.entity.User; // UserProfile → User로 변경
 
 import lombok.Builder;
 
@@ -24,7 +24,9 @@ public record UserProfileDto(
         LocalDateTime lastLoginAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
-    public static UserProfileDto from(UserProfile user) {
+
+    // UserProfile → User 파라미터로 변경!
+    public static UserProfileDto from(User user) {
         return UserProfileDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())

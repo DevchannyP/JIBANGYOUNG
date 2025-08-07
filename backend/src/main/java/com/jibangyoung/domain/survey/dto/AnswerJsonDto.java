@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class AnswerJsonDto {
-    private Long userId; // 추가
+    // userId 필드 제거!
     private Map<String, Answer> answers;
     private Metadata metadata;
 
