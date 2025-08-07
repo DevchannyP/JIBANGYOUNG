@@ -3,13 +3,13 @@ import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
 import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion";
 import {
+  approveMentorRequestFirst,
+  approveMentorRequestSecond,
   fetchAdMentorRequestList,
-  updateMentorRequestStatus,
+  rejectMentorRequest,
+  requestMentorApproval,
 } from "@/libs/api/admin/adminMentor.api";
-import {
-  AdMentorRequest,
-  MentorRequestStatus,
-} from "@/types/api/adMentorRequest";
+import { AdMentorRequest } from "@/types/api/adMentorRequest";
 import { useCallback, useEffect, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
 import { MentorRequestModal } from "./MentorRequestModal";
@@ -21,23 +21,45 @@ export function MentorRequestList() {
   const [selectedMentor, setSelectedMentor] = useState<AdMentorRequest | null>(
     null
   );
-  const [selectedRegionId, setSelectedRegionId] = useState<number>(0); // 기본값 0 = 전체
+  const [selectedRegionId, setSelectedRegionId] = useState<number>(0);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const ITEMS_PER_PAGE = 10;
+
+  // 로컬스토리지에서 userRole 가져오기 (초기 1회만)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("auth-store-v2");
+        if (raw) {
+          const user = JSON.parse(raw)?.state?.user;
+          setUserRole(user?.role);
+        }
+      } catch (e) {
+        setUserRole(undefined);
+      }
+    }
+  }, []);
 
   // 지역탭 옵션 불러오기
   const { regionOptions } = useAdminRegion();
 
   // 최초 데이터 로드
   useEffect(() => {
-    fetchAdMentorRequestList().then((data) => {
-      setApplications(data);
-      setSearchResult(data);
-    });
+    fetchAdMentorRequestList()
+      .then((data) => {
+        setApplications(data);
+        setSearchResult(data);
+      })
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message || e?.message || "멘토 신청 목록 조회 실패"
+        );
+      });
   }, []);
 
-  // 필터 함수 useCallback
+  // 필터 함수
   const filterData = useCallback(
     (regionId: number, keyword: string) => {
       let filtered = applications;
@@ -61,7 +83,7 @@ export function MentorRequestList() {
     [applications]
   );
 
-  // 지역 변경 핸들러 useCallback
+  // 지역 변경 핸들러
   const handleRegionChange = useCallback(
     (_region: string, code: number) => {
       setSelectedRegionId(code);
@@ -70,7 +92,7 @@ export function MentorRequestList() {
     [filterData, searchKeyword]
   );
 
-  // 검색 핸들러 useCallback
+  // 검색 핸들러
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -79,21 +101,109 @@ export function MentorRequestList() {
     [filterData, selectedRegionId]
   );
 
-  // 상태 변경 핸들러 useCallback
-  const updateStatus = useCallback(
-    (id: number, status: MentorRequestStatus) => {
-      updateMentorRequestStatus(id, status).then(() => {
+  // 1차 승인
+  const handleFirstApprove = useCallback((id: number) => {
+    approveMentorRequestFirst(id)
+      .then(() => {
         setApplications((prev) =>
-          prev.map((app) => (app.id === id ? { ...app, status } : app))
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "FIRST_APPROVED" } : app
+          )
         );
         setSearchResult((prev) =>
-          prev.map((app) => (app.id === id ? { ...app, status } : app))
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "FIRST_APPROVED" } : app
+          )
         );
         setSelectedMentor(null);
+        alert("1차 승인 처리 완료되었습니다!");
+      })
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message ||
+            e?.message ||
+            "처리 중 오류가 발생했습니다."
+        );
       });
-    },
-    []
-  );
+  }, []);
+
+  // 2차 승인
+  const handleSecondApprove = useCallback((id: number) => {
+    approveMentorRequestSecond(id)
+      .then(() => {
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "SECOND_APPROVED" } : app
+          )
+        );
+        setSearchResult((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "SECOND_APPROVED" } : app
+          )
+        );
+        setSelectedMentor(null);
+        alert("2차 승인 처리 완료되었습니다!");
+      })
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message ||
+            e?.message ||
+            "처리 중 오류가 발생했습니다."
+        );
+      });
+  }, []);
+
+  // 반려
+  const handleReject = useCallback((id: number) => {
+    rejectMentorRequest(id)
+      .then(() => {
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "REJECTED" } : app
+          )
+        );
+        setSearchResult((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "REJECTED" } : app
+          )
+        );
+        setSelectedMentor(null);
+        alert("반려 처리 완료되었습니다!");
+      })
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message ||
+            e?.message ||
+            "처리 중 오류가 발생했습니다."
+        );
+      });
+  }, []);
+
+  // 승인요청
+  const handleRequest = useCallback((id: number) => {
+    requestMentorApproval(id)
+      .then(() => {
+        setApplications((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "REQUESTED" } : app
+          )
+        );
+        setSearchResult((prev) =>
+          prev.map((app) =>
+            app.id === id ? { ...app, status: "REQUESTED" } : app
+          )
+        );
+        setSelectedMentor(null);
+        alert("승인요청 처리 완료되었습니다!");
+      })
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message ||
+            e?.message ||
+            "처리 중 오류가 발생했습니다."
+        );
+      });
+  }, []);
 
   const totalPages = Math.ceil(searchResult.length / ITEMS_PER_PAGE);
   const paginatedData = searchResult.slice(
@@ -148,7 +258,7 @@ export function MentorRequestList() {
                   index={index + (currentPage - 1) * ITEMS_PER_PAGE}
                   total={searchResult.length}
                   onClick={() => setSelectedMentor(app)}
-                  regionOptions={regionOptions} // 추가
+                  regionOptions={regionOptions}
                 />
               ))
             )}
@@ -164,9 +274,11 @@ export function MentorRequestList() {
       {selectedMentor && (
         <MentorRequestModal
           data={selectedMentor}
-          onApprove={() => updateStatus(selectedMentor.id, "APPROVED")}
-          onFirstApprove={() => updateStatus(selectedMentor.id, "PENDING")}
-          onReject={() => updateStatus(selectedMentor.id, "REJECTED")}
+          userRole={userRole}
+          onRequest={() => handleRequest(selectedMentor.id)}
+          onFirstApprove={() => handleFirstApprove(selectedMentor.id)}
+          onSecondApprove={() => handleSecondApprove(selectedMentor.id)}
+          onReject={() => handleReject(selectedMentor.id)}
           onClose={() => setSelectedMentor(null)}
         />
       )}

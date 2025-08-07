@@ -83,12 +83,47 @@ public class AdMentorUserController {
         return ResponseEntity.ok().build();
     }
 
-    // 멘토 신청 목록조회
     @GetMapping("/request/list")
     @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR_A', 'MENTOR_B', 'MENTOR_C')")
     public ResponseEntity<ApiResponse<List<MentorApplicationResponseDto>>> getMentorApplicationList() {
         List<MentorApplicationResponseDto> list = adMentorRequestService.getAllMentorRequests();
         return ResponseEntity.ok(ApiResponse.success(list));
+    }
+
+    @PatchMapping("/request/{id}/approve/first")
+    @PreAuthorize("hasAnyRole('MENTOR_B', 'ADMIN')")
+    public ResponseEntity<?> approveFirst(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        adMentorRequestService.approveFirst(id, loginUser.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/request/{id}/approve/second")
+    @PreAuthorize("hasAnyRole('MENTOR_A', 'ADMIN')")
+    public ResponseEntity<?> approveSecond(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        adMentorRequestService.approveSecond(id, loginUser.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/request/{id}/request-approval")
+    @PreAuthorize("hasAnyRole('MENTOR_C', 'ADMIN')")
+    public ResponseEntity<?> requestApproval(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        adMentorRequestService.requestApproval(id, loginUser.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/request/{id}/reject")
+    @PreAuthorize("hasAnyRole('MENTOR_A', 'MENTOR_B', 'MENTOR_C', 'ADMIN')")
+    public ResponseEntity<?> rejectRequest(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+        adMentorRequestService.rejectRequest(id, loginUser.getId());
+        return ResponseEntity.ok().build();
     }
 
 

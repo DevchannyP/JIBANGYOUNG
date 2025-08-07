@@ -8,9 +8,12 @@ const STATUS_LABELS: Record<
   MentorRequestStatus,
   { label: string; color: string }
 > = {
-  APPROVED: { label: "멘토 승인", color: "#36b37e" },
+  FINAL_APPROVED: { label: "최종 승인", color: "#36b37e" },
+  SECOND_APPROVED: { label: "2차 승인", color: "#28b0ff" },
+  FIRST_APPROVED: { label: "1차 승인", color: "#49c7f5" },
+  REQUESTED: { label: "승인 요청", color: "#b8b8b8" },
   PENDING: { label: "승인 대기", color: "#fbbf24" },
-  REJECTED: { label: "멘토 미승인", color: "#ef4444" },
+  REJECTED: { label: "반려", color: "#ef4444" },
 };
 
 export interface MentorRequestRowProps {
@@ -33,12 +36,21 @@ export function MentorRequestRow({
     e.stopPropagation();
   };
 
+  // 지역명 가져오기
   const region = regionOptions.find((r) => r.code === app.regionId);
   const regionName = region ? region.name : app.regionId;
+
+  // 상태 라벨/색상 정보
   const statusInfo = STATUS_LABELS[app.status as MentorRequestStatus] || {
     label: app.status,
     color: "#ccc",
   };
+
+  // 담당자(없으면 미지정), 날짜 포맷
+  const reviewedByLabel = app.reviewedBy ? app.reviewedBy : "미지정";
+  const createdAtLabel = app.createdAt
+    ? app.createdAt.slice(0, 16).replace("T", " ")
+    : "";
 
   return (
     <tr onClick={onClick} style={{ cursor: "pointer" }}>
@@ -46,10 +58,8 @@ export function MentorRequestRow({
       <td>{app.userName}</td>
       <td>{app.userEmail}</td>
       <td>{regionName}</td>
-      <td>
-        {app.createdAt ? app.createdAt.slice(0, 16).replace("T", " ") : ""}
-      </td>
-      <td>{app.reviewedBy ? app.reviewedBy : "미지정"}</td>
+      <td>{createdAtLabel}</td>
+      <td>{reviewedByLabel}</td>
       <td>
         <span
           style={{
@@ -69,10 +79,14 @@ export function MentorRequestRow({
         </span>
       </td>
       <td>
-        <DownloadButton
-          fileUrl={app.documentUrl}
-          onClick={handleDownloadClick}
-        />
+        {app.documentUrl ? (
+          <DownloadButton
+            fileUrl={app.documentUrl}
+            onClick={handleDownloadClick}
+          />
+        ) : (
+          <span style={{ color: "#aaa" }}>없음</span>
+        )}
       </td>
     </tr>
   );

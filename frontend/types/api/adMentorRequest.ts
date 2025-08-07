@@ -1,4 +1,10 @@
-export type MentorRequestStatus = "APPROVED" | "PENDING" | "REJECTED";
+export type MentorRequestStatus =
+  | "FINAL_APPROVED"
+  | "SECOND_APPROVED"
+  | "FIRST_APPROVED"
+  | "REQUESTED"
+  | "PENDING"
+  | "REJECTED";
 
 export interface AdMentorRequest {
   id: number;

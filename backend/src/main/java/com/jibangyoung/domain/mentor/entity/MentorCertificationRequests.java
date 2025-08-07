@@ -1,13 +1,20 @@
 package com.jibangyoung.domain.mentor.entity;
 
-import io.micrometer.core.annotation.Counted;
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -74,14 +81,30 @@ public class MentorCertificationRequests {
 
     @Getter
     public enum Status {
-        APPROVED("멘토 승인"),
+        FINAL_APPROVED("최종 승인"),
+        SECOND_APPROVED	("2차 승인"),
+        FIRST_APPROVED("1차 승인"),
+        REQUESTED("승인 요청"),
         PENDING("승인 대기"),
-        REJECTED("멘토 미승인");
+        REJECTED("반려");
 
         private final String description;
 
         Status(String description) {
             this.description = description;
         }
+    }
+
+    // 멘토 신고목록_처리상태 + 담당자 + 수정시간 변경
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void setReviewedBy(Long reviewedBy) {
+        this.reviewedBy = reviewedBy;
+    }
+
+    public void setReviewedAt(LocalDateTime reviewedAt) {
+        this.reviewedAt = reviewedAt;
     }
 }

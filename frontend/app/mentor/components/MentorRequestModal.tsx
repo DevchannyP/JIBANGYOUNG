@@ -1,21 +1,69 @@
-import { CommonModal } from "@/app/admin/components/AdminModal";
+import { CommonModal, ModalButton } from "@/app/admin/components/AdminModal";
 import { AdMentorRequest } from "@/types/api/adMentorRequest";
 
 interface MentorRequestModalProps {
   data: AdMentorRequest;
-  onApprove: () => void;
-  onFirstApprove: () => void;
+  userRole?: string;
+  onRequest?: () => void;
+  onFirstApprove?: () => void;
+  onSecondApprove?: () => void;
   onReject: () => void;
   onClose: () => void;
 }
 
 export function MentorRequestModal({
   data,
-  onApprove,
+  userRole,
+  onRequest,
   onFirstApprove,
+  onSecondApprove,
   onReject,
   onClose,
 }: MentorRequestModalProps) {
+  // 상태값 + 유저 role에 따라 버튼을 동적으로 제어
+  const getButtons = (): ModalButton[] => {
+    // MENTOR_A: FIRST_APPROVED, REQUESTED, PENDING → 2차 승인, 반려
+    if (
+      userRole === "MENTOR_A" &&
+      ["FIRST_APPROVED", "REQUESTED", "PENDING"].includes(data.status)
+    ) {
+      return [
+        onSecondApprove && {
+          label: "2차 승인",
+          onClick: onSecondApprove,
+          type: "secondary",
+        },
+        { label: "멘토 미승인", onClick: onReject, type: "danger" },
+      ].filter(Boolean) as ModalButton[];
+    }
+    // MENTOR_B: REQUESTED, PENDING → 1차 승인, 반려
+    if (
+      userRole === "MENTOR_B" &&
+      ["REQUESTED", "PENDING"].includes(data.status)
+    ) {
+      return [
+        onFirstApprove && {
+          label: "1차 승인",
+          onClick: onFirstApprove,
+          type: "info",
+        },
+        { label: "멘토 미승인", onClick: onReject, type: "danger" },
+      ].filter(Boolean) as ModalButton[];
+    }
+    // MENTOR_C: PENDING → 승인요청, 반려
+    if (userRole === "MENTOR_C" && data.status === "PENDING") {
+      return [
+        onRequest && {
+          label: "승인 요청",
+          onClick: onRequest,
+          type: "warning",
+        },
+        { label: "멘토 미승인", onClick: onReject, type: "danger" },
+      ].filter(Boolean) as ModalButton[];
+    }
+    return [];
+  };
+
   return (
     <CommonModal
       title="멘토 신청 상세"
@@ -31,7 +79,7 @@ export function MentorRequestModal({
             <b>지역:</b> {data.regionId}
           </p>
           <p>
-            <b>행정기관여부:</b> {data.governmentAgency}
+            <b>행정기관여부:</b> {data.governmentAgency ? "예" : "아니오"}
           </p>
           <p>
             <b>신청일:</b>{" "}
@@ -47,14 +95,9 @@ export function MentorRequestModal({
             readOnly
             style={{ width: "100%", height: "100px" }}
           />
-          {/* 필요하다면 반려사유, 첨부파일, 상태값 등 추가로 표시 */}
         </div>
       }
-      buttons={[
-        { label: "멘토 승인", onClick: onApprove, type: "primary" },
-        { label: "승인 대기", onClick: onFirstApprove, type: "secondary" },
-        { label: "멘토 미승인", onClick: onReject, type: "danger" },
-      ]}
+      buttons={getButtons()}
       onClose={onClose}
     />
   );

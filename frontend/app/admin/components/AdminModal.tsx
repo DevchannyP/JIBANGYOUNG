@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "../AdminPage.module.css";
 
-type ModalButton = {
+export type ModalButton = {
   label: string;
   onClick: () => void;
-  type?: "primary" | "secondary" | "danger";
+  type?: "primary" | "secondary" | "danger" | "info" | "warning";
 };
 
 interface CommonModalProps {
