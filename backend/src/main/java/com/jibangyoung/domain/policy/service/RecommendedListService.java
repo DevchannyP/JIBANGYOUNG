@@ -20,8 +20,8 @@ public class RecommendedListService {
     public List<PolicyCardDto> getRecommendedPoliciesByUserId(String userId) {
         // 1. userId에 해당하는 plcyNo 목록 추출 (중복 제거)
         // 테스트용 하드코딩
-        Long userIdLong = 1001L;
-        // Integer userIdInt = Integer.parseInt(userId);
+        // Long userIdLong = 1001L;
+        long userIdLong = Long.parseLong(userId);
         List<Integer> policyCodes = recommendationRepository.findByUserId(userIdLong).stream()
                 .map(Recommendation::getPolicyCode)
                 .distinct()
