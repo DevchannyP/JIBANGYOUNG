@@ -24,7 +24,7 @@ public class CommentResponseDto {
 
     // 메인 생성자 (답글 포함)
     public CommentResponseDto(Comment comment, List<CommentResponseDto> replies) {
-        this.id = comment.getId();
+        this.id = comment.isDeleted() ? 0 : comment.getId();
         this.author = comment.getUser().getNickname();
         this.parentId = comment.getParent() != null ? comment.getParent().getId() : null;
         this.createdAt = comment.getCreatedAt();

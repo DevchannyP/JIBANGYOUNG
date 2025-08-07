@@ -26,6 +26,7 @@ const CommentList: React.FC<CommentListProps> = ({
           comment={comment}
           onReplySubmit={onReplySubmit}
           onDelete={onDelete} // onDelete props 전달
+          isReply={false} // 최상위 댓글이므로 isReply는 false
         />
       ))}
     </div>

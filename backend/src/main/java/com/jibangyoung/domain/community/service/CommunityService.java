@@ -310,13 +310,13 @@ public class CommunityService {
         Map<Long, CommentResponseDto> commentDtoMap = new HashMap<>();
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
-        // 3. 모든 댓글을 DTO로 변환하고 Map에 저장합니다.
+        // 3. 모든 댓글을 DTO로 변환하고 Map에 저장
         for (Comment comment : comments) {
             CommentResponseDto dto = new CommentResponseDto(comment, new ArrayList<>());
             commentDtoMap.put(comment.getId(), dto);
         }
 
-        // 4. 대댓글을 부모 댓글의 replies 리스트에 추가합니다.
+        // 4. 대댓글을 부모 댓글의 replies 리스트에 추가
         for (Comment comment : comments) {
             if (comment.getParent() != null) {
                 CommentResponseDto parentDto = commentDtoMap.get(comment.getParent().getId());
@@ -361,7 +361,11 @@ public class CommunityService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다. id=" + commentId));
 
-        // 사용자 권한 확인 로직 제거 (임시 방편)
+        // 댓글 작성자만 삭제할 수 있도록 권한 확인
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다.");
+        }
+
         commentRepository.delete(comment);
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.community.dto.CommentRequestDto;
+import com.jibangyoung.global.security.CustomUserPrincipal;
 import com.jibangyoung.domain.community.dto.CommentResponseDto;
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
@@ -127,11 +128,16 @@ public class CommunityController {
     @PostMapping("/posts/{postId}/comments")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> createComment(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @PathVariable Long postId,
             @RequestBody CommentRequestDto requestDto) {
-        Long userId = 2L;
-        String author = user.getUsername(); // 혹은 닉네임 등
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Long userId = userPrincipal.getId();
+        String author = userPrincipal.getUsername();
         log.info("댓글 작성, userId: {}, author: {}", userId, author);
         communityService.saveComment(postId, userId, author, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -141,9 +147,14 @@ public class CommunityController {
     @DeleteMapping("/comments/{commentId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteComment(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal,
             @PathVariable Long commentId) {
-        // 임시
-        Long userId = 1L;
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Long userId = userPrincipal.getId();
         communityService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build(); // 204 No Content
     }
@@ -154,8 +165,13 @@ public class CommunityController {
     public ResponseEntity<Void> recommendPost(
             @PathVariable Long postId,
             @RequestBody @Valid RecommendationRequestDto requestDto,
-            @AuthenticationPrincipal User user) {
-        communityService.recommendPost(postId, user.getId(), requestDto.getType());
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        communityService.recommendPost(postId, userPrincipal.getId(), requestDto.getType());
         return ResponseEntity.ok().build();
     }
 }
