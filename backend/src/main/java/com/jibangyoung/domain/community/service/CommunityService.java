@@ -16,7 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.OptimisticLockException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jibangyoung.domain.auth.entity.User;
@@ -26,6 +29,7 @@ import com.jibangyoung.domain.community.dto.CommentResponseDto;
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.dto.PostUpdateRequestDto;
 import com.jibangyoung.domain.community.dto.RegionResponseDto;
 import com.jibangyoung.domain.community.entity.PostRecommendation;
 import com.jibangyoung.domain.community.entity.Posts;
@@ -55,28 +59,73 @@ public class CommunityService {
 
     @Transactional
     public void recommendPost(Long postId, Long userId, String recommendationType) {
+        int retryCount = 3;
+        for (int i = 0; i < retryCount; i++) {
+            try {
+                performRecommendPost(postId, userId, recommendationType);
+                return; // 성공 시 메서드 종료
+            } catch (OptimisticLockException e) {
+                if (i == retryCount - 1) {
+                    throw new RuntimeException("추천 처리 중 오류가 발생했습니다. 다시 시도해주세요.", e);
+                }
+                // 잠시 대기 후 재시도
+                try {
+                    Thread.sleep(50); // 50ms 대기
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("추천 처리가 중단되었습니다.", ie);
+                }
+            }
+        }
+    }
+
+    private void performRecommendPost(Long postId, Long userId, String recommendationType) {
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 사용자가 이미 이 게시글을 추천했는지 확인
-        if (postRecommendationRepository.findByUserIdAndPostId(userId, postId).isPresent()) {
-            throw new BusinessException(ErrorCode.ALREADY_RECOMMENDED);
+        // 사용자가 이미 이 게시글을 추천했는지 확인 (5개 중 1개만 가능)
+        Optional<PostRecommendation> existingRecommendation = postRecommendationRepository.findByUserIdAndPostId(userId, postId);
+        if (existingRecommendation.isPresent()) {
+            // 기존 추천이 있으면 타입만 변경 (5개 중 1개만 선택 가능)
+            PostRecommendation recommendation = existingRecommendation.get();
+            String oldType = recommendation.getRecommendationType();
+            
+            // 같은 타입이면 추천 취소
+            if (oldType.equals(recommendationType)) {
+                postRecommendationRepository.delete(recommendation);
+                post.decrementLikes();
+            } else {
+                // 다른 타입이면 변경 (좋아요 수는 유지)
+                PostRecommendation updatedRecommendation = PostRecommendation.builder()
+                        .id(recommendation.getId())
+                        .user(user)
+                        .post(post)
+                        .recommendationType(recommendationType)
+                        .build();
+                postRecommendationRepository.save(updatedRecommendation);
+            }
+        } else {
+            // 새로운 추천 저장
+            PostRecommendation recommendation = PostRecommendation.builder()
+                    .user(user)
+                    .post(post)
+                    .recommendationType(recommendationType)
+                    .build();
+            postRecommendationRepository.save(recommendation);
+            
+            // 게시글 좋아요 수 증가
+            post.incrementLikes();
         }
-
-        // 추천 정보 저장
-        PostRecommendation recommendation = PostRecommendation.builder()
-                .user(user)
-                .post(post)
-                .recommendationType(recommendationType)
-                .build();
-        postRecommendationRepository.save(recommendation);
-
-        // 게시글 좋아요 수 증가
-        post.incrementLikes();
+        
         postRepository.save(post); // 변경된 likes 수를 저장
+    }
+
+    public String getUserRecommendationType(Long postId, Long userId) {
+        Optional<PostRecommendation> recommendation = postRecommendationRepository.findByUserIdAndPostId(userId, postId);
+        return recommendation.map(PostRecommendation::getRecommendationType).orElse(null);
     }
 
     // 지역 코드
@@ -211,12 +260,34 @@ public class CommunityService {
         return postPage.map(PostListDto::from);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PostDetailDto getPostDetail(Long postId) {
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다."));
-        post.increaseViews();
-        return PostDetailDto.from(post);
+        
+        // 조회수 증가는 별도 트랜잭션에서 처리
+        increaseViewCount(postId);
+        
+        // 작성자 정보 조회
+        User author = userRepository.findById(post.getUserId())
+                .orElse(null);
+        String authorName = (author != null) ? author.getUsername() : "알 수 없음";
+        
+        return PostDetailDto.fromWithAuthor(post, authorName);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void increaseViewCount(Long postId) {
+        try {
+            Posts post = postRepository.findById(postId).orElse(null);
+            if (post != null) {
+                post.increaseViews();
+                postRepository.save(post);
+            }
+        } catch (OptimisticLockException e) {
+            // 조회수 증가 실패 시 무시 (조회수는 정확성보다 성능이 중요)
+            // 로그만 남기고 예외는 전파하지 않음
+        }
     }
 
     @Transactional
@@ -261,6 +332,88 @@ public class CommunityService {
         postRepository.save(post);
     }
 
+    // 게시글 수정
+    @Transactional
+    public void updatePost(Long postId, Long userId, PostUpdateRequestDto request) {
+        int retryCount = 3;
+        for (int i = 0; i < retryCount; i++) {
+            try {
+                performUpdatePost(postId, userId, request);
+                return; // 성공 시 메서드 종료
+            } catch (OptimisticLockException e) {
+                if (i == retryCount - 1) {
+                    throw new RuntimeException("게시글 수정 중 오류가 발생했습니다. 다시 시도해주세요.", e);
+                }
+                // 잠시 대기 후 재시도
+                try {
+                    Thread.sleep(50); // 50ms 대기
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("게시글 수정이 중단되었습니다.", ie);
+                }
+            }
+        }
+    }
+
+    private void performUpdatePost(Long postId, Long userId, PostUpdateRequestDto request) {
+        // 게시글 조회
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        // 작성자 확인
+        if (post.getUserId() != userId) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
+        String content = request.getContent();
+
+        // 본문에서 사용된 temp 이미지 key 추출
+        List<String> usedTempKeys = s3ImageManager.extractUsedTempImageKeys(content);
+
+        // 모든 temp/ 이미지 key 조회
+        List<String> allTempKeys = s3ImageManager.getAllTempImageKeys();
+
+        // 사용된 temp 이미지 post-images/로 복사
+        Map<String, String> urlMapping = new HashMap<>();
+        for (String tempKey : usedTempKeys) {
+            String newKey = tempKey.replace("temp/", "post-images/");
+            s3ImageManager.copyObject(tempKey, newKey);
+            s3ImageManager.deleteObject(tempKey);
+
+            String oldUrl = s3ImageManager.getPublicUrl(tempKey);
+            String newUrl = s3ImageManager.getPublicUrl(newKey);
+            urlMapping.put(oldUrl, newUrl);
+        }
+
+        // content temp 이미지 URL, post-images/ URL로 변경
+        for (Map.Entry<String, String> entry : urlMapping.entrySet()) {
+            content = content.replace(entry.getKey(), entry.getValue());
+        }
+
+        // 사용되지 않은 temp 이미지 삭제
+        allTempKeys.stream()
+                .filter(key -> !usedTempKeys.contains(key))
+                .forEach(s3ImageManager::deleteObject);
+
+        // 썸네일 재추출 (post-images로 치환된 content 기준)
+        String thumbnailUrl = Optional.ofNullable(
+                s3ImageManager.extractFirstImageUrl(content))
+                .orElse("https://jibangyoung-s3.s3.ap-northeast-2.amazonaws.com/main/%ED%9B%84%EB%8B%88.png");
+
+        // 게시글 업데이트
+        post.updatePost(
+                request.getTitle(),
+                content,
+                Posts.PostCategory.valueOf(request.getCategory()),
+                request.isNotice(),
+                request.isMentorOnly(),
+                thumbnailUrl
+        );
+        
+        // 명시적으로 저장
+        postRepository.save(post);
+    }
+
     @Transactional
     public Page<PostListDto> getPostsByRegionPopular(String regionCode, int page, int size) {
         int pageIndex = page - 1; // PageRequest는 0-based
@@ -291,6 +444,24 @@ public class CommunityService {
     @Transactional(readOnly = true)
     public List<PostListDto> getNotices() {
         return postRepository.findTop2ByIsNoticeTrueOrderByCreatedAtDesc()
+                .stream()
+                .map(PostListDto::from)
+                .collect(Collectors.toList());
+    }
+
+    // 지역별 공지사항 조회 (갯수 제한 없음)
+    @Transactional(readOnly = true)
+    public List<PostListDto> getNoticesByRegion(Long regionId) {
+        return postRepository.findByRegionIdAndIsNoticeTrueOrderByCreatedAtDesc(regionId)
+                .stream()
+                .map(PostListDto::from)
+                .collect(Collectors.toList());
+    }
+
+    // 지역별 인기글 조회
+    @Transactional(readOnly = true)
+    public List<PostListDto> getPopularPostsByRegion(Long regionId) {
+        return postRepository.findTop10ByRegionIdOrderByLikesDesc(regionId)
                 .stream()
                 .map(PostListDto::from)
                 .collect(Collectors.toList());

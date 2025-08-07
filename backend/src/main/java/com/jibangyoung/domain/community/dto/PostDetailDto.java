@@ -22,6 +22,7 @@ public class PostDetailDto {
 
     // 작성자 및 지역 정보
     private Long userId;
+    private String author;
     private Long regionId;
     private String regionName;
 
@@ -46,6 +47,27 @@ public class PostDetailDto {
                 .category(post.getCategory().name())
                 .tag(post.getTag())
                 .userId(post.getUserId())
+                .regionId(post.getRegionId())
+                .regionName(RegionSidoMapper.getRegionName(post.getRegionId()))
+                .likes(post.getLikes())
+                .views(post.getViews())
+                .isNotice(post.isNotice())
+                .isMentorOnly(post.isMentorOnly())
+                .isDeleted(post.isDeleted())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
+    }
+
+    public static PostDetailDto fromWithAuthor(Posts post, String author) {
+        return PostDetailDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .category(post.getCategory().name())
+                .tag(post.getTag())
+                .userId(post.getUserId())
+                .author(author)
                 .regionId(post.getRegionId())
                 .regionName(RegionSidoMapper.getRegionName(post.getRegionId()))
                 .likes(post.getLikes())

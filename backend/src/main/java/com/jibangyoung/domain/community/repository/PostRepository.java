@@ -42,4 +42,10 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     // 공지사항 (isNotice = true) 중 최신 2개 조회
     List<Posts> findTop2ByIsNoticeTrueOrderByCreatedAtDesc();
 
+    // 지역별 공지사항 조회 (갯수 제한 없음)
+    List<Posts> findByRegionIdAndIsNoticeTrueOrderByCreatedAtDesc(Long regionId);
+
+    // 지역별 인기글 조회 (좋아요 순)
+    List<Posts> findTop10ByRegionIdOrderByLikesDesc(Long regionId);
+
 }

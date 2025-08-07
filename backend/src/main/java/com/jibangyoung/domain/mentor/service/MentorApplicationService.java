@@ -23,14 +23,8 @@ public class MentorApplicationService {
     private final MentorCertificationRequestsRepository mentorRequestRepository;
     private final UserRepository userRepository;
 
-    // 임시 사용자 ID (토큰 구현 전까지)
-    private static final Long TEMP_USER_ID = 1L;
-    
     @Transactional
-    public void applyMentor(MentorApplicationRequestDto requestDto) {
-        // 임시로 하드코딩된 유저 ID 사용
-        Long userId = 1l;
-        
+    public void applyMentor(MentorApplicationRequestDto requestDto, Long userId) {
         // 사용자 정보 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
@@ -54,19 +48,13 @@ public class MentorApplicationService {
 
 
     @Transactional(readOnly = true)
-    public Optional<MentorApplicationResponseDto> getMentorApplicationStatus() {
-        // 임시로 하드코딩된 유저 ID 사용
-        Long userId = TEMP_USER_ID;
-        
+    public Optional<MentorApplicationResponseDto> getMentorApplicationStatus(Long userId) {
         return mentorRequestRepository.findByUserId(userId)
                 .map(MentorApplicationResponseDto::from);
     }
     
     @Transactional(readOnly = true)
-    public boolean hasAlreadyApplied() {
-        // 임시로 하드코딩된 유저 ID 사용
-        Long userId = TEMP_USER_ID;
-        
+    public boolean hasAlreadyApplied(Long userId) {
         return mentorRequestRepository.existsByUserId(userId);
     }
 }

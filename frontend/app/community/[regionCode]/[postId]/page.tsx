@@ -3,6 +3,7 @@ import {
   fetchPostDetail,
   fetchPostsByRegion,
 } from "@/libs/api/community/community.api";
+import { getGuGunNameByCode } from "@/libs/utils/region";
 import { Metadata } from "next";
 import RegionSelector from "../../components/RegionSelector";
 import BoardNavigation from "../components/BoardHeader";
@@ -21,16 +22,21 @@ interface Props {
   }>;
 }
 
-// ✅ SEO 메타데이터
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { regionCode } = await params;
+    const { regionCode } = await params;
+    const guGunName = await getGuGunNameByCode(regionCode);
 
   return {
-    title: `${regionCode} 커뮤니티 - 지방청년`,
-    description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+    title: `${guGunName} 지역 게시판 - 협업 질문 및 모임 2025`,
+    description: `${guGunName} 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판입니다.`,
+    keywords: `${guGunName}, 지역게시판, 커뮤니티, 협업, 모임, 질문답변`,
     openGraph: {
-      title: `${regionCode} 커뮤니티 - 지방청년`,
-      description: `${regionCode} 지역 청년을 위한 커뮤니티 게시판입니다.`,
+      title: `${guGunName} 지역 게시판 - 협업 질문 및 모임 2025`,
+      description: `${guGunName} 지역 주민들의 협업, 질문, 모임을 위한 커뮤니티 게시판`,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -47,16 +53,14 @@ export default async function CommunityPostPage({ params }: Props) {
   return (
     <div className={styles.container}>
       <RegionSelector />
-      <div>{/* 카드형 게시글 */}</div>
       <BoardNavigation />
-      <div>{/* 검색창 */}</div>
       <div className={styles.main}>
         <div className={styles.content}>
           <PostDetail detail={detail} />
           <CommentSection postId={postId} />
         </div>
         <aside className={styles.sidebar}>
-          <PopularPosts posts={posts} />
+          <PopularPosts regionCode={regionCode}/>
         </aside>
       </div>
     </div>

@@ -35,6 +35,9 @@ public class PostListDto {
 
     // 요약
     private String summary;
+    
+    // 공지사항 여부
+    private boolean isNotice;
 
     public static PostListDto from(Posts posts) {
         String regionName = RegionSidoMapper.getRegionName(posts.getRegionId());
@@ -51,6 +54,7 @@ public class PostListDto {
                 .regionId(posts.getRegionId())
                 .regionName(regionName)
                 .summary(summary)
+                .isNotice(posts.isNotice())
                 .build();
     }
     private static String extractSummary(String content) {

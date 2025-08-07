@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ import com.jibangyoung.domain.community.dto.CommentResponseDto;
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
 import com.jibangyoung.domain.community.dto.PostListDto;
+import com.jibangyoung.domain.community.dto.PostUpdateRequestDto;
 import com.jibangyoung.domain.community.dto.PresignedUrlRequest;
 import com.jibangyoung.domain.community.dto.PresignedUrlResponse;
 import com.jibangyoung.domain.community.dto.RecommendationRequestDto;
@@ -118,6 +120,20 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getNotices());
     }
 
+    // 지역별 공지사항 조회
+    @GetMapping("/region/{regionCode}/notices")
+    public ResponseEntity<List<PostListDto>> getNoticesByRegion(@PathVariable String regionCode) {
+        Long regionId = Long.parseLong(regionCode);
+        return ResponseEntity.ok(communityService.getNoticesByRegion(regionId));
+    }
+
+    // 지역별 인기글 조회
+    @GetMapping("/region/{regionCode}/popular")
+    public ResponseEntity<List<PostListDto>> getPopularPostsByRegion(@PathVariable String regionCode) {
+        Long regionId = Long.parseLong(regionCode);
+        return ResponseEntity.ok(communityService.getPopularPostsByRegion(regionId));
+    }
+
     // 댓글 가져오기
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
@@ -159,6 +175,23 @@ public class CommunityController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
+    // 게시글 수정
+    @PutMapping("/post/{postId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> updatePost(
+            @PathVariable Long postId,
+            @RequestBody @Valid PostUpdateRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        Long userId = userPrincipal.getId();
+        communityService.updatePost(postId, userId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
     // 게시글 추천
     @PostMapping("/post/{postId}/recommend")
     @PreAuthorize("isAuthenticated()")
@@ -173,5 +206,19 @@ public class CommunityController {
         
         communityService.recommendPost(postId, userPrincipal.getId(), requestDto.getType());
         return ResponseEntity.ok().build();
+    }
+
+    // 사용자의 게시글 추천 상태 조회
+    @GetMapping("/post/{postId}/recommendation")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> getUserRecommendation(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String recommendationType = communityService.getUserRecommendationType(postId, userPrincipal.getId());
+        return ResponseEntity.ok(recommendationType != null ? recommendationType : "");
     }
 }
