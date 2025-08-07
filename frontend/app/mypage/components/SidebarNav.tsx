@@ -37,7 +37,15 @@ const QUICKLINKS: SidebarMenuItem[] = [
     external: true,
     path: "/policy/recommendedList",
   },
+  // ✅ [추가] 멘토 신청 버튼 (모두에게 노출, 외부 URL)
+  {
+    key: "mentorApply",
+    label: "멘토 신청",
+    external: true,
+    path: "/mentor/info",
+  },
 ];
+
 
 interface SidebarNavProps {
   tab: Tab;

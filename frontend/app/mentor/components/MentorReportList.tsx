@@ -60,7 +60,9 @@ export function MentorReportList() {
         setSearchResult(data);
       })
       .catch((e) => {
-        alert(e.message || "신고 목록 조회 실패");
+        alert(
+          e?.response?.data?.message || e?.message || "신고 목록 조회 실패"
+        );
       });
   }, [selectedType]);
 

@@ -1,17 +1,15 @@
 .pageContainer {
   width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 40px;
+  margin: 40px auto;
+  background-color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .pageHeader {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 2rem;
-}
-
-.tabContainer {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 2rem;
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 1rem;
 }
 
 .tabLabel {
@@ -59,7 +57,7 @@
 }
 
 .contentContainer {
-  padding: 2rem 0;
+  padding: 1rem 0;
   line-height: 1.6;
 }
 
@@ -69,7 +67,7 @@
 }
 
 .buttonContainer {
-  margin-top: 2rem;
+  margin-top: 1rem;
   text-align: center;
 }
 

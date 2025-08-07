@@ -138,6 +138,7 @@ public class CommunityService {
                 .map(PostListDto::from)
                 .collect(Collectors.toList());
     }
+
     @Transactional
     public List<PostListDto> getCachedTop10ByPeriod(String period) {
         String key = switch (period.toLowerCase()) {
@@ -218,7 +219,7 @@ public class CommunityService {
         return PostDetailDto.from(post);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void write(PostCreateRequestDto request) {
         String content = request.getContent();
 

@@ -655,40 +655,57 @@
 .top10ListItem {
   display: flex;
   align-items: center;
-  width: 100%;
-  min-height: 42px;
-  gap: 12px;
-  padding: 8px 0 8px 6px;
+  gap: 6px;
+  padding: 3px 5px 3px 5px;       /* 상하좌우 패딩 최소화 */
+  min-height: 26px;                /* 기존 32~47 → 26~28px */
+  font-size: 0.91rem;              /* 글씨 더 축소 */
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s, box-shadow 0.12s, border 0.13s;
+  transition: background 0.15s, color 0.13s, box-shadow 0.13s;
+  outline: none;
+  background: none;
+  color: #232323;
 }
 .top10ListItemActive,
-.top10ListItem:hover,
-.top10ListItem:focus {
-  background: #fffbe0;
-  box-shadow: 0 0 0 2px #ffe16b80;
-  color: #111;
+.top10ListItem:focus,
+.top10ListItem:hover {
+  background: #fff7e1;
+  color: #eab82c;
   font-weight: bold;
-  border-bottom: 2.5px solid #ffd600;
+  outline: none;
+  box-shadow: 0 2px 8px 0 rgba(234,184,44,0.03);
+}
+.thumbWrap {
+  width: 22px;          /* 기존 30~38 → 22px */
+  height: 22px;
+  border-radius: 4px;
+  margin-right: 3px;
+}
+.top10ListItemActive .thumbWrap,
+.top10ListItem:focus .thumbWrap,
+.top10ListItem:hover .thumbWrap {
+  border: 1px solid #f7e9bb;
+  box-shadow: 0 0 0 1.2px #eab82c33;
 }
 .top10ListRank {
-  width: 28px;
-  text-align: right;
-  color: #ffd600;
+  font-size: 0.97em;
+  margin-right: 2px;
+  min-width: 16px;
+  color: #ecc94b;
   font-weight: bold;
-  font-size: 1.16rem;
+  text-align: right;
+  flex-shrink: 0;
 }
 .top10ListTitle {
   flex: 1 1 0;
+  font-size: 0.92em;
   min-width: 0;
-  font-size: 1.06rem;
-  font-weight: 500;
-  color: #333;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.22;
 }
+
 .top10ListEmoji {
   margin-left: 8px;
   font-size: 1.1rem;

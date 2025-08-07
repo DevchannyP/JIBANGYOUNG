@@ -104,6 +104,7 @@ export default function MentorNoticesDashboard() {
       {/* 검색 영역 */}
       <div className={styles.searchContainer}>
         <select
+          title="지역 선택"
           value={selectedRegion}
           onChange={(e) => setSelectedRegion(e.target.value)}
           className={styles.regionSelect}

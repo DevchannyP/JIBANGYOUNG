@@ -186,54 +186,102 @@ export default function TodayPopularCard() {
             onKeyDown={handleKeyDown}
             aria-live="polite"
           >
-            {posts.slice(0, 10).map((post, idx) => {
-              const thumb = post.thumbnailUrl || FALLBACK;
-              return (
-                <li
-                  ref={idx === 0 ? firstItemRef : undefined}
-                  key={post.id || idx}
-                  className={`${styles.top10ListItem} ${idx === activeIdx ? styles.top10ListItemActive : ""}`}
-                  role="option"
-                  aria-selected={idx === activeIdx}
-                  tabIndex={0}
-                  aria-label={`[${rankEmoji[idx]}] ${post.title}${post.title?.length > 32 ? " (더보기)" : ""}`}
-                  onFocus={() => setActiveIdx(idx)}
-                  onMouseEnter={() => setActiveIdx(idx)}
-                  onMouseLeave={() => setActiveIdx(-1)}
-                  // ✅ regionId, id를 사용한 이동 경로!
-                  onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
-                  title={post.title?.length > 32 ? post.title : undefined}
-                >
-                  <span className={styles.thumbWrap}>
-                    <Image
-                      src={thumb}
-                      alt={post.title || "썸네일"}
-                      width={38}
-                      height={38}
-                      style={{
-                        objectFit: "cover",
-                        width: 38,
-                        height: 38,
-                        borderRadius: 9,
-                        background: "#f5eedc",
-                        filter: idx === activeIdx ? "brightness(1.08)" : "brightness(0.95)",
-                        transition: "filter .13s",
-                      }}
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        if (target.src !== FALLBACK) target.src = FALLBACK;
-                      }}
-                    />
-                  </span>
-                  <span className={styles.top10ListRank}>{rankEmoji[idx]}</span>
-                  <span className={styles.top10ListTitle}>
-                    {post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+ {posts.slice(0, 10).map((post, idx) => {
+  const thumb = post.thumbnailUrl || FALLBACK;
+  return (
+    <li
+      ref={idx === 0 ? firstItemRef : undefined}
+      key={post.id ?? `noid-${idx}`}
+      className={idx === activeIdx ? styles.top10ListItemActive : ""}
+      role="option"
+      aria-selected={idx === activeIdx}
+      tabIndex={0}
+      aria-label={`[${rankEmoji[idx]}] ${post.title}${post.title?.length > 32 ? " (더보기)" : ""}`}
+      onFocus={() => setActiveIdx(idx)}
+      onMouseEnter={() => setActiveIdx(idx)}
+      onMouseLeave={() => setActiveIdx(-1)}
+      onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
+      title={post.title?.length > 32 ? post.title : undefined}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 7,                 // 6 → 7
+        padding: "4px 6px",     // 3px 5px → 4px 6px
+        minHeight: 31,          // 26 → 31
+        fontSize: "1.07rem",    // 0.91rem → 1.07rem
+        borderRadius: 9,        // 8 → 9
+        cursor: "pointer",
+        outline: "none",
+        background: idx === activeIdx ? "#fff7e1" : "none",
+        color: idx === activeIdx ? "#eab82c" : "#232323",
+        fontWeight: idx === activeIdx ? "bold" : undefined,
+        boxShadow: idx === activeIdx ? "0 2px 8px 0 rgba(234,184,44,0.03)" : undefined,
+        transition: "background 0.15s, color 0.13s, box-shadow 0.13s"
+      }}
+    >
+      <span
+        style={{
+          display: "inline-block",
+          width: 26,             // 22 → 26
+          height: 26,            // 22 → 26
+          borderRadius: 5,       // 4 → 5
+          marginRight: 4,        // 3 → 4
+          background: "#f5eedc",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          src={thumb}
+          alt={post.title || "썸네일"}
+          width={26}
+          height={26}
+          style={{
+            objectFit: "cover",
+            width: 26,
+            height: 26,
+            borderRadius: 5,
+            background: "#f5eedc",
+            filter: idx === activeIdx ? "brightness(1.08)" : "brightness(0.95)",
+            transition: "filter .13s",
+          }}
+          loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== FALLBACK) target.src = FALLBACK;
+          }}
+        />
+      </span>
+      <span
+        style={{
+          fontSize: "1.09em",   // 0.92em → 1.09em
+          marginRight: 2,
+          minWidth: 16,         // 그대로
+          color: "#ecc94b",
+          fontWeight: "bold",
+          textAlign: "right",
+          flexShrink: 0,
+        }}
+      >
+        {rankEmoji[idx]}
+      </span>
+      <span
+        style={{
+          flex: "1 1 0",
+          minWidth: 0,
+          fontSize: "1.09em",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          lineHeight: 1.18,
+        }}
+      >
+        {post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}
+      </span>
+    </li>
+  );
+})}
+
+</ul>
         )}
       </div>
     </section>

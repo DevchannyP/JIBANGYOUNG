@@ -49,7 +49,10 @@ export function MentorStatsList() {
         setLogs(data);
         setSearchResult(data);
       })
-      .catch(() => {
+      .catch((e) => {
+        alert(
+          e?.response?.data?.message || e?.message || "멘토 활동 통계 조회 실패"
+        );
         setLogs([]);
         setSearchResult([]);
       });

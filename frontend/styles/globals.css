@@ -90,6 +90,7 @@ main {
   margin-right: 24px;
   display: flex;
   align-items: center;
+  -webkit-user-select: none;
   user-select: none;
   white-space: nowrap;
   transition: font-size 0.18s;
@@ -220,6 +221,70 @@ main {
 }
 
 /* ===== FOOTER (네임스페이스 적용) ===== */
+/* ===== FOOTER (네임스페이스 적용) ===== */
+
+/* New Footer Layout Styles */
+.footer-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 30px; /* 각 섹션 사이의 간격 */
+  width: 100%;
+  max-width: 1200px; /* 최대 너비 설정 */
+  margin: 0 auto 6px auto; /* 위아래 마진, 좌우 자동 */
+  padding: 0 20px; /* 좌우 패딩 */
+}
+
+.footer-brand {
+  flex: 2; /* 브랜드 섹션이 더 넓은 공간을 차지 */
+  min-width: 250px;
+}
+
+.footer-brand h3 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+.footer-links-group {
+  flex: 1; /* 링크 그룹들이 남은 공간을 균등하게 차지 */
+  min-width: 150px;
+}
+
+.footer-links-group h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #e9ecef;
+}
+
+.footer-links-group a {
+  display: block;
+  margin-bottom: 10px;
+  color: #adb5bd;
+  text-decoration: none;
+}
+
+.footer-links-group a:hover {
+  text-decoration: underline;
+  color: #f8f9fa;
+}
+
+.footer-info {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  border-top: 1px solid #495057;
+  text-align: center;
+  font-size: 13px;
+  color: #868e96;
+}
+
+.footer-info .separator {
+  margin: 0 10px;
+}
+
 .footer-root {
   background-color: #000000;
   color: #ffffff;

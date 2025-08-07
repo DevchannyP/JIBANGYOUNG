@@ -26,7 +26,8 @@ export function MentorLogList() {
         setLogs(data);
         setSearchResult(data);
       })
-      .catch(() => {
+      .catch((e) => {
+        alert(e?.response?.data?.message || e?.message || "활동로그 조회 실패");
         setLogs([]);
         setSearchResult([]);
       });
