@@ -31,7 +31,7 @@ jobs:
           context: .
           file: infra/docker/Dockerfile.backend
           push: true
-          tags: jibangyoung/backend-prod:latest
+          tags: kiheun/backend-prod:latest
 
       - name: 🐳 Build & Push Frontend Image
         uses: docker/build-push-action@v5
@@ -39,7 +39,7 @@ jobs:
           context: .
           file: infra/docker/Dockerfile.frontend
           push: true
-          tags: jibangyoung/frontend-prod:latest
+          tags: kiheun/frontend-prod:latest
 
       - name: 🚀 Deploy to EC2 via SSH
         uses: appleboy/ssh-action@master
@@ -48,13 +48,13 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker pull jibangyoung/backend-prod:latest
-            sudo docker pull jibangyoung/frontend-prod:latest
+            sudo docker pull kiheun/backend-prod:latest
+            sudo docker pull kiheun/frontend-prod:latest
 
             sudo docker stop jibangyoung-backend || true
             sudo docker rm jibangyoung-backend || true
-            sudo docker run -d --name jibangyoung-backend -p 8080:8080 jibangyoung/backend-prod:latest
+            sudo docker run -d --name jibangyoung-backend -p 8080:8080 kiheun/backend-prod:latest
 
             sudo docker stop jibangyoung-frontend || true
             sudo docker rm jibangyoung-frontend || true
-            sudo docker run -d --name jibangyoung-frontend -p 3000:3000 jibangyoung/frontend-prod:latest
+            sudo docker run -d --name jibangyoung-frontend -p 3000:3000 kiheun/frontend-prod:latest
