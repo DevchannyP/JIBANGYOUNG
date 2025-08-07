@@ -1,10 +1,10 @@
 "use client";
 
+import { patchMyProfile } from "@/libs/api/mypage.api";
+import type { UserProfileDto } from "@/types/api/mypage.types";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useState } from "react";
-import { patchMyProfile } from "@/libs/api/mypage.api";
-import type { UserProfileDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
 
 // status 매핑
@@ -152,15 +152,14 @@ export default function ProfileEditPanel({ user }: ProfileEditPanelProps) {
           </div>
         )}
       </div>
-      <Image
-        src={imgError || !profileImageUrl ? "/default-profile.webp" : profileImageUrl}
-        alt="프로필 이미지"
-        width={110}
-        height={110}
-        className={styles.mypageProfileBear}
-        priority
-        onError={() => setImgError(true)} // ✅ 이미지 실패 시 fallback 적용
-      />
+<Image
+  src="/default-profile.webp"
+  alt="프로필 이미지"
+  width={110}
+  height={110}
+  className={styles.mypageProfileBear}
+  priority
+/>
     </section>
   );
 }

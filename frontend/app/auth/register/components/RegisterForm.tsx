@@ -72,7 +72,7 @@ export default function RegisterForm() {
     nickname: "",
     phone: "",
     regionMulti: [] as string[],
-    profileImageUrl: "",
+    // profileImageUrl: "", // ❌ 프로필 이미지 URL 필드 주석 처리
     gender: "",
     birthDate: "",
   });
@@ -283,7 +283,7 @@ export default function RegisterForm() {
       nickname: form.nickname,
       region: form.regionMulti.join(","),
       phone: form.phone,
-      profileImageUrl: form.profileImageUrl,
+      // profileImageUrl: form.profileImageUrl, // ❌ 전송 데이터에서 주석 처리
       birthDate: form.birthDate,
       gender: form.gender,
     };
@@ -706,6 +706,8 @@ export default function RegisterForm() {
                     </div>
                   )}
                 </div>
+                {/* 프로필 이미지 URL 필드는 아래와 같이 완전히 주석 처리 */}
+                {/*
                 <div className={styles.formRow}>
                   <input
                     name="profileImageUrl"
@@ -723,6 +725,7 @@ export default function RegisterForm() {
                     aria-label="프로필 이미지 URL"
                   />
                 </div>
+                */}
               </motion.div>
             )}
           </AnimatePresence>
