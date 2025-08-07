@@ -12,7 +12,6 @@ interface CommentItemProps {
   onDelete: (commentId: number) => void;
   isReply?: boolean;
 }
-
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
   onReplySubmit,
@@ -25,13 +24,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
     onReplySubmit(content, comment.id);
     setShowReplyForm(false);
   };
-
+  console.log(comment);
   return (
     <div className={styles.commentItemScope}>
       <div
         className={`${styles.commentItem} ${isReply ? styles.replyItem : ""}`}
       >
-        {comment.isDeleted ? (
+        {comment.id == 0 ? (
           <p className={`${styles.commentContent} ${styles.deleted}`}>
             작성자가 삭제한, 블라인드 처리된 댓글입니다.
           </p>

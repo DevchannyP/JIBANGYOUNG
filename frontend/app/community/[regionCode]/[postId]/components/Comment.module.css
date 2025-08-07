@@ -1,9 +1,5 @@
 /* Comment.module.css */
 
-.commentList {
-  margin-top: 2rem;
-}
-
 .commentItemScope {
   /* 각 댓글+대댓글 그룹을 위한 범위 지정 */
 }
@@ -94,9 +90,6 @@
 .replies {
   margin-left: 2rem;
   position: relative;
-  padding-left: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
-  /* L-자 모양 아이콘을 위한 공간 */
 }
 
 .replies::before {
