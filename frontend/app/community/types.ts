@@ -10,6 +10,7 @@ export interface PostListDto {
   regionName: string;
   thumbnailUrl: string;
   summary: string;
+  isNotice: boolean;
 }
 
 // 게시글 상세에서 사용할 타입

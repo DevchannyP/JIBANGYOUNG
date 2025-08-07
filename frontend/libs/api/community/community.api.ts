@@ -117,10 +117,11 @@ export async function fetchPostDetail(postId: string): Promise<DetailProps> {
 // 게시판 작성 데이터 타입
 export interface CreatePostRequest {
   title: string;
-  category: "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
+  category: "FREE" | "QUESTION" | "SETTLEMENT_REVIEW" | "NOTICE";
   content: string;
   regionId: number;
   userId: number;
+  isNotice?: boolean;
 }
 
 // 게시판 작성
@@ -133,6 +134,7 @@ export async function createCommunityPost(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
     },
     body: JSON.stringify(payload),
   });
@@ -178,6 +180,7 @@ export async function recommendPost(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
     },
     body: JSON.stringify({ type: recommendationType }),
   });
@@ -185,5 +188,92 @@ export async function recommendPost(
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(errorData.message || "추천 실패");
+  }
+}
+
+// 사용자의 게시글 추천 상태 조회
+export async function getUserRecommendation(postId: number): Promise<string | null> {
+  const res = await fetch(`${BASE}/api/community/post/${postId}/recommendation`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  if (!res.ok) {
+    return null;
+  }
+
+  return res.text();
+}
+
+// 지역별 공지사항 조회
+export async function fetchNoticesByRegion(regionCode: string): Promise<PostListDto[]> {
+  try {
+    const res = await fetch(`${BASE}/api/community/region/${regionCode}/notices`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[fetchNoticesByRegion] HTTP ${res.status}: ${res.statusText}`, errorText);
+      throw new Error(`API 요청 실패: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error(`[fetchNoticesByRegion] 요청 URL: ${BASE}/api/community/region/${regionCode}/notices`);
+    console.error(`[fetchNoticesByRegion] 에러:`, error);
+    throw error;
+  }
+}
+
+// 지역별 인기글 조회
+export async function fetchPopularPostsByRegion(regionCode: string): Promise<PostListDto[]> {
+  try {
+    const res = await fetch(`${BASE}/api/community/region/${regionCode}/popular`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`[fetchPopularPostsByRegion] HTTP ${res.status}: ${res.statusText}`, errorText);
+      throw new Error(`API 요청 실패: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error(`[fetchPopularPostsByRegion] 요청 URL: ${BASE}/api/community/region/${regionCode}/popular`);
+    console.error(`[fetchPopularPostsByRegion] 에러:`, error);
+    throw error;
+  }
+}
+
+// 게시글 수정 데이터 타입
+export interface UpdatePostRequest {
+  title: string;
+  category: "FREE" | "QUESTION" | "SETTLEMENT_REVIEW" | "NOTICE";
+  content: string;
+  isNotice?: boolean;
+}
+
+// 게시글 수정
+// PUT /api/community/post/{postId}
+export async function updateCommunityPost(
+  postId: string,
+  payload: UpdatePostRequest
+): Promise<void> {
+  const res = await fetch(`${BASE}/api/community/post/${postId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "게시글 수정에 실패했습니다.");
   }
 }

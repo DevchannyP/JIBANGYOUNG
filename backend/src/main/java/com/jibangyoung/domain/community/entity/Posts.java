@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -85,6 +86,10 @@ public class Posts {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // 낙관적 락을 위한 버전 필드
+    @Version
+    private Long version;
+
     // 자동 시간 처리
     @PrePersist
     protected void onCreate() {
@@ -105,6 +110,12 @@ public class Posts {
         this.likes += 1;
     }
 
+    public void decrementLikes() {
+        if (this.likes > 0) {
+            this.likes -= 1;
+        }
+    }
+
     // 내부 enum으로 카테고리 정의
     @Getter
     public enum PostCategory {
@@ -119,6 +130,17 @@ public class Posts {
             this.label = label;
         }
     }
+    // 게시글 수정
+    public void updatePost(String title, String content, PostCategory category, 
+                          boolean isNotice, boolean isMentorOnly, String thumbnailUrl) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.isNotice = isNotice;
+        this.isMentorOnly = isMentorOnly;
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
     // 관리자_데시보드_신고게시글 복구
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;

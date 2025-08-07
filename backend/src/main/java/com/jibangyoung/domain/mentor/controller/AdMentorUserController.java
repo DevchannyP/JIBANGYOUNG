@@ -84,23 +84,27 @@ public class AdMentorUserController {
     // 🔓 일반 사용자 권한
     @PostMapping("/application")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ApiResponse<String>> applyMentor(@RequestBody @Valid MentorApplicationRequestDto requestDto) {
-        mentorApplicationService.applyMentor(requestDto);
+    public ResponseEntity<ApiResponse<String>> applyMentor(
+            @RequestBody @Valid MentorApplicationRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        mentorApplicationService.applyMentor(requestDto, userPrincipal.getId());
         return ResponseEntity.ok(ApiResponse.success("멘토 신청이 완료되었습니다."));
     }
 
     @GetMapping("/application/status")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ApiResponse<MentorApplicationResponseDto>> getMentorApplicationStatus() {
-        Optional<MentorApplicationResponseDto> status = mentorApplicationService.getMentorApplicationStatus();
+    public ResponseEntity<ApiResponse<MentorApplicationResponseDto>> getMentorApplicationStatus(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        Optional<MentorApplicationResponseDto> status = mentorApplicationService.getMentorApplicationStatus(userPrincipal.getId());
         return status.map(dto -> ResponseEntity.ok(ApiResponse.success(dto)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/application/check")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ApiResponse<Boolean>> checkMentorApplication() {
-        boolean hasApplied = mentorApplicationService.hasAlreadyApplied();
+    public ResponseEntity<ApiResponse<Boolean>> checkMentorApplication(
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        boolean hasApplied = mentorApplicationService.hasAlreadyApplied(userPrincipal.getId());
         return ResponseEntity.ok(ApiResponse.success(hasApplied));
     }
 
