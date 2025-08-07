@@ -70,7 +70,8 @@ public class AdminController {
         return postService.getAllPosts();
     }
 
-    // [시/도 목록 반환]
+    // [시/도 목록 반환-멘토/관리자 공통기능]
+    @PreAuthorize("permitAll()")
     @GetMapping("/region")
     public List<AdRegionDTO> getSidoList() {
         return regionService.getSidoList();

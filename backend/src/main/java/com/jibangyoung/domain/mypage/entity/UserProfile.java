@@ -8,7 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.auth.entity.UserRole;
 import com.jibangyoung.domain.auth.entity.UserStatus;
 
@@ -17,11 +16,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,10 +31,10 @@ public class UserProfile {
     @Id
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "id")
-    private User user;
+    // @OneToOne(fetch = FetchType.LAZY)
+    // @MapsId
+    // @JoinColumn(name = "id")
+    // private User user;
 
     @Column(unique = true, nullable = false, length = 50)
     private String username;

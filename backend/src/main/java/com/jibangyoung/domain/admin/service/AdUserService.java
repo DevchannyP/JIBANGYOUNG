@@ -57,7 +57,7 @@ public class AdUserService {
         }
     }
 
-        // 유저 상태 변경
+    // 유저 상태 변경
     @Transactional
     public void updateUserStatus(Long userId, String status) {
         var user = adUserRepository.findById(userId)
