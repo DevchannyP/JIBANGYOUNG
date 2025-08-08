@@ -29,8 +29,13 @@ import com.jibangyoung.domain.community.dto.PresignedUrlRequest;
 import com.jibangyoung.domain.community.dto.PresignedUrlResponse;
 import com.jibangyoung.domain.community.dto.RecommendationRequestDto;
 import com.jibangyoung.domain.community.dto.RegionResponseDto;
+import com.jibangyoung.domain.community.dto.ReportCreateRequestDto;
 import com.jibangyoung.domain.community.service.CommunityService;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
+import com.jibangyoung.domain.community.service.ReportService;
+import com.jibangyoung.global.common.ApiResponse;
+
+import java.util.Map;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +49,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
     private final PresignedUrlService presignedUrlService;
+    private final ReportService reportService;
 
     // 지역 코드
     @GetMapping("/region")
@@ -209,16 +215,39 @@ public class CommunityController {
     }
 
     // 사용자의 게시글 추천 상태 조회
-    @GetMapping("/post/{postId}/recommendation")
+    @PostMapping("/user/recommendation/status")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> getUserRecommendation(
-            @PathVariable Long postId,
+            @RequestBody Map<String, Object> request,
             @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        Long postId = Long.valueOf(request.get("postId").toString());
         if (userPrincipal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
         String recommendationType = communityService.getUserRecommendationType(postId, userPrincipal.getId());
         return ResponseEntity.ok(recommendationType != null ? recommendationType : "");
+    }
+
+    // 신고 접수
+    @PostMapping("/report")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<Void>> createReport(
+            @RequestBody @Valid ReportCreateRequestDto requestDto,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        try {
+            reportService.createReport(userPrincipal.getId(), requestDto);
+            System.out.println("오예~");
+            return ResponseEntity.ok(ApiResponse.success(null, "신고가 접수되었습니다."));
+        } catch (Exception e) {
+            log.warn("신고 접수 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("REPORT_FAILED", e.getMessage()));
+        }
     }
 }

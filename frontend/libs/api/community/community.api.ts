@@ -193,14 +193,18 @@ export async function recommendPost(
 
 // 사용자의 게시글 추천 상태 조회
 export async function getUserRecommendation(postId: number): Promise<string | null> {
-  const res = await fetch(`${BASE}/api/community/post/${postId}/recommendation`, {
-    method: "GET",
+  const res = await fetch(`${BASE}/api/community/user/recommendation/status`, {
+    method: "POST",
     headers: {
+      "Content-Type": "application/json",
       "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
     },
+    body: JSON.stringify({ postId }),
   });
 
   if (!res.ok) {
+    console.error(`추천 상태 조회 실패: ${res.status} ${res.statusText}`);
+    console.error('Token:', localStorage.getItem('accessToken'));
     return null;
   }
 
