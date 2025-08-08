@@ -32,41 +32,52 @@ export default function PostDetail({ detail }: Props) {
           }}
         >
           <h2 className={styles.boardTitle}>{detail.title}</h2>
-          <button
-            onClick={() =>
-              openReportModal("POST", detail.id, {
-                title: detail.title,
-                authorName: detail.author,
-              })
-            }
-            style={{
-              padding: "6px 12px",
-              backgroundColor: "#f21616ff",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "4px",
-              fontSize: "13px",
-              fontWeight: "600",
-            }}
-          >
-            신고
-          </button>
-          {isAuthor && (
-            <Link
-              href={`/community/${regionCode}/${detail.id}/edit`}
-              style={{
-                padding: "6px 12px",
-                backgroundColor: "#ffc82c",
-                color: "white",
-                textDecoration: "none",
-                borderRadius: "4px",
-                fontSize: "13px",
-                fontWeight: "600",
-              }}
-            >
-              수정
-            </Link>
-          )}
+          <div style={{ display: "flex", gap: "8px" }}>
+            {!isAuthor && (
+              <button
+                onClick={() =>
+                  openReportModal("POST", detail.id, {
+                    title: detail.title,
+                    authorName: detail.author,
+                  })
+                }
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#dc3545",
+                  cursor: "pointer",
+                  fontSize: "0.75rem",
+                  padding: "0",
+                  textDecoration: "underline",
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#b02a37";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#dc3545";
+                }}
+              >
+                신고
+              </button>
+            )}
+            {isAuthor && (
+              <Link
+                href={`/community/${regionCode}/${detail.id}/edit`}
+                style={{
+                  padding: "6px 12px",
+                  backgroundColor: "#ffc82c",
+                  color: "white",
+                  textDecoration: "none",
+                  borderRadius: "4px",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                }}
+              >
+                수정
+              </Link>
+            )}
+          </div>
         </div>
         <div>
           <span>작성자: {detail.author}</span>

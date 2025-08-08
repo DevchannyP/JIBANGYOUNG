@@ -240,7 +240,6 @@ public class CommunityController {
 
         try {
             reportService.createReport(userPrincipal.getId(), requestDto);
-            System.out.println("오예~");
             return ResponseEntity.ok(ApiResponse.success(null, "신고가 접수되었습니다."));
         } catch (Exception e) {
             log.warn("신고 접수 실패: {}", e.getMessage());

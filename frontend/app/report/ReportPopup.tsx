@@ -1,5 +1,6 @@
 "use client";
 
+import { createReport, CreateReportRequest } from "@/libs/api/community/community.api";
 import { useReportStore } from "@/store/reportStore";
 import { useState } from "react";
 import styles from "./ReportPopup.module.css";
@@ -43,19 +44,34 @@ export default function ReportPopup() {
     return null;
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedReason) {
       alert("신고 사유를 선택해주세요.");
       return;
     }
-    console.log(`신고 대상: ${reportType}, ID: ${targetId}`);
-    console.log(`상세 정보:`, details);
-    console.log(`신고 사유: ${selectedReason}`);
-    console.log(`상세 내용: ${reasonDetail}`);
-    alert("신고가 접수되었습니다.");
-    setSelectedReason("");
-    setReasonDetail("");
-    closeReportModal();
+
+    if (!reportType || !targetId) {
+      alert("신고 대상 정보가 없습니다.");
+      return;
+    }
+
+    try {
+      const reportRequest: CreateReportRequest = {
+        targetType: reportType as CreateReportRequest["targetType"],
+        targetId: Number(targetId),
+        reasonCode: selectedReason,
+        reasonDetail: reasonDetail || undefined,
+      };
+
+      await createReport(reportRequest);
+      alert("신고가 접수되었습니다.");
+      setSelectedReason("");
+      setReasonDetail("");
+      closeReportModal();
+    } catch (error) {
+      console.error("신고 접수 중 오류 발생:", error);
+      alert(error instanceof Error ? error.message : "신고 접수에 실패했습니다.");
+    }
   };
 
   const renderTargetInfo = () => {

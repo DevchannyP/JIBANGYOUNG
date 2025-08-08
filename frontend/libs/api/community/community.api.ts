@@ -281,3 +281,29 @@ export async function updateCommunityPost(
     throw new Error(errorData.message || "게시글 수정에 실패했습니다.");
   }
 }
+
+// 신고 데이터 타입
+export interface CreateReportRequest {
+  targetType: "POST" | "COMMENT" | "USER" | "POLICY" | "ETC";
+  targetId: number;
+  reasonCode: string;
+  reasonDetail?: string;
+}
+
+// 신고 접수
+// POST /api/community/report
+export async function createReport(payload: CreateReportRequest): Promise<void> {
+  const res = await fetch(`${BASE}/api/community/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "신고 접수에 실패했습니다.");
+  }
+}
