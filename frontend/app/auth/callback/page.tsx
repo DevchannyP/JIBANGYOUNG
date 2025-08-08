@@ -2,9 +2,28 @@
 
 import { useAuthStore } from "@/store/authStore";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AuthCallbackContent />
+    </Suspense>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin inline-block w-8 h-8 border-4 rounded-full border-t-transparent border-primary"></div>
+        <p className="mt-4 text-gray-600">로그인 처리 중...</p>
+      </div>
+    </div>
+  );
+}
+
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
@@ -14,10 +33,10 @@ export default function AuthCallbackPage() {
     const handleCallback = async () => {
       const accessToken = searchParams.get("accessToken");
       const refreshToken = searchParams.get("refreshToken");
-      const provider = searchParams.get("provider");
+      const provider = searchParams.get("provider"); // 사용 중 아니지만 향후 확장 대비
       const error = searchParams.get("error");
 
-      // ✅ 에러일 때 /login 으로 보내지 말고 현재 페이지에서 처리
+      // 에러 메시지 전달된 경우
       if (error) {
         setErrorMsg(decodeURIComponent(error));
         return;
@@ -47,11 +66,10 @@ export default function AuthCallbackPage() {
                 issuedAt: new Date().toISOString(),
                 expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
               });
-              router.replace("/"); // ✅ 성공 시 홈으로
+              router.replace("/");
               return;
             }
           }
-          // 실패 시 에러 표시
           setErrorMsg("사용자 정보 조회 실패");
         } catch (e) {
           console.error("콜백 처리 실패:", e);
@@ -63,6 +81,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
+    // searchParams는 App Router에서 URL 변경 시 새 객체가 되므로 deps에 포함
   }, [searchParams, router, setAuth]);
 
   if (errorMsg) {
@@ -81,12 +100,6 @@ export default function AuthCallbackPage() {
     );
   }
 
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin inline-block w-8 h-8 border-4 rounded-full border-t-transparent border-primary"></div>
-        <p className="mt-4 text-gray-600">로그인 처리 중...</p>
-      </div>
-    </div>
-  );
+  // 로딩 화면은 Suspense fallback에서 처리되므로 여기서는 렌더링할 게 없음
+  return null;
 }
