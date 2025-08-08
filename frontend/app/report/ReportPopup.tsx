@@ -4,21 +4,57 @@ import { useReportStore } from "@/store/reportStore";
 import { useState } from "react";
 import styles from "./ReportPopup.module.css";
 
+type ReasonCode =
+  | "ABUSE"
+  | "AD"
+  | "COPYRIGHT"
+  | "ETC"
+  | "HATE"
+  | "PERSONAL"
+  | "SEXUAL"
+  | "SPAM";
+
+const REASON_OPTIONS: { code: ReasonCode; label: string }[] = [
+  { code: "ABUSE", label: "욕설/비방/폭언" },
+  { code: "AD", label: "광고/홍보" },
+  { code: "COPYRIGHT", label: "저작권 침해" },
+  { code: "ETC", label: "기타 부적절한 내용" },
+  { code: "HATE", label: "혐오/차별" },
+  { code: "PERSONAL", label: "개인정보 노출" },
+  { code: "SEXUAL", label: "음란/선정성" },
+  { code: "SPAM", label: "도배/스팸" },
+];
+
+const TARGET_TYPE_LABELS = {
+  POST: "게시글",
+  COMMENT: "도시",
+  USER: "정착민",
+  POLICY: "게시글",
+  ETC: "기타",
+};
+
 export default function ReportPopup() {
   const { isOpen, reportType, targetId, details, closeReportModal } =
     useReportStore();
-  const [reason, setReason] = useState("");
+  const [selectedReason, setSelectedReason] = useState<ReasonCode | "">("");
+  const [reasonDetail, setReasonDetail] = useState("");
 
   if (!isOpen) {
     return null;
   }
 
   const handleSubmit = () => {
+    if (!selectedReason) {
+      alert("신고 사유를 선택해주세요.");
+      return;
+    }
     console.log(`신고 대상: ${reportType}, ID: ${targetId}`);
     console.log(`상세 정보:`, details);
-    console.log(`신고 사유: ${reason}`);
+    console.log(`신고 사유: ${selectedReason}`);
+    console.log(`상세 내용: ${reasonDetail}`);
     alert("신고가 접수되었습니다.");
-    setReason("");
+    setSelectedReason("");
+    setReasonDetail("");
     closeReportModal();
   };
 
@@ -29,48 +65,144 @@ export default function ReportPopup() {
       case "POST":
         return (
           <div className={styles.targetInfo}>
-            <p>
-              <strong>글 제목:</strong> {details.title || "정보 없음"}
-            </p>
-            <p>
-              <strong>작성자:</strong> {details.authorName || "정보 없음"}
-            </p>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>제목</span>
+              <span className={styles.targetValue}>
+                {details.title || "정보 없음"}
+              </span>
+            </div>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>작성자</span>
+              <span className={styles.targetValue}>
+                {details.authorName || "정보 없음"}
+              </span>
+            </div>
           </div>
         );
       case "COMMENT":
         return (
           <div className={styles.targetInfo}>
-            <p>
-              <strong>댓글 내용:</strong> {details.content || "정보 없음"}
-            </p>
-            <p>
-              <strong>작성자:</strong> {details.authorName || "정보 없음"}
-            </p>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>댓글 내용:</span>
+              <span className={styles.targetValue}>
+                {details.content || "정보 없음"}
+              </span>
+            </div>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>작성자:</span>
+              <span className={styles.targetValue}>
+                {details.authorName || "정보 없음"}
+              </span>
+            </div>
           </div>
         );
-      // 다른 타입(USER, POLICY 등)에 대한 케이스도 추가 가능
+      case "USER":
+        return (
+          <div className={styles.targetInfo}>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>사용자명:</span>
+              <span className={styles.targetValue}>
+                {details.userName || details.authorName || "정보 없음"}
+              </span>
+            </div>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>사용자 ID:</span>
+              <span className={styles.targetValue}>
+                {details.userId || targetId || "정보 없음"}
+              </span>
+            </div>
+          </div>
+        );
+      case "POLICY":
+        return (
+          <div className={styles.targetInfo}>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>정책명:</span>
+              <span className={styles.targetValue}>
+                {details.title || details.policyName || "정보 없음"}
+              </span>
+            </div>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>정책 ID:</span>
+              <span className={styles.targetValue}>
+                {targetId || "정보 없음"}
+              </span>
+            </div>
+          </div>
+        );
       default:
-        return <p>신고 대상 ID: {targetId}</p>;
+        return (
+          <div className={styles.targetInfo}>
+            <div className={styles.targetRow}>
+              <span className={styles.targetLabel}>신고 대상:</span>
+              <span className={styles.targetValue}>
+                {targetId || "정보 없음"}
+              </span>
+            </div>
+          </div>
+        );
     }
   };
 
   return (
     <div className={styles.overlay}>
       <div className={styles.popup}>
-        <h2>신고하기</h2>
-        {renderTargetInfo()}
-        <textarea
-          className={styles.textarea}
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="신고 사유를 입력해주세요..."
-        />
-        <div className={styles.buttons}>
-          <button onClick={closeReportModal} className={styles.cancelButton}>
-            취소
+        <div className={styles.header}>
+          <h2 className={styles.title}>⚠ 신고</h2>
+          <button onClick={closeReportModal} className={styles.closeButton}>
+            ✕
           </button>
+        </div>
+
+        <div className={styles.infoSection}>
+          <div className={styles.categoryInfo}>
+            <div className={styles.categoryLabel}>
+              <span className={styles.categoryBadge}>
+                {TARGET_TYPE_LABELS[
+                  reportType as keyof typeof TARGET_TYPE_LABELS
+                ] || "기타"}
+              </span>
+            </div>
+          </div>
+          {renderTargetInfo()}
+        </div>
+
+        <div className={styles.reasonSection}>
+          <h3 className={styles.sectionTitle}>신고 사유</h3>
+          <div className={styles.reasonOptions}>
+            {REASON_OPTIONS.map((option) => (
+              <label key={option.code} className={styles.reasonOption}>
+                <input
+                  type="radio"
+                  name="reportReason"
+                  value={option.code}
+                  checked={selectedReason === option.code}
+                  onChange={(e) =>
+                    setSelectedReason(e.target.value as ReasonCode)
+                  }
+                  className={styles.radioInput}
+                />
+                <span className={styles.radioLabel}>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.detailSection}>
+          <textarea
+            className={styles.textarea}
+            value={reasonDetail}
+            onChange={(e) => setReasonDetail(e.target.value)}
+            placeholder="신고 사유"
+          />
+        </div>
+
+        <div className={styles.buttons}>
           <button onClick={handleSubmit} className={styles.submitButton}>
             신고하기
+          </button>
+          <button onClick={closeReportModal} className={styles.cancelButton}>
+            취소
           </button>
         </div>
       </div>

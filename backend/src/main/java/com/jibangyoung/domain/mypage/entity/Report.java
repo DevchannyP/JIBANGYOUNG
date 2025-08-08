@@ -78,4 +78,18 @@ public class Report {
     public void setReviewedBy(Long reviewedBy) {
         this.reviewedBy = reviewedBy;
     }
+    
+    // 정적 팩토리 메서드
+    public static Report createReport(User user, ReportTargetType targetType, Long targetId, 
+                                    String reasonCode, String reasonDetail) {
+        Report report = new Report();
+        report.user = user;
+        report.targetType = targetType;
+        report.targetId = targetId;
+        report.reasonCode = reasonCode;
+        report.reasonDetail = reasonDetail;
+        report.reviewResultCode = ReviewResultCode.PENDING;
+        report.createdAt = LocalDateTime.now();
+        return report;
+    }
 }

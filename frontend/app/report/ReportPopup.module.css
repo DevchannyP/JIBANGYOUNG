@@ -13,56 +13,224 @@
 
 .popup {
   background-color: white;
-  padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   width: 90%;
-  max-width: 400px;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.header {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #999;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.closeButton:hover {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.infoSection {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.categoryInfo {
+  margin-bottom: 16px;
+}
+
+.categoryLabel {
+  margin-bottom: 0;
+}
+
+.categoryBadge {
+  display: inline-block;
+  background-color: #4285f4;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .targetInfo {
-  background-color: #f7f7f7;
-  padding: 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #eee;
-  font-size: 0.9rem;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.targetInfo p {
-  margin: 0;
-  line-height: 1.4;
+.targetRow {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.targetRow:last-child {
+  margin-bottom: 0;
+}
+
+.targetLabel {
+  font-weight: 500;
+  color: #555;
+  min-width: 60px;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.targetValue {
+  color: #333;
+  font-size: 14px;
+  flex: 1;
+  word-break: break-all;
+}
+
+.reasonSection {
+  padding: 0 20px 16px;
+}
+
+.sectionTitle {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.reasonOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reasonOption {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.reasonOption:hover {
+  border-color: #4285f4;
+  background-color: #f8f9ff;
+}
+
+.reasonOption:has(.radioInput:checked) {
+  border-color: #4285f4;
+  background-color: #e8f0fe;
+  color: #1a73e8;
+}
+
+.radioInput {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  cursor: pointer;
+  accent-color: #4285f4;
+}
+
+.radioLabel {
+  font-size: 13px;
+  cursor: pointer;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.detailSection {
+  padding: 0 20px 20px;
 }
 
 .textarea {
   width: 100%;
-  min-height: 120px;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
   resize: vertical;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+}
+
+.textarea::placeholder {
+  color: #999;
 }
 
 .buttons {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.cancelButton, .submitButton {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancelButton {
-  background-color: #eee;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #eee;
 }
 
 .submitButton {
-  background-color: #ff4d4d;
+  flex: 1;
+  padding: 12px 24px;
+  background-color: #4285f4;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #3367d6;
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: 12px 24px;
+  background-color: #f8f9fa;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background-color: #e9ecef;
 }
