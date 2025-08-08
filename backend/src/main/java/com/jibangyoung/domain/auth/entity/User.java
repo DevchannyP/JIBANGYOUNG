@@ -1,4 +1,3 @@
-// User.java
 package com.jibangyoung.domain.auth.entity;
 
 import java.time.LocalDate;
@@ -16,17 +15,24 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,7 +60,7 @@ public class User {
     @Column(nullable = false)
     private UserStatus status;
 
-    @Column(name = "profile_image_url")
+    @Column(name = "profile_image_url", length = 255)
     private String profileImageUrl;
 
     @Column(name = "birth_date")
@@ -77,7 +83,49 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // 정적 팩토리 메서드 (권한 구분)
+    /** === 안전 가드: 기본값/길이 방어 === */
+    @PrePersist
+    protected void onCreate() {
+        // 기본값 채우기 (누락 방지)
+        if (this.role == null)
+            this.role = UserRole.USER;
+        if (this.status == null)
+            this.status = UserStatus.ACTIVE;
+
+        // 길이 방어 (DB 제약 초과 방지)
+        this.username = trim(this.username, 50);
+        this.email = trim(this.email, 100);
+        this.password = trim(this.password, 255); // 인코딩된 비밀번호라도 가드
+        this.nickname = trim(this.nickname, 50);
+        this.phone = trim(this.phone, 20);
+        this.profileImageUrl = trim(this.profileImageUrl, 255);
+        this.gender = trim(this.gender, 10);
+        this.region = trim(this.region, 100);
+
+        // createdAt은 @CreatedDate로 자동 세팅됨 (Auditing 활성 필요)
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        // 길이 방어
+        this.username = trim(this.username, 50);
+        this.email = trim(this.email, 100);
+        this.password = trim(this.password, 255);
+        this.nickname = trim(this.nickname, 50);
+        this.phone = trim(this.phone, 20);
+        this.profileImageUrl = trim(this.profileImageUrl, 255);
+        this.gender = trim(this.gender, 10);
+        this.region = trim(this.region, 100);
+        // updatedAt은 @LastModifiedDate로 자동 세팅됨
+    }
+
+    private static String trim(String s, int max) {
+        if (s == null)
+            return null;
+        return (s.length() <= max) ? s : s.substring(0, max);
+    }
+
+    // === 정적 팩토리 (기존 시그니처 그대로 유지) ===
     public static User createUser(String username, String email, String password,
             String nickname, String phone, String profileImageUrl,
             LocalDate birthDate, String gender, String region, UserRole role) {
@@ -91,8 +139,8 @@ public class User {
         user.birthDate = birthDate;
         user.gender = gender;
         user.region = region;
-        user.role = role;
-        user.status = UserStatus.ACTIVE;
+        user.role = role; // 누락 시 @PrePersist에서 USER로 보정
+        user.status = UserStatus.ACTIVE; // 누락 방지를 위해 기본 지정(추가로 @PrePersist에서도 보정)
         return user;
     }
 
@@ -103,7 +151,7 @@ public class User {
                 UserRole.USER);
     }
 
-    // 비즈니스 메서드
+    // === 비즈니스 메서드 (기존 유지) ===
     public void updateProfile(String nickname, String phone, String profileImageUrl) {
         this.nickname = nickname;
         this.phone = phone;
@@ -156,12 +204,10 @@ public class User {
         this.password = encodedPassword;
     }
 
-    // 관리자페이지_사용자관리(권한변경)
     public void changeRole(UserRole newRole) {
         this.role = newRole;
     }
 
-    // 관리자페이지_신고유저 상태(활성/비활성/정지/삭제)
     public void changeStatus(UserStatus newStatus) {
         this.status = newStatus;
     }

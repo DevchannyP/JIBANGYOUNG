@@ -43,18 +43,21 @@ public enum ErrorCode {
     // [이메일]
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_FAILED", "메일 발송에 실패했습니다."),
 
-    // [마이페이지/알림] 도메인별 추가 예시
+    // [마이페이지/알림]
     MYPAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MYPAGE_NOT_FOUND", "마이페이지 정보를 찾을 수 없습니다."),
     ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "ALERT_NOT_FOUND", "알림을 찾을 수 없습니다."),
 
-    // [커뮤니티/게시글] 관련 에러
+    // [커뮤니티/게시글]
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", "게시글을 찾을 수 없습니다."),
     ALREADY_RECOMMENDED(HttpStatus.CONFLICT, "ALREADY_RECOMMENDED", "이미 추천한 게시글입니다."),
-    
+
     // [멘토]
     ALREADY_APPLIED_MENTOR(HttpStatus.CONFLICT, "ALREADY_APPLIED_MENTOR", "이미 멘토 신청을 하셨습니다."),
-    NOTICE_NOT_MENTOR(HttpStatus.CONFLICT, "NOTICE_NOT_MENTOR", "공지사항을 찾을 수 없습니다.");
+    NOTICE_NOT_MENTOR(HttpStatus.CONFLICT, "NOTICE_NOT_MENTOR", "공지사항을 찾을 수 없습니다."),
 
+    // [소셜 로그인/외부 API]
+    SOCIAL_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "SOCIAL_001", "소셜 로그인 처리 실패"),
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL_001", "외부 API 호출 오류");
 
     private final HttpStatus status;
     private final String code;
