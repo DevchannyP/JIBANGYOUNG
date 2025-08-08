@@ -1,6 +1,7 @@
 package com.jibangyoung.domain.community.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.community.dto.CommentRequestDto;
-import com.jibangyoung.global.security.CustomUserPrincipal;
 import com.jibangyoung.domain.community.dto.CommentResponseDto;
 import com.jibangyoung.domain.community.dto.PostCreateRequestDto;
 import com.jibangyoung.domain.community.dto.PostDetailDto;
@@ -34,8 +33,7 @@ import com.jibangyoung.domain.community.service.CommunityService;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
 import com.jibangyoung.domain.community.service.ReportService;
 import com.jibangyoung.global.common.ApiResponse;
-
-import java.util.Map;
+import com.jibangyoung.global.security.CustomUserPrincipal;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -157,7 +155,7 @@ public class CommunityController {
             log.warn("인증된 사용자 정보가 없습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         Long userId = userPrincipal.getId();
         String author = userPrincipal.getUsername();
         log.info("댓글 작성, userId: {}, author: {}", userId, author);
@@ -175,7 +173,7 @@ public class CommunityController {
             log.warn("인증된 사용자 정보가 없습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         Long userId = userPrincipal.getId();
         communityService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build(); // 204 No Content
@@ -192,7 +190,7 @@ public class CommunityController {
             log.warn("인증된 사용자 정보가 없습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         Long userId = userPrincipal.getId();
         communityService.updatePost(postId, userId, requestDto);
         return ResponseEntity.ok().build();
@@ -209,7 +207,7 @@ public class CommunityController {
             log.warn("인증된 사용자 정보가 없습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         communityService.recommendPost(postId, userPrincipal.getId(), requestDto.getType());
         return ResponseEntity.ok().build();
     }
@@ -224,7 +222,7 @@ public class CommunityController {
         if (userPrincipal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         String recommendationType = communityService.getUserRecommendationType(postId, userPrincipal.getId());
         return ResponseEntity.ok(recommendationType != null ? recommendationType : "");
     }
@@ -239,7 +237,7 @@ public class CommunityController {
             log.warn("인증된 사용자 정보가 없습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         try {
             reportService.createReport(userPrincipal.getId(), requestDto);
             System.out.println("오예~");

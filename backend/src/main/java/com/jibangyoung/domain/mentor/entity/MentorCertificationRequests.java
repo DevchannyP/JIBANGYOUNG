@@ -1,20 +1,27 @@
 package com.jibangyoung.domain.mentor.entity;
 
-import io.micrometer.core.annotation.Counted;
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="mentor_certification_requests")
+@Table(name = "mentor_certification_requests")
 public class MentorCertificationRequests {
 
     @Id
@@ -40,7 +47,7 @@ public class MentorCertificationRequests {
     private Long reviewedBy;
 
     // 검토 일시
-    @Column(name ="reviewed_at")
+    @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
 
     // 신청 지역 코드
@@ -56,7 +63,7 @@ public class MentorCertificationRequests {
     private Boolean governmentAgency;
 
     // 거절 이유
-    @Column(name ="rejection_reason")
+    @Column(name = "rejection_reason")
     private String rejectionReason;
 
     // 신청 일시
@@ -75,7 +82,7 @@ public class MentorCertificationRequests {
     @Getter
     public enum Status {
         FINAL_APPROVED("최종 승인"),
-        SECOND_APPROVED   ("2차 승인"),
+        SECOND_APPROVED("2차 승인"),
         FIRST_APPROVED("1차 승인"),
         REQUESTED("승인 요청"),
         PENDING("승인 대기"),
