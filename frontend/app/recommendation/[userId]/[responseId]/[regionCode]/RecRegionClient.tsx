@@ -1,6 +1,7 @@
 'use client';
 
 import PolicyCardList from '@/app/policy/totalPolicies/components/PolicyCardList';
+import SkeletonLoader from '@/app/policy/totalPolicies/skeleton';
 import { syncBookmarkedPolicies } from '@/libs/api/policy/sync';
 import { fetchPolicies, fetchRegionReason } from '@/libs/api/recommendation.api';
 import { PolicyCard } from '@/types/api/policy.c';
@@ -151,9 +152,7 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="recommendation-container">
-        <p className="loading-text">데이터를 불러오는 중...</p>
-      </div>
+      <SkeletonLoader/>
     );
   }
 

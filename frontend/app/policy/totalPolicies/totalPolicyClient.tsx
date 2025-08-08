@@ -237,7 +237,7 @@ export default function PolicyClient({ serverState }: PolicyClientProps) {
     return () => clearInterval(intervalId);
   }, [userId]);
 
-  if (userId === null || isLoading) {
+  if (isLoading) {
     return <SkeletonLoader />;
   }
 

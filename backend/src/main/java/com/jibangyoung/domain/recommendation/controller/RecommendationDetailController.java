@@ -2,6 +2,7 @@ package com.jibangyoung.domain.recommendation.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jibangyoung.domain.policy.dto.PolicyCardDto;
 import com.jibangyoung.domain.recommendation.dto.RecommendationRegionReasonDto;
 import com.jibangyoung.domain.recommendation.service.RecommendationDetailService;
+import com.jibangyoung.global.security.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +27,8 @@ public class RecommendationDetailController {
     public List<PolicyCardDto> getPolicies(
             @PathVariable Long userId,
             @PathVariable Long responseId,
-            @PathVariable String regionCode) {
+            @PathVariable String regionCode,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
         return recommendationDetailService.getAllPoliciesByUserResponseAndRegion(userId, responseId, regionCode);
     }
 
@@ -34,7 +37,8 @@ public class RecommendationDetailController {
     public RecommendationRegionReasonDto getReason(
             @PathVariable Long userId,
             @PathVariable Long responseId,
-            @PathVariable String regionCode) {
+            @PathVariable String regionCode,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
         return recommendationDetailService.getRegionReason(userId, responseId, regionCode);
     }
 }

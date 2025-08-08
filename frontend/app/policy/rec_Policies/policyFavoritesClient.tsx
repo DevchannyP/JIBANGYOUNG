@@ -40,13 +40,14 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const itemsPerPage = 12;
-  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = serverState.itemsPerPage || 12;
+  const [currentPage, setCurrentPage] = useState(serverState.currentPage || 1);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchType, setSearchType] = useState<'title' | 'keyword'>("title");
-  const [sortBy, setSortBy] = useState<'d_day_desc' | 'favorite_asc'>("d_day_desc");
+  const [searchQuery, setSearchQuery] = useState(serverState.searchQuery || "");
+  const [searchType, setSearchType] = useState<'title' | 'keyword'>(serverState.searchType || "title");
+  const [sortBy, setSortBy] = useState<'d_day_desc' | 'favorite_asc'>(serverState.sortBy || "d_day_desc");
 
+  // 최초 마운트 시에만 fetch 수행 (bookmarkedPolicyIds 변경시 fetch하지 않음)
   useEffect(() => {
     const fetchFavoritePoliciesFromServer = async () => {
       if (bookmarkedPolicyIds.length === 0) {
@@ -68,7 +69,8 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
     };
 
     fetchFavoritePoliciesFromServer();
-  }, [bookmarkedPolicyIds]);
+  // 빈 배열로 의존 설정 — 최초 렌더 때만 실행
+  }, []);
 
   const filteredAndSortedPolicies = useMemo(() => {
     let filtered = [...favoritePolicies];
@@ -109,7 +111,7 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
   const paginatedPolicies = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredAndSortedPolicies.slice(start, start + itemsPerPage);
-  }, [filteredAndSortedPolicies, currentPage]);
+  }, [filteredAndSortedPolicies, currentPage, itemsPerPage]);
 
   const handlePrevPage = useCallback(() => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -127,6 +129,7 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
     window.location.href = `./policy_detail/${id}`;
   }, []);
 
+  // 북마크 토글 시 상태와 localStorage만 업데이트, favoritePolicies는 변경하지 않음 → 리스트 즉시 변경 없음
   const handleBookmarkToggle = useCallback((policyId: number) => {
     setBookmarkedPolicyIds((prev) => {
       let updated;
@@ -140,7 +143,7 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
         try {
           localStorage.setItem("bookmarkedPolicyIds", JSON.stringify(updated));
         } catch {
-          // ignore
+          // 무시
         }
       }
 
@@ -150,12 +153,12 @@ export default function PolicyFavoritesClient({ serverState }: PolicyClientProps
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query.trim());
-    setCurrentPage(1); // 검색 시 페이지 초기화
+    setCurrentPage(1);
   }, []);
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery("");
-    setCurrentPage(1); // 초기화 시 페이지 초기화
+    setCurrentPage(1);
   }, []);
 
   if (isLoading) return <SkeletonLoader />;

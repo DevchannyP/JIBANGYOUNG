@@ -1,5 +1,6 @@
 'use client';
 
+import SkeletonLoader from '@/app/policy/totalPolicies/skeleton';
 import { syncBookmarkedPolicies } from '@/libs/api/policy/sync';
 import { fetchRecommendations } from '@/libs/api/recommendation.api';
 import { RecommendationResultDto } from '@/types/api/recommendation';
@@ -116,9 +117,7 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <p className="loading-text">추천 정보를 불러오는 중입니다...</p>
-      </div>
+      <SkeletonLoader/>
     );
   }
 

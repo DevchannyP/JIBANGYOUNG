@@ -82,8 +82,6 @@ const PolicyCardList = memo<PolicyCardListProps>(({
     );
   }
 
-  console.log(`PolicyCardList 렌더링 - 페이지: ${currentPage}, 정책 수: ${policies.length}`);
-
   return (
     <section 
       className={styles.listContainer}
