@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useCreateMentorApplication } from "@/libs/hooks/useMentor";
+import {
+  getMentorDocumentPresignedUrl,
+  uploadFileToS3,
+} from "@/libs/api/mentor/mentor.api";
 import { getRegionsBoard } from "@/libs/api/region.api";
-import { getMentorDocumentPresignedUrl, uploadFileToS3 } from "@/libs/api/mentor/mentor.api";
+import { useCreateMentorApplication } from "@/libs/hooks/useMentor";
 import type { Region } from "@/types/api/region.d";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import styles from "../MentorApply.module.css";
 
 export default function MentorApplicationForm() {
@@ -35,7 +38,9 @@ export default function MentorApplicationForm() {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
@@ -60,22 +65,36 @@ export default function MentorApplicationForm() {
       alert("신청 사유를 입력해주세요.");
       return;
     }
-    if (!form.documentFile) {
-      alert("제출 파일을 선택해주세요.");
-      return;
-    }
+    // if (!form.documentFile) {
+    //   alert("제출 파일을 선택해주세요.");
+    //   return;
+    // }
 
     setLoading(true);
     setUploadProgress("파일 업로드 중...");
-    
+
     try {
-      // 1. Presigned URL 발급
-      const { url: presignedUrl, publicUrl } = await getMentorDocumentPresignedUrl(form.documentFile);
-      
-      // 2. S3에 파일 업로드
-      setUploadProgress("S3에 파일 업로드 중...");
-      await uploadFileToS3(presignedUrl, form.documentFile);
-      
+      // 공공기관 체크 시 서류 필수 확인
+      if (form.governmentAgency && !form.documentFile) {
+        alert("공공기관 소속의 경우 서류 파일을 선택해주세요.");
+        setLoading(false);
+        return;
+      }
+
+      let publicUrl = "";
+
+      // 서류가 있는 경우에만 업로드 처리
+      if (form.documentFile) {
+        // 1. Presigned URL 발급
+        const { url: presignedUrl, publicUrl: uploadedUrl } =
+          await getMentorDocumentPresignedUrl(form.documentFile);
+        publicUrl = uploadedUrl;
+
+        // 2. S3에 파일 업로드
+        setUploadProgress("S3에 파일 업로드 중...");
+        await uploadFileToS3(presignedUrl, form.documentFile);
+      }
+
       // 3. 멘토 신청 제출 (publicUrl 포함)
       setUploadProgress("멘토 신청 제출 중...");
       await createMutation.mutateAsync({
@@ -84,7 +103,7 @@ export default function MentorApplicationForm() {
         governmentAgency: form.governmentAgency,
         documentUrl: publicUrl,
       });
-      
+
       alert("멘토 신청이 완료되었습니다.");
       router.push("/mentor/info");
     } catch (error) {
@@ -98,10 +117,10 @@ export default function MentorApplicationForm() {
 
   return (
     <div className={styles.formContainer}>
-
       <div className={styles.formRow}>
         <label className={styles.label}>지역</label>
         <select
+          title="지역선택"
           name="regionId"
           value={form.regionId}
           onChange={handleChange}
@@ -131,6 +150,7 @@ export default function MentorApplicationForm() {
         <label className={styles.label}>행정기관</label>
         <div className={styles.checkboxContainer}>
           <input
+            title="행정기관 체크"
             type="checkbox"
             name="governmentAgency"
             checked={form.governmentAgency}
@@ -165,16 +185,16 @@ export default function MentorApplicationForm() {
 
       <div className={styles.submitContainer}>
         {uploadProgress && (
-          <div className={styles.progressText}>
-            {uploadProgress}
-          </div>
+          <div className={styles.progressText}>{uploadProgress}</div>
         )}
         <button
           onClick={handleSubmit}
           disabled={loading || createMutation.isPending}
           className={styles.submitButton}
         >
-          {loading || createMutation.isPending ? uploadProgress || "신청 중..." : "신청"}
+          {loading || createMutation.isPending
+            ? uploadProgress || "신청 중..."
+            : "신청"}
         </button>
       </div>
     </div>

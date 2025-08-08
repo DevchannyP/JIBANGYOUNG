@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import MentorApplyButton from "./components/MentorApplyButton";
+import AuthMentorApplyButton from "./components/AuthMentorApplyButton";
 import MentorIntroContent from "./components/MentorIntroContent";
 import MentorIntroTabs from "./components/MentorIntroTabs";
 import styles from "./MentorInfo.module.css";
@@ -14,7 +14,7 @@ export default function MentorInfoPage() {
       <Suspense fallback={<div>멘토 정보를 불러오는 중...</div>}>
         <MentorIntroContent />
       </Suspense>
-      <MentorApplyButton />
+      <AuthMentorApplyButton />
     </div>
   );
 }

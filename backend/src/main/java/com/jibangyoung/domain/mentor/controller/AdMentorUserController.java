@@ -112,6 +112,7 @@ public class AdMentorUserController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ApiResponse<PresignedUrlResponse>> getMentorDocumentPresignedUrl(
             @RequestBody PresignedUrlRequest request) {
+        System.out.println("띠용띠용");
         String fileName = "mentor-documents/" + request.getFileName();
         String presignedUrl = presignedUrlService.generatePresignedUrl(fileName, request.getContentType());
         String publicUrl = presignedUrlService.getPublicUrl(fileName);
