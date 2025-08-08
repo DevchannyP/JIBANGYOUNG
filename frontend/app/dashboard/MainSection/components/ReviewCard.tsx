@@ -4,7 +4,7 @@ import { useReviewTop3Query } from "@/libs/api/dashboard/reviewTop.api";
 import { ReviewPostWithRank } from "@/types/dashboard/ReviewPostDto";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import styles from "../MainSection.module.css";
+import styles from "../ReviewCard.module.css";
 
 const FALLBACK = "/default-profile.webp";
 const rankEmoji = ["🥇", "🥈", "🥉"];
@@ -75,6 +75,7 @@ export default function ReviewCard() {
         setActiveIdx(i => (i - 1 >= 0 ? i - 1 : posts.length - 1));
       }
       if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
         if (activeIdx !== -1 && posts[activeIdx]) {
           window.location.href = `/community/${posts[activeIdx].regionId}/${posts[activeIdx].id}`;
         }
@@ -96,17 +97,21 @@ export default function ReviewCard() {
       closeTimeout.current = setTimeout(() => {
         setOpen(false);
         setActiveIdx(-1);
-      }, 120);
+      }, 150);
     }
   };
 
   // 터치: 고정상태 아니면 열림
-  const handleTouchStart = () => {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
     if (!open && !fixed) setOpen(true);
   };
 
   // 버튼 클릭: 고정 상태 토글
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!open) {
       setOpen(true);
       setFixed(true);
@@ -119,132 +124,136 @@ export default function ReviewCard() {
     }
   };
 
-  // 로딩/에러 처리
-  if (isLoading)
-    return (
-      <section className={styles.subCard}>
-        <div className={styles.reviewHeaderRow}>
-          <span className={styles.reviewSectionTitleUp}>인기 정착 후기</span>
-          <span className={styles.reviewSectionHeart} aria-hidden>💛</span>
-        </div>
-        <div className={styles.todayPopularSingle}>
-          <div className={styles.skeletonBtn} style={{ height: 38 }} />
-        </div>
-      </section>
-    );
-  if (isError || !posts.length)
-    return (
-      <section className={styles.subCard}>
-        <div className={styles.reviewHeaderRow}>
-          <span className={styles.reviewSectionTitleUp}>인기 정착 후기</span>
-          <span className={styles.reviewSectionHeart} aria-hidden>💛</span>
-        </div>
-        <div className={styles.todayPopularSingleError}>인기 후기를 불러올 수 없습니다</div>
-      </section>
-    );
+  // 아이템 클릭 핸들러
+  const handleItemClick = (e: React.MouseEvent, post: ReviewPostWithRank) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.location.href = `/community/${post.regionId}/${post.id}`;
+  };
 
-  // 본 카드: 래퍼 전체가 hover/클릭 인식!
-  return (
-    <section className={styles.subCard}>
-      <div
-        ref={wrapRef}
-        className={styles.todayPopularWrap}
-        onMouseEnter={() => handleHover(true)}
-        onMouseLeave={() => handleHover(false)}
-        onTouchStart={handleTouchStart}
-        tabIndex={0}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls="review-popular-listbox"
-        role="button"
-        onClick={handleClick}
-        title="인기 정착 후기 더보기"
-        style={{ outline: "none" }}
-      >
-        <div className={styles.reviewHeaderRow} tabIndex={-1}>
-          <span className={styles.reviewSectionTitleUp}>인기 정착 후기</span>
-          <span className={styles.reviewSectionHeart} aria-hidden>💛</span>
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <span className={styles.reviewTitle}>인기 정착 후기</span>
+          <span className={styles.reviewHeart} aria-hidden>💛</span>
         </div>
-        {open && (
-          <div
-            id="review-popular-listbox"
-            className={styles.todayPopularDropdown}
-            role="listbox"
-            aria-label="인기 후기 목록"
-            tabIndex={-1}
-            style={{
-              left: 0,
-              top: "calc(100% + 9px)",
-              minWidth: 270,
-              maxWidth: 400,
-              position: "absolute",
-              zIndex: 30,
-            }}
-            onKeyDown={handleKeyDown}
-            aria-live="polite"
-          >
-            {posts.map((post, idx) => (
-              <div
-                ref={idx === 0 ? firstItemRef : undefined}
-                key={post.id || idx}
-                className={`${styles.top10ListItem} ${idx === activeIdx ? styles.top10ListItemActive : ""}`}
-                role="option"
-                aria-selected={idx === activeIdx}
-                tabIndex={0}
-                aria-label={`[${rankEmoji[idx]}] ${post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}`}
-                onFocus={() => setActiveIdx(idx)}
-                onMouseEnter={() => setActiveIdx(idx)}
-                onMouseLeave={() => setActiveIdx(-1)}
-                onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
-                title={post.title?.length > 32 ? post.title : undefined}
-                style={{
-                  display: "flex", alignItems: "center", cursor: "pointer",
-                  padding: 12, borderRadius: 10, marginBottom: 2,
-                  background: idx === activeIdx ? "#FFFCE4" : "#fff"
-                }}
-              >
-                <span style={{ marginRight: 14 }}>
-                  <Image
-                    src={post.thumbnailUrl || FALLBACK}
-                    alt={post.title || "썸네일"}
-                    width={46}
-                    height={46}
-                    style={{
-                      objectFit: "cover",
-                      width: 46,
-                      height: 46,
-                      borderRadius: 9,
-                      background: "#f5eedc",
-                      filter: idx === activeIdx ? "brightness(1.09)" : "brightness(0.96)",
-                      transition: "filter .13s",
-                    }}
-                    loading="lazy"
-                    onError={e => {
-                      const target = e.target as HTMLImageElement;
-                      if (target.src !== FALLBACK) target.src = FALLBACK;
-                    }}
-                  />
-                </span>
-                <span style={{
-                  fontSize: 22, marginRight: 13, width: 26, display: "inline-block", textAlign: "center"
-                }}>
-                  {rankEmoji[idx]}
-                </span>
-                <span style={{
-                  fontSize: "15px", fontWeight: 600, flex: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
-                }}>
-                  {post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}
-                </span>
-                <span style={{
-                  color: "#aaa", fontSize: 12, fontWeight: 500, marginLeft: 14, minWidth: 48, textAlign: "right"
-                }}>
-                  {post.regionName}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className={styles.loadingState}>
+          <div className={styles.loadingSpinner}></div>
+          후기를 불러오는 중...
+        </div>
       </div>
-    </section>
+    );
+  }
+
+  // 에러 상태
+  if (isError || !posts.length) {
+    return (
+      <div className={styles.reviewCard}>
+        <div className={styles.reviewHeader}>
+          <span className={styles.reviewTitle}>인기 정착 후기</span>
+          <span className={styles.reviewHeart} aria-hidden>💛</span>
+        </div>
+        <div className={styles.errorState}>
+          인기 후기를 불러올 수 없습니다
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={wrapRef}
+      className={styles.reviewCard}
+      onMouseEnter={() => handleHover(true)}
+      onMouseLeave={() => handleHover(false)}
+      onTouchStart={handleTouchStart}
+      tabIndex={0}
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      aria-controls="review-popular-listbox"
+      role="button"
+      onClick={handleClick}
+      title="인기 정착 후기 더보기"
+    >
+      {/* 헤더 */}
+      <div className={styles.reviewHeader}>
+        <span className={styles.reviewTitle}>인기 정착 후기</span>
+        <span className={styles.reviewHeart} aria-hidden>💛</span>
+      </div>
+
+      {/* 드롭다운 메뉴 */}
+      {open && (
+        <div
+          id="review-popular-listbox"
+          className={styles.reviewDropdown}
+          role="listbox"
+          aria-label="인기 후기 목록"
+          tabIndex={-1}
+          onKeyDown={handleKeyDown}
+          aria-live="polite"
+        >
+          <div className={styles.reviewGrid}>
+            {posts.map((post, idx) => {
+              const isActive = idx === activeIdx;
+              const truncatedTitle = post.title?.length > 30 ? 
+                post.title.slice(0, 30) + "..." : 
+                post.title;
+
+              return (
+                <div
+                  ref={idx === 0 ? firstItemRef : undefined}
+                  key={post.id || `post-${idx}`}
+                  className={`${styles.reviewItem} ${isActive ? styles.active : ''}`}
+                  role="option"
+                  aria-selected={isActive}
+                  tabIndex={0}
+                  aria-label={`${idx + 1}위. ${post.title} - ${post.regionName}`}
+                  onFocus={() => setActiveIdx(idx)}
+                  onMouseEnter={() => setActiveIdx(idx)}
+                  onMouseLeave={() => setActiveIdx(-1)}
+                  onClick={(e) => handleItemClick(e, post)}
+                  title={post.title?.length > 24 ? post.title : undefined}
+                >
+                  {/* 썸네일과 랭킹 배지 */}
+                  <div className={styles.thumbnailWrapper}>
+                    <Image
+                      src={post.thumbnailUrl || FALLBACK}
+                      alt={post.title || "썸네일"}
+                      width={110}
+                      height={110}
+                      className={styles.thumbnailImage}
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== FALLBACK) target.src = FALLBACK;
+                      }}
+                    />
+                    {/* 랭킹 배지 */}
+                    <span className={styles.rankBadge}>
+                      {rankEmoji[idx]}
+                    </span>
+                  </div>
+
+                  {/* 콘텐츠 영역 */}
+                  <div className={styles.itemContent}>
+                    {/* 제목 */}
+                    <span className={styles.itemTitle}>
+                      {truncatedTitle}
+                    </span>
+                    
+                    {/* 지역명 */}
+                    <span className={styles.regionName}>
+                      {post.regionName}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

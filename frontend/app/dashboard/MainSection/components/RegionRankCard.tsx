@@ -29,7 +29,7 @@ export default function RegionRankCard() {
       setActiveIdx((idx) => (idx + 1) % 3); // 0→1→2→0
     }, 3000);
     return () => clearInterval(timer);
-  }, [data]); // 🔑 의존성 'data'로 수정
+  }, [data]);
 
   // 사용자가 hover/포커스 시 해당 순위 강조
   const handleManualFocus = (idx: number) => setActiveIdx(idx);
@@ -68,7 +68,7 @@ export default function RegionRankCard() {
             : `${rank}위 ${label} 커뮤니티로 이동`
         }
         aria-disabled={isDisabled}
-        onClick={isDisabled ? undefined : () => regionClickHandler(item?.regionCode, label)} // ⬅️ item?.regionCode로 안전 처리
+        onClick={isDisabled ? undefined : () => regionClickHandler(item?.regionCode, label)}
         onKeyDown={buttonKeyDown(() => regionClickHandler(item?.regionCode, label), isDisabled)}
         onMouseEnter={() => handleManualFocus(idx)}
         onFocus={() => handleManualFocus(idx)}
@@ -122,7 +122,9 @@ export default function RegionRankCard() {
     );
   }
 
-  const [first, second, third] = data;
+  // ------- 전국(sido === "전국") 제외하고 TOP3만 추출 -------
+  const regionOnly = data.filter(item => item.sido !== "전국");
+  const top3 = [regionOnly[0], regionOnly[1], regionOnly[2]];
 
   return (
     <div className={styles.rankCard}>
@@ -137,9 +139,9 @@ export default function RegionRankCard() {
         ref={liveRef}
         style={{ minHeight: 36, display: "flex", alignItems: "center" }}
       >
-        <RegionRankButton rank={1} idx={0} item={first} isActive={activeIdx === 0} />
-        <RegionRankButton rank={2} idx={1} item={second} isActive={activeIdx === 1} />
-        <RegionRankButton rank={3} idx={2} item={third} isActive={activeIdx === 2} />
+        <RegionRankButton rank={1} idx={0} item={top3[0]} isActive={activeIdx === 0} />
+        <RegionRankButton rank={2} idx={1} item={top3[1]} isActive={activeIdx === 1} />
+        <RegionRankButton rank={3} idx={2} item={top3[2]} isActive={activeIdx === 2} />
       </div>
     </div>
   );
