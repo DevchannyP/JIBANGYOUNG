@@ -4,6 +4,7 @@ import Footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import "../styles/globals.css";
 import Providers from "./providers";
+import ReportPopup from "./report/ReportPopup";
 
 export const metadata: Metadata = {
   title: "지방청년 플랫폼",
@@ -23,6 +24,7 @@ export default function RootLayout({
           <Header />
           <main className="container">{children}</main>
           <Footer />
+          <ReportPopup />
         </Providers>
       </body>
     </html>

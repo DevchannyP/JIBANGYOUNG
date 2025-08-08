@@ -26,6 +26,7 @@ public class PostListDto {
     private LocalDateTime createdAt;
 
     private Long userId;
+
     // 지역
     private Long regionId;
     private String regionName;
@@ -59,11 +60,8 @@ public class PostListDto {
     }
     private static String extractSummary(String content) {
         if (content == null) return "";
-        // 이미지 태그 제거
         String noImg = content.replaceAll("<img[^>]*>", "");
-        // HTML 태그 제거
         String plainText = noImg.replaceAll("<[^>]*>", "");
-        // 글자 자르기
         return plainText.length() > 80 ? plainText.substring(0, 80) + "..." : plainText;
     }
 
