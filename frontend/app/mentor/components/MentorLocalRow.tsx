@@ -32,8 +32,8 @@ export function MentorLocalRow({
       <td>{order}</td>
       <td>{user.nickname}</td>
       <td>{user.roleDescription}</td>
-      <td>{user.warning_count}</td>
       <td>{regionName}</td>
+      <td>{user.warning_count}</td>
       <td>{user.current_score}</td>
     </tr>
   );

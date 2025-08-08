@@ -47,7 +47,8 @@ export function MentorRequestRow({
   };
 
   // 담당자(없으면 미지정), 날짜 포맷
-  const reviewedByLabel = app.reviewedBy ? app.reviewedBy : "미지정";
+  const reviewedByLabel =
+    app.reviewedBy && app.nickname ? app.nickname : "미지정";
   const createdAtLabel = app.createdAt
     ? app.createdAt.slice(0, 16).replace("T", " ")
     : "";

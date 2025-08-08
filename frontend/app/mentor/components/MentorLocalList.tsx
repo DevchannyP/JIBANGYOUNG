@@ -120,8 +120,8 @@ export function MentorLocalList() {
               <th>NO</th>
               <th>닉네임</th>
               <th>등급</th>
-              <th>경고</th>
               <th>지역</th>
+              <th>경고</th>
               <th>점수</th>
             </tr>
           </thead>

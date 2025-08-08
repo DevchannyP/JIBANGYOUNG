@@ -10,7 +10,7 @@ import {
   requestMentorApproval,
 } from "@/libs/api/admin/adminMentor.api";
 import { AdMentorRequest } from "@/types/api/adMentorRequest";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react"; // ✅ useMemo 추가
 import styles from "../../admin/AdminPage.module.css";
 import { MentorRequestModal } from "./MentorRequestModal";
 import { MentorRequestRow } from "./MentorRequestRow";
@@ -27,6 +27,9 @@ export function MentorRequestList() {
   const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const ITEMS_PER_PAGE = 10;
 
+  // 전체 지역 옵션
+  const { regionOptions: allRegionOptions } = useAdminRegion();
+
   // 로컬스토리지에서 userRole 가져오기 (초기 1회만)
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -36,14 +39,11 @@ export function MentorRequestList() {
           const user = JSON.parse(raw)?.state?.user;
           setUserRole(user?.role);
         }
-      } catch (e) {
+      } catch {
         setUserRole(undefined);
       }
     }
   }, []);
-
-  // 지역탭 옵션 불러오기
-  const { regionOptions } = useAdminRegion();
 
   // 최초 데이터 로드
   useEffect(() => {
@@ -58,6 +58,37 @@ export function MentorRequestList() {
         );
       });
   }, []);
+
+  // ✅ 데이터에 등장하는 regionId만 추출 (중복 제거)
+  const availableRegionIds = useMemo(
+    () => Array.from(new Set(applications.map((a) => a.regionId))),
+    [applications]
+  );
+
+  // ✅ 전체 옵션 중 등장한 지역만 + '전체' 탭
+  const filteredRegionOptions = useMemo(
+    () => [
+      { code: 0, name: "전체" },
+      ...allRegionOptions.filter((opt) =>
+        availableRegionIds.includes(opt.code)
+      ),
+    ],
+    [allRegionOptions, availableRegionIds]
+  );
+
+  // ✅ 옵션 변경/초기 로드 때 선택된 탭 유효성 보정 + 필터 재적용
+  useEffect(() => {
+    if (filteredRegionOptions.length === 0) return;
+    const stillValid = filteredRegionOptions.some(
+      (o) => o.code === selectedRegionId
+    );
+    const nextCode = stillValid
+      ? selectedRegionId
+      : filteredRegionOptions[0].code;
+    if (nextCode !== selectedRegionId) setSelectedRegionId(nextCode);
+    filterData(nextCode, searchKeyword);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredRegionOptions]);
 
   // 필터 함수
   const filterData = useCallback(
@@ -74,7 +105,7 @@ export function MentorRequestList() {
             app.userEmail.toLowerCase().includes(lowered) ||
             (app.reason && app.reason.toLowerCase().includes(lowered)) ||
             (app.status && app.status.toLowerCase().includes(lowered)) ||
-            (app.createdAt && app.createdAt.includes(lowered))
+            (app.createdAt && app.createdAt.toLowerCase().includes(lowered))
         );
       }
       setSearchResult(filtered);
@@ -215,8 +246,9 @@ export function MentorRequestList() {
     <div>
       <h1 className={styles.title}>멘토 신청 목록</h1>
 
+      {/* ✅ 담당(등장) 지역만 노출 */}
       <AdminRegionTab
-        regionOptions={regionOptions}
+        regionOptions={filteredRegionOptions}
         selectedRegionCode={selectedRegionId}
         onSelectRegion={handleRegionChange}
       />
@@ -231,7 +263,7 @@ export function MentorRequestList() {
           <thead>
             <tr>
               <th>NO</th>
-              <th>이름</th>
+              <th>ID</th>
               <th>이메일</th>
               <th>신청지역</th>
               <th>신청일자</th>
@@ -258,7 +290,7 @@ export function MentorRequestList() {
                   index={index + (currentPage - 1) * ITEMS_PER_PAGE}
                   total={searchResult.length}
                   onClick={() => setSelectedMentor(app)}
-                  regionOptions={regionOptions}
+                  regionOptions={filteredRegionOptions} // ✅ 일관성 유지
                 />
               ))
             )}
@@ -280,6 +312,7 @@ export function MentorRequestList() {
           onSecondApprove={() => handleSecondApprove(selectedMentor.id)}
           onReject={() => handleReject(selectedMentor.id)}
           onClose={() => setSelectedMentor(null)}
+          regionOptions={filteredRegionOptions} // ✅ 모달도 동일 옵션
         />
       )}
     </div>

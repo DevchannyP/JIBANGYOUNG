@@ -21,6 +21,7 @@ import com.jibangyoung.domain.community.dto.PresignedUrlResponse;
 import com.jibangyoung.domain.community.service.PresignedUrlService;
 import com.jibangyoung.domain.mentor.dto.AdMentorLogListDTO;
 import com.jibangyoung.domain.mentor.dto.AdMentorReportDTO;
+import com.jibangyoung.domain.mentor.dto.AdMentorRequestDTO;
 import com.jibangyoung.domain.mentor.dto.AdMentorUserDTO;
 import com.jibangyoung.domain.mentor.dto.MentorApplicationRequestDto;
 import com.jibangyoung.domain.mentor.dto.MentorApplicationResponseDto;
@@ -83,15 +84,26 @@ public class AdMentorUserController {
         return ResponseEntity.ok().build();
     }
 
+
+
+    // 멘토 리스트
     @GetMapping("/request/list")
     @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR_A', 'MENTOR_B', 'MENTOR_C')")
-    public ResponseEntity<ApiResponse<List<MentorApplicationResponseDto>>> getMentorApplicationList() {
-        List<MentorApplicationResponseDto> list = adMentorRequestService.getAllMentorRequests();
+    public ResponseEntity<ApiResponse<List<AdMentorRequestDTO>>> getMentorApplicationList(
+            @AuthenticationPrincipal CustomUserPrincipal loginUser) {
+
+        Long loginUserId = loginUser.getId();
+        List<AdMentorRequestDTO> list = adMentorRequestService.getMentorRequestsByUserRegion(loginUserId);
+
         return ResponseEntity.ok(ApiResponse.success(list));
     }
 
+
+
+
+
     @PatchMapping("/request/{id}/approve/first")
-    @PreAuthorize("hasAnyRole('MENTOR_B', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR_B','MENTOR_A','ADMIN')")
     public ResponseEntity<?> approveFirst(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserPrincipal loginUser) {
@@ -109,7 +121,7 @@ public class AdMentorUserController {
     }
 
     @PatchMapping("/request/{id}/request-approval")
-    @PreAuthorize("hasAnyRole('MENTOR_C', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR_C','MENTOR_B','MENTOR_A','ADMIN')")
     public ResponseEntity<?> requestApproval(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserPrincipal loginUser) {
@@ -118,7 +130,7 @@ public class AdMentorUserController {
     }
 
     @PatchMapping("/request/{id}/reject")
-    @PreAuthorize("hasAnyRole('MENTOR_A', 'MENTOR_B', 'MENTOR_C', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR_A', 'MENTOR_B', 'ADMIN')")
     public ResponseEntity<?> rejectRequest(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserPrincipal loginUser) {

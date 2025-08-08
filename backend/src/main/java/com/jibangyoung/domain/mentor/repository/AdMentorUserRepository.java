@@ -27,11 +27,19 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
     """)
     List<AdMentorUserDTO> findUsersByMentorRegionIds(@Param("regionIds") List<Long> regionIds);
 
-    // regionId(지역코드)를 userId로 조회하는 쿼리
+    // 로그인 유저 ID로 regionId(지역코드) 조회
     @Query("""
         SELECT m.regionId
         FROM MentorTest m
         WHERE m.userId = :userId
     """)
     List<Long> findRegionIdByUserId(@Param("userId") Long userId);
+
+    // 로그인 유저 ID로 nickname 조회
+    @Query("""
+        SELECT u.nickname
+        FROM User u
+        WHERE u.id = :userId
+    """)
+    String findNicknameByUserId(@Param("userId") Long userId);
 }
