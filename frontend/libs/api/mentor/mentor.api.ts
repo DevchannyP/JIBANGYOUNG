@@ -1,4 +1,4 @@
-  const BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 // 백엔드 API 응답 래퍼 타입
 export interface ApiResponse<T> {
@@ -15,7 +15,13 @@ export interface CreateMentorApplicationRequest {
   documentUrl?: string;
 }
 
-export type MentorApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type MentorApplicationStatus =
+  | "FINAL_APPROVED"
+  | "SECOND_APPROVED"
+  | "FIRST_APPROVED"
+  | "REQUESTED"
+  | "PENDING"
+  | "REJECTED";
 
 export interface MentorApplicationResponse {
   id: number;
@@ -41,13 +47,18 @@ export async function createMentorApplication(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || errorData.message || "멘토 신청 중 오류가 발생했습니다.");
+    throw new Error(
+      errorData.error ||
+        errorData.message ||
+        "멘토 신청 중 오류가 발생했습니다."
+    );
   }
 }
 
@@ -55,6 +66,9 @@ export async function createMentorApplication(
 export async function getMentorApplicationStatus(): Promise<MentorApplicationResponse | null> {
   const res = await fetch(`${BASE}/api/mentor/application/status`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
   });
 
   if (res.status === 404) {
@@ -73,6 +87,9 @@ export async function getMentorApplicationStatus(): Promise<MentorApplicationRes
 export async function checkMentorApplication(): Promise<boolean> {
   const res = await fetch(`${BASE}/api/mentor/application/check`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
   });
 
   if (!res.ok) {
@@ -84,13 +101,18 @@ export async function checkMentorApplication(): Promise<boolean> {
 }
 
 // 멘토 신청용 파일 업로드 presigned URL 발급
-export async function getMentorDocumentPresignedUrl(file: File): Promise<{ url: string; publicUrl: string }> {
+export async function getMentorDocumentPresignedUrl(
+  file: File
+): Promise<{ url: string; publicUrl: string }> {
   const ext = file.name.split(".").pop();
   const fileName = `${crypto.randomUUID()}.${ext}`;
 
   const res = await fetch(`${BASE}/api/mentor/application/presign`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
     body: JSON.stringify({
       fileName,
       contentType: file.type,
@@ -101,12 +123,16 @@ export async function getMentorDocumentPresignedUrl(file: File): Promise<{ url: 
     throw new Error("Presigned URL 발급 실패");
   }
 
-  const result: ApiResponse<{ url: string; publicUrl: string }> = await res.json();
+  const result: ApiResponse<{ url: string; publicUrl: string }> =
+    await res.json();
   return result.data;
 }
 
 // S3에 파일 직접 업로드
-export async function uploadFileToS3(presignedUrl: string, file: File): Promise<void> {
+export async function uploadFileToS3(
+  presignedUrl: string,
+  file: File
+): Promise<void> {
   const res = await fetch(presignedUrl, {
     method: "PUT",
     headers: {
@@ -173,17 +199,20 @@ export async function getMentorNotices(
     page: page.toString(),
     size: size.toString(),
   });
-  
+
   if (regionId) {
-    params.append('regionId', regionId.toString());
+    params.append("regionId", regionId.toString());
   }
-  
+
   if (keyword) {
-    params.append('keyword', keyword);
+    params.append("keyword", keyword);
   }
 
   const res = await fetch(`${BASE}/api/mentor/notices?${params}`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
   });
 
   if (!res.ok) {
@@ -195,9 +224,14 @@ export async function getMentorNotices(
 }
 
 // 멘토 공지사항 상세 조회 (네비게이션 포함)
-export async function getMentorNoticeDetail(noticeId: number): Promise<MentorNoticeNavigation> {
+export async function getMentorNoticeDetail(
+  noticeId: number
+): Promise<MentorNoticeNavigation> {
   const res = await fetch(`${BASE}/api/mentor/notices/${noticeId}`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
   });
 
   if (!res.ok) {
@@ -216,13 +250,18 @@ export async function createMentorNotice(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || errorData.message || "멘토 공지사항 작성 중 오류가 발생했습니다.");
+    throw new Error(
+      errorData.error ||
+        errorData.message ||
+        "멘토 공지사항 작성 중 오류가 발생했습니다."
+    );
   }
 
   const result: ApiResponse<number> = await res.json();
@@ -233,11 +272,18 @@ export async function createMentorNotice(
 export async function deleteMentorNotice(noticeId: number): Promise<void> {
   const res = await fetch(`${BASE}/api/mentor/notices/${noticeId}/delete`, {
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || errorData.message || "멘토 공지사항 삭제 중 오류가 발생했습니다.");
+    throw new Error(
+      errorData.error ||
+        errorData.message ||
+        "멘토 공지사항 삭제 중 오류가 발생했습니다."
+    );
   }
 }
 
@@ -246,9 +292,15 @@ export async function getRecentMentorNotices(
   regionId: number,
   limit: number = 5
 ): Promise<MentorNotice[]> {
-  const res = await fetch(`${BASE}/api/mentor/notices/recent?regionId=${regionId}&limit=${limit}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `${BASE}/api/mentor/notices/recent?regionId=${regionId}&limit=${limit}`,
+    {
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
 
   if (!res.ok) {
     throw new Error("최신 멘토 공지사항을 불러오지 못했습니다.");

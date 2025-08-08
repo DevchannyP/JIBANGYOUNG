@@ -46,7 +46,7 @@ public class MentorCertificationRequests {
     // 신청 지역 코드
     @Column(name = "region_id", nullable = false)
     private long regionId;
-    
+
     // 신청사유
     @Column(name = "reason", length = 1000)
     private String reason;
@@ -54,7 +54,7 @@ public class MentorCertificationRequests {
     // 행정 기관
     @Column(name = "government_agency", nullable = false)
     private Boolean governmentAgency;
-    
+
     // 거절 이유
     @Column(name ="rejection_reason")
     private String rejectionReason;
@@ -74,9 +74,12 @@ public class MentorCertificationRequests {
 
     @Getter
     public enum Status {
-        APPROVED("멘토 승인"),
+        FINAL_APPROVED("최종 승인"),
+        SECOND_APPROVED   ("2차 승인"),
+        FIRST_APPROVED("1차 승인"),
+        REQUESTED("승인 요청"),
         PENDING("승인 대기"),
-        REJECTED("멘토 미승인");
+        REJECTED("반려");
 
         private final String description;
 

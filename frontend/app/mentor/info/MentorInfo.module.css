@@ -11,7 +11,6 @@
   border-bottom: 2px solid #dee2e6;
   margin-bottom: 1rem;
 }
-
 .tabLabel {
   font-weight: bold;
   margin-right: 1rem;
@@ -26,21 +25,58 @@
   transition: all 0.2s ease;
 }
 
-.tabButtonApproved {
-  background-color: #1e40af;
+
+.tabButtonApprovedFinal {
+  background-color: #2563eb;
   color: white;
 }
-
+.tabButtonApproved2nd {
+  background-color: #3b82f6;
+  color: white;
+}
+.tabButtonApproved1st {
+  background-color: #3b82f6;
+  color: white;
+}
+.tabButtonRequested {
+  background-color: #60a5fa;
+  color: white;
+}
 .tabButtonPending {
   background-color: #93c5fd;
   color: white;
 }
+.tabButtonRejected {
+  background-color: #f3f4f6;
+  color: #2563eb;
+}
 
+
+/* .tabButtonApprovedFinal {
+  background-color: #1e40af;
+  color: white;
+}
+.tabButtonApproved2nd {
+  background-color: #1e40af;
+  color: white;
+}
+.tabButtonApproved1st {
+  background-color: #1e40af;
+  color: white;
+}
+.tabButtonRequested {
+  background-color: #1e40af;
+  color: white;
+}
+.tabButtonPending {
+  background-color: #93c5fd;
+  color: white;
+}
 .tabButtonRejected {
   background-color: white;
   color: #666;
   border: 1px solid #ddd;
-}
+} */
 
 .tabButtonActive {
   background-color: #6366f1;

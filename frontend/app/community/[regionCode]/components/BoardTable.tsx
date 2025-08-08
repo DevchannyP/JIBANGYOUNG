@@ -33,7 +33,7 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
         const regionNotices = await fetchNoticesByRegion(regionCode);
         setNotices(regionNotices);
       } catch (err) {
-        console.error('공지사항 로드 실패:', err);
+        console.error("공지사항 로드 실패:", err);
         setNotices([]);
       } finally {
         setIsLoadingNotices(false);
@@ -42,16 +42,6 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
 
     loadNotices();
   }, [regionCode]);
-
-  // 공지사항을 상단에, 일반 게시글을 하단에 배치
-  const displayPosts = [...notices, ...posts];
-  
-  // 공지사항이 항상 상단에 오도록 정렬
-  displayPosts.sort((a, b) => {
-    if (a.isNotice && !b.isNotice) return -1; // a가 공지사항이면 위로
-    if (!a.isNotice && b.isNotice) return 1;  // b가 공지사항이면 아래로
-    return 0; // 둘 다 같은 타입이면 순서 유지
-  });
 
   return (
     <div className={styles.tableContainer}>
@@ -66,41 +56,55 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
           </tr>
         </thead>
         <tbody>
-          {displayPosts.map((post, index) => {
-            const postLink = `/community/${post.regionId}/${post.id}`;
-            // isNotice 필드를 직접 사용하거나 공지사항 배열에서 온 것인지 확인
-            const isNotice = post.isNotice || index < notices.length;
-            const rowClassName = isNotice
-              ? `${styles.tableRow} ${styles.noticeRow}`
-              : styles.tableRow;
-            const titleClassName = isNotice
-              ? `${styles.titleLink} ${styles.noticeTitle}`
-              : styles.titleLink;
+          {/* 공지사항*/}
+          {notices.map((post) => (
+            <tr
+              key={`notice-${post.id}`}
+              className={`${styles.tableRow} ${styles.noticeRow}`}
+              style={{ backgroundColor: "#c4c4c475" }}
+            >
+              <td className={styles.authorCell}>
+                <span className={styles.categoryBadge}>공지</span>
+              </td>
+              <td className={styles.titleCell}>
+                <Link
+                  href={`/community/${post.regionId}/${post.id}`}
+                  className={`${styles.titleLink} ${styles.noticeTitle}`}
+                >
+                  {post.title}
+                </Link>
+              </td>
+              <td className={styles.dateCell}>
+                {formatBoardDate(post.createdAt)}
+              </td>
+              <td className={styles.viewsCell}>{post.views}</td>
+              <td className={styles.commentsCell}>{post.likes}</td>
+            </tr>
+          ))}
 
-            return (
-              <tr 
-                key={post.id} 
-                className={rowClassName}
-                style={isNotice ? { backgroundColor: '#fafafa' } : {}}
-              >
-                <td className={styles.authorCell}>
-                  <span className={styles.categoryBadge}>
-                    {isNotice ? "공지" : (categoryMap[post.category] || post.category)}
-                  </span>
-                </td>
-                <td className={styles.titleCell}>
-                  <Link href={postLink} className={titleClassName}>
-                    {post.title}
-                  </Link>
-                </td>
-                <td className={styles.dateCell}>
-                  {formatBoardDate(post.createdAt)}
-                </td>
-                <td className={styles.viewsCell}>{post.views}</td>
-                <td className={styles.commentsCell}>{post.likes}</td>
-              </tr>
-            );
-          })}
+          {/* 일반 게시글 */}
+          {posts.map((post) => (
+            <tr key={`post-${post.id}`} className={styles.tableRow}>
+              <td className={styles.authorCell}>
+                <span className={styles.categoryBadge}>
+                  {categoryMap[post.category] || post.category}
+                </span>
+              </td>
+              <td className={styles.titleCell}>
+                <Link
+                  href={`/community/${post.regionId}/${post.id}`}
+                  className={styles.titleLink}
+                >
+                  {post.title}
+                </Link>
+              </td>
+              <td className={styles.dateCell}>
+                {formatBoardDate(post.createdAt)}
+              </td>
+              <td className={styles.viewsCell}>{post.views}</td>
+              <td className={styles.commentsCell}>{post.likes}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
