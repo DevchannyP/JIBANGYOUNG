@@ -364,3 +364,26 @@
   border: 1px solid #dee2e6;
   font-size: 0.9rem;
 }
+
+/* 댓글 헤더의 버튼 그룹 */
+.commentButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* 신고 버튼 스타일 */
+.reportButton {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.reportButton:hover {
+  color: #b02a37;
+}

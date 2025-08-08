@@ -2,6 +2,8 @@
 
 import { formatDetailDate } from "@/libs/utils/date";
 import { Comment } from "@/types/comment";
+import { useReportStore } from "@/store/reportStore";
+import { useAuthStore } from "@/store/authStore";
 import React, { useState } from "react";
 import styles from "./Comment.module.css";
 import CommentForm from "./CommentForm";
@@ -19,6 +21,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
   isReply = false,
 }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const { openReportModal } = useReportStore();
+  const { user } = useAuthStore();
+  const isCommentAuthor = user && user.username === comment.author;
 
   const handleReplySubmit = (content: string) => {
     onReplySubmit(content, comment.id);
@@ -38,12 +43,29 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <>
             <div className={styles.commentHeader}>
               <span className={styles.commentAuthor}>{comment.author}</span>
-              <button
-                className={styles.deleteButton}
-                onClick={() => onDelete(comment.id)}
-              >
-                삭제
-              </button>
+              <div className={styles.commentButtons}>
+                {!isCommentAuthor && (
+                  <button
+                    className={styles.reportButton}
+                    onClick={() =>
+                      openReportModal("COMMENT", comment.id, {
+                        content: comment.content,
+                        authorName: comment.author,
+                      })
+                    }
+                  >
+                    신고
+                  </button>
+                )}
+                {isCommentAuthor && (
+                  <button
+                    className={styles.deleteButton}
+                    onClick={() => onDelete(comment.id)}
+                  >
+                    삭제
+                  </button>
+                )}
+              </div>
             </div>
             <p className={styles.commentContent}>{comment.content}</p>
             <div className={styles.commentActions}>
