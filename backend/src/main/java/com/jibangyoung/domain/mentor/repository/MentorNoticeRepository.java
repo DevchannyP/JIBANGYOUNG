@@ -45,4 +45,19 @@ public interface MentorNoticeRepository extends JpaRepository<MentorNotice, Long
     // 다음 글 조회
     @Query("SELECT mn FROM MentorNotice mn WHERE mn.id != :currentId AND mn.createdAt > (SELECT m.createdAt FROM MentorNotice m WHERE m.id = :currentId) ORDER BY mn.createdAt ASC")
     List<MentorNotice> findNextNotice(@Param("currentId") Long currentId, Pageable pageable);
+    
+    // 특정 지역 + 전국 공지사항 조회
+    @Query("SELECT mn FROM MentorNotice mn WHERE (mn.regionId = :regionId OR mn.regionId = :nationalId) ORDER BY mn.createdAt DESC")
+    Page<MentorNotice> findByRegionIdOrNationalOrderByCreatedAtDesc(
+            @Param("regionId") Long regionId, 
+            @Param("nationalId") Long nationalId, 
+            Pageable pageable);
+    
+    // 특정 지역 + 전국 공지사항 검색
+    @Query("SELECT mn FROM MentorNotice mn WHERE (mn.regionId = :regionId OR mn.regionId = :nationalId) AND mn.title LIKE %:keyword% ORDER BY mn.createdAt DESC")
+    Page<MentorNotice> findByRegionIdOrNationalWithKeywordOrderByCreatedAtDesc(
+            @Param("regionId") Long regionId, 
+            @Param("nationalId") Long nationalId, 
+            @Param("keyword") String keyword, 
+            Pageable pageable);
 }

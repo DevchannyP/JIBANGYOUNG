@@ -4,6 +4,8 @@ import type { MentorNotice } from "@/libs/api/mentor/mentor.api";
 import { getMentorNotices } from "@/libs/api/mentor/mentor.api";
 import { getRegionsBoard } from "@/libs/api/region.api";
 import type { Region } from "@/types/api/region.d";
+import { regionFullPath } from "@/components/constants/region-map";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "../MentorNotices.module.css";
@@ -28,6 +30,7 @@ const truncateText = (text: string, maxLength: number): string => {
 
 export default function MentorNoticesDashboard() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [regions, setRegions] = useState<Region[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [keyword, setKeyword] = useState("");
@@ -36,7 +39,21 @@ export default function MentorNoticesDashboard() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // 멘토 권한 체크
+  const isMentor = user?.role && ['MENTOR_A', 'MENTOR_B', 'MENTOR_C', 'ADMIN'].includes(user.role);
+
+  // 멘토가 아닌 경우 접근 차단
   useEffect(() => {
+    if (user && !isMentor) {
+      alert("멘토 권한이 필요합니다.");
+      router.push("/dashboard");
+      return;
+    }
+  }, [user, isMentor, router]);
+
+  useEffect(() => {
+    if (!user || !isMentor) return;
+    
     const fetchRegions = async () => {
       try {
         const regionData = await getRegionsBoard();
@@ -46,13 +63,16 @@ export default function MentorNoticesDashboard() {
       }
     };
     fetchRegions();
-  }, []);
+  }, [user, isMentor]);
 
   useEffect(() => {
+    if (!user || !isMentor) return;
     fetchNotices();
-  }, [selectedRegion, currentPage]);
+  }, [selectedRegion, currentPage, user, isMentor]);
 
   const fetchNotices = async () => {
+    if (!user || !isMentor) return;
+    
     setLoading(true);
     try {
       const response = await getMentorNotices(
@@ -99,6 +119,15 @@ export default function MentorNoticesDashboard() {
     return pages;
   };
 
+  // 권한 체크 - 로딩 중이거나 멘토가 아닌 경우
+  if (!user) {
+    return <div style={{ textAlign: "center", padding: "2rem" }}>로그인이 필요합니다.</div>;
+  }
+
+  if (!isMentor) {
+    return <div style={{ textAlign: "center", padding: "2rem" }}>멘토 권한이 필요합니다.</div>;
+  }
+
   return (
     <div>
       {/* 검색 영역 */}
@@ -112,7 +141,7 @@ export default function MentorNoticesDashboard() {
           <option value="">전체 지역</option>
           {regions.map((region) => (
             <option key={region.regionCode} value={region.regionCode}>
-              {region.sido} {region.guGun}
+              {region.regionCode === "99999" ? "전국" : regionFullPath(region.regionCode)}
             </option>
           ))}
         </select>
@@ -156,7 +185,7 @@ export default function MentorNoticesDashboard() {
 
                 <div className={styles.noticeInfo}>
                   <span className={styles.regionBadge}>
-                    {notice.regionName}
+                    {notice.regionCode === "99999" ? "전국" : regionFullPath(notice.regionCode)}
                   </span>
                   <span>📅 {notice.createdAt}</span>
                   <span>💬</span>

@@ -155,6 +155,7 @@ export interface MentorNotice {
   authorId: number;
   authorName?: string;
   regionId: number;
+  regionCode?: string;
   regionName?: string;
   fileUrl?: string;
   createdAt: string;
@@ -216,7 +217,14 @@ export async function getMentorNotices(
   });
 
   if (!res.ok) {
-    throw new Error("멘토 공지사항 목록을 불러오지 못했습니다.");
+    const errorText = await res.text();
+    console.error("API 에러 응답:", {
+      status: res.status,
+      statusText: res.statusText,
+      body: errorText,
+      url: res.url
+    });
+    throw new Error(`멘토 공지사항 목록을 불러오지 못했습니다. (${res.status}: ${res.statusText})`);
   }
 
   const result: ApiResponse<PageResponse<MentorNotice>> = await res.json();

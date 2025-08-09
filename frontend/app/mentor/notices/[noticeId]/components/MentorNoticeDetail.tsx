@@ -2,6 +2,8 @@
 
 import type { MentorNoticeNavigation } from "@/libs/api/mentor/mentor.api";
 import { getMentorNoticeDetail } from "@/libs/api/mentor/mentor.api";
+import { regionFullPath } from "@/components/constants/region-map";
+import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "../MentorNoticeDetail.module.css";
@@ -12,10 +14,25 @@ interface Props {
 
 export default function MentorNoticeDetail({ noticeId }: Props) {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [noticeData, setNoticeData] = useState<MentorNoticeNavigation | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 멘토 권한 체크
+  const isMentor = user?.role && ['MENTOR_A', 'MENTOR_B', 'MENTOR_C', 'ADMIN'].includes(user.role);
+
+  // 멘토가 아닌 경우 접근 차단
   useEffect(() => {
+    if (user && !isMentor) {
+      alert("멘토 권한이 필요합니다.");
+      router.push("/dashboard");
+      return;
+    }
+  }, [user, isMentor, router]);
+
+  useEffect(() => {
+    if (!user || !isMentor) return;
+    
     const fetchNotice = async () => {
       try {
         const data = await getMentorNoticeDetail(noticeId);
@@ -29,7 +46,7 @@ export default function MentorNoticeDetail({ noticeId }: Props) {
     };
 
     fetchNotice();
-  }, [noticeId]);
+  }, [noticeId, user, isMentor]);
 
   const handleBack = () => {
     router.back();
@@ -38,6 +55,15 @@ export default function MentorNoticeDetail({ noticeId }: Props) {
   const handleNavigation = (targetId: number) => {
     router.push(`/mentor/notices/${targetId}`);
   };
+
+  // 권한 체크
+  if (!user) {
+    return <div style={{ textAlign: "center", padding: "2rem" }}>로그인이 필요합니다.</div>;
+  }
+
+  if (!isMentor) {
+    return <div style={{ textAlign: "center", padding: "2rem" }}>멘토 권한이 필요합니다.</div>;
+  }
 
   if (loading) {
     return <div style={{ textAlign: 'center', padding: '2rem' }}>로딩 중...</div>;
@@ -56,7 +82,7 @@ export default function MentorNoticeDetail({ noticeId }: Props) {
         
         <div className={styles.noticeInfo}>
           <span className={styles.regionBadge}>
-            {notice?.regionName}
+            {notice?.regionCode === "99999" ? "전국" : regionFullPath(notice?.regionCode)}
           </span>
           <span>📅 {notice?.createdAt || "날짜 없음"}</span>
         </div>

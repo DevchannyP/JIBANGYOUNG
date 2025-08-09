@@ -53,19 +53,24 @@ public class MentorNoticeService {
                 notices = mentorNoticeRepository.findAllOrderByCreatedAtDesc(pageable);
             }
         } else {
-            // 특정 지역 공지 조회
+            // 특정 지역 공지 조회 + 전국 공지(99999) 포함
             if (keyword != null && !keyword.trim().isEmpty()) {
-                notices = mentorNoticeRepository.findByRegionIdAndTitleContainingOrderByCreatedAtDesc(
-                        regionId, keyword.trim(), pageable);
+                notices = mentorNoticeRepository.findByRegionIdOrNationalWithKeywordOrderByCreatedAtDesc(
+                        regionId, 99999L, keyword.trim(), pageable);
             } else {
-                notices = mentorNoticeRepository.findByRegionIdOrderByCreatedAtDesc(regionId, pageable);
+                notices = mentorNoticeRepository.findByRegionIdOrNationalOrderByCreatedAtDesc(regionId, 99999L, pageable);
             }
         }
         
         return notices.map(notice -> {
+            if (notice.getRegionId() == 99999) {
+                return MentorNoticeDto.fromWithRegionInfo(notice, "99999", "전국");
+            }
+            
             Region region = regionRepository.findById(notice.getRegionId()).orElse(null);
+            String regionCode = region != null ? String.valueOf(region.getRegionCode()) : "";
             String regionName = region != null ? region.getSido() + " " + region.getGuGun1() : "";
-            return MentorNoticeDto.fromWithRegion(notice, regionName);
+            return MentorNoticeDto.fromWithRegionInfo(notice, regionCode, regionName);
         });
     }
     
@@ -74,10 +79,15 @@ public class MentorNoticeService {
         MentorNotice notice = mentorNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_MENTOR));
                 
+        if (notice.getRegionId() == 99999) {
+            return MentorNoticeDto.fromWithRegionInfo(notice, "99999", "전국");
+        }
+        
         Region region = regionRepository.findById(notice.getRegionId()).orElse(null);
+        String regionCode = region != null ? String.valueOf(region.getRegionCode()) : "";
         String regionName = region != null ? region.getSido() + " " + region.getGuGun1() : "";
         
-        return MentorNoticeDto.fromWithRegion(notice, regionName);
+        return MentorNoticeDto.fromWithRegionInfo(notice, regionCode, regionName);
     }
     
     @Transactional(readOnly = true)
@@ -86,10 +96,15 @@ public class MentorNoticeService {
         MentorNotice notice = mentorNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOTICE_NOT_MENTOR));
                 
-        Region region = regionRepository.findById(notice.getRegionId()).orElse(null);
-        String regionName = region != null ? region.getSido() + " " + region.getGuGun1() : "";
-        
-        MentorNoticeDto currentNotice = MentorNoticeDto.fromWithRegion(notice, regionName);
+        MentorNoticeDto currentNotice;
+        if (notice.getRegionId() == 99999) {
+            currentNotice = MentorNoticeDto.fromWithRegionInfo(notice, "99999", "전국");
+        } else {
+            Region region = regionRepository.findById(notice.getRegionId()).orElse(null);
+            String regionCode = region != null ? String.valueOf(region.getRegionCode()) : "";
+            String regionName = region != null ? region.getSido() + " " + region.getGuGun1() : "";
+            currentNotice = MentorNoticeDto.fromWithRegionInfo(notice, regionCode, regionName);
+        }
         
         // 이전 글 조회
         Pageable pageable = PageRequest.of(0, 1);
@@ -122,9 +137,14 @@ public class MentorNoticeService {
         
         return notices.stream()
                 .map(notice -> {
+                    if (notice.getRegionId() == 99999) {
+                        return MentorNoticeDto.fromWithRegionInfo(notice, "99999", "전국");
+                    }
+                    
                     Region region = regionRepository.findById(notice.getRegionId()).orElse(null);
+                    String regionCode = region != null ? String.valueOf(region.getRegionCode()) : "";
                     String regionName = region != null ? region.getSido() + " " + region.getGuGun1() : "";
-                    return MentorNoticeDto.fromWithRegion(notice, regionName);
+                    return MentorNoticeDto.fromWithRegionInfo(notice, regionCode, regionName);
                 })
                 .collect(Collectors.toList());
     }

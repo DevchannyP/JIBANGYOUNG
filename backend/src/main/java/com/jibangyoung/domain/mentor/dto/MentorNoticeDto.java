@@ -21,6 +21,7 @@ public class MentorNoticeDto {
     private Long authorId;
     private String authorName;
     private Integer regionId;
+    private String regionCode;
     private String regionName;
     private String fileUrl;
     private String createdAt;
@@ -40,13 +41,14 @@ public class MentorNoticeDto {
                 .build();
     }
     
-    public static MentorNoticeDto fromWithRegion(MentorNotice entity, String regionName) {
+    public static MentorNoticeDto fromWithRegionInfo(MentorNotice entity, String regionCode, String regionName) {
         return MentorNoticeDto.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .authorId(entity.getAuthorId())
                 .regionId(entity.getRegionId())
+                .regionCode(regionCode)
                 .regionName(regionName)
                 .fileUrl(entity.getFileUrl())
                 .createdAt(entity.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))

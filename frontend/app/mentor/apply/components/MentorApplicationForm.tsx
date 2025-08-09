@@ -7,6 +7,7 @@ import {
 import { getRegionsBoard } from "@/libs/api/region.api";
 import { useCreateMentorApplication } from "@/libs/hooks/useMentor";
 import type { Region } from "@/types/api/region.d";
+import { regionFullPath } from "@/components/constants/region-map";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "../MentorApply.module.css";
@@ -129,7 +130,7 @@ export default function MentorApplicationForm() {
           <option value="">지역선택</option>
           {regions.map((region) => (
             <option key={region.regionCode} value={region.regionCode}>
-              {region.sido} {region.guGun}
+              {region.regionCode === "99999" ? "전국" : regionFullPath(region.regionCode)}
             </option>
           ))}
         </select>
