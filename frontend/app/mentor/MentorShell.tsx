@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../admin/AdminPage.module.css";
 
 import { MentorLocalList } from "./components/MentorLocalList";
@@ -13,6 +13,22 @@ import { MentorStatsList } from "./components/MentorStatsList";
 
 export default function MentorShellPage() {
   const [selectedMenu, setSelectedMenu] = useState("mentorRequestList"); // 기본 메뉴
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("auth-store-v2");
+        if (raw) {
+          const user = JSON.parse(raw)?.state?.user;
+          if (user?.role === "ADMIN") {
+            setSelectedMenu("mentorLocal"); // ADMIN이면 기본 진입점 변경
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse auth-store-v2", e);
+      }
+    }
+  }, []);
 
   const renderContent = () => {
     switch (selectedMenu) {

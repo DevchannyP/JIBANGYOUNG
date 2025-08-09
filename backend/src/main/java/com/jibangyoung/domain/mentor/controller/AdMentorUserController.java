@@ -90,7 +90,7 @@ public class AdMentorUserController {
     }
 
     @PatchMapping("/report/{id}/status")
-    @PreAuthorize("hasAnyRole('MENTOR_A', 'MENTOR_B', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MENTOR_A', 'MENTOR_B', 'MENTOR_C', 'ADMIN')")
     public ResponseEntity<?> updateReportStatus(
             @PathVariable Long id,
             @RequestBody Map<String, String> request,

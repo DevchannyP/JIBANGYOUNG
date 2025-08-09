@@ -142,6 +142,21 @@ export function MentorReportList() {
   ) {
     if (!userRole) return [];
     if (userRole === "MENTOR_C") {
+      if (selectedReport.reviewResultCode === "PENDING") {
+        return [
+          {
+            label: "닫기",
+            onClick: () => setSelectedReport(null),
+            type: "secondary" as const,
+          },
+          {
+            label: "무시",
+            onClick: () => handleChangeStatus(selectedReport.id, "IGNORED"),
+            type: "secondary" as const,
+          },
+        ];
+      }
+      // PENDING이 아닐 경우 → 닫기 버튼만
       return [
         {
           label: "닫기",

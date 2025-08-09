@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "mentor_profiles_test") // DB 테이블명
+@Table(name = "mentor_profiles") // DB 테이블명
 @Getter
 @Setter
 public class MentorTest {
