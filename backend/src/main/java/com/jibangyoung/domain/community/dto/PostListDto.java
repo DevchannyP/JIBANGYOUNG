@@ -26,6 +26,7 @@ public class PostListDto {
     private LocalDateTime createdAt;
 
     private Long userId;
+    private String nickname;
 
     // 지역
     private Long regionId;
@@ -58,6 +59,27 @@ public class PostListDto {
                 .isNotice(posts.isNotice())
                 .build();
     }
+
+    public static PostListDto fromWithNickname(Posts posts, String nickname) {
+        String regionName = RegionSidoMapper.getRegionName(posts.getRegionId());
+        String summary = extractSummary(posts.getContent());
+        return PostListDto.builder()
+                .id(posts.getId())
+                .title(posts.getTitle())
+                .category(posts.getCategory().name())
+                .likes(posts.getLikes())
+                .thumbnailUrl(posts.getThumbnailUrl())
+                .views(posts.getViews())
+                .createdAt(posts.getCreatedAt())
+                .userId(posts.getUserId())
+                .nickname(nickname)
+                .regionId(posts.getRegionId())
+                .regionName(regionName)
+                .summary(summary)
+                .isNotice(posts.isNotice())
+                .build();
+    }
+
     private static String extractSummary(String content) {
         if (content == null) return "";
         String noImg = content.replaceAll("<img[^>]*>", "");

@@ -194,7 +194,7 @@ public class CommunityService {
         return postRepository
                 .findTop10ByCategoryOrderByLikesDesc(Posts.PostCategory.REVIEW)
                 .stream()
-                .map(PostListDto::from)
+                .map(this::convertToPostListDtoWithNickname)
                 .collect(Collectors.toList());
     }
 
@@ -203,7 +203,7 @@ public class CommunityService {
     @Transactional
     public List<PostListDto> getRecentTop10(LocalDateTime since) {
         return postRepository.findTop10ByCreatedAtAfterOrderByLikesDesc(since).stream()
-                .map(PostListDto::from)
+                .map(this::convertToPostListDtoWithNickname)
                 .collect(Collectors.toList());
     }
 
@@ -234,7 +234,7 @@ public class CommunityService {
     public Page<PostListDto> getPopularPostsPage(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<Posts> postPage = postRepository.findByLikesGreaterThanEqualOrderByIdDesc(10, pageable);
-        return postPage.map(PostListDto::from); // ✅ now it's correct
+        return postPage.map(this::convertToPostListDtoWithNickname);
     }
 
     @Transactional
@@ -276,7 +276,18 @@ public class CommunityService {
             Posts.PostCategory postCategory = Posts.PostCategory.valueOf(category.toUpperCase());
             postPage = postRepository.findByRegionIdAndCategoryOrderByCreatedAtDesc(regionId, postCategory, pageable);
         }
-        return postPage.map(PostListDto::from);
+        return postPage.map(this::convertToPostListDtoWithNickname);
+    }
+
+    private PostListDto convertToPostListDtoWithNickname(Posts post) {
+        User author = userRepository.findById(post.getUserId()).orElse(null);
+        String nickname = "알 수 없음";
+        if (author != null) {
+            nickname = (author.getNickname() != null && !author.getNickname().trim().isEmpty()) 
+                ? author.getNickname() 
+                : author.getUsername();
+        }
+        return PostListDto.fromWithNickname(post, nickname);
     }
 
     @Transactional(readOnly = true)
@@ -288,11 +299,15 @@ public class CommunityService {
         increaseViewCount(postId);
         
         // 작성자 정보 조회
-        User author = userRepository.findById(post.getUserId())
-                .orElse(null);
-        String authorName = (author != null) ? author.getUsername() : "알 수 없음";
+        User author = userRepository.findById(post.getUserId()).orElse(null);
+        String nickname = "알 수 없음";
+        if (author != null) {
+            nickname = (author.getNickname() != null && !author.getNickname().trim().isEmpty()) 
+                ? author.getNickname() 
+                : author.getUsername();
+        }
         
-        return PostDetailDto.fromWithAuthor(post, authorName);
+        return PostDetailDto.fromWithNickname(post, nickname);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -457,7 +472,7 @@ public class CommunityService {
         Pageable pageable = PageRequest.of(pageIndex, size);
         Page<Posts> postPage = postRepository
                 .findByRegionIdAndLikesGreaterThanEqualOrderByCreatedAtDesc(Long.valueOf(regionCode), 10, pageable);
-        return postPage.map(PostListDto::from);
+        return postPage.map(this::convertToPostListDtoWithNickname);
     }
 
     // 인기 후기
@@ -482,7 +497,7 @@ public class CommunityService {
     public List<PostListDto> getNotices() {
         return postRepository.findTop2ByIsNoticeTrueOrderByCreatedAtDesc()
                 .stream()
-                .map(PostListDto::from)
+                .map(this::convertToPostListDtoWithNickname)
                 .collect(Collectors.toList());
     }
 
@@ -491,7 +506,7 @@ public class CommunityService {
     public List<PostListDto> getNoticesByRegion(Long regionId) {
         return postRepository.findByRegionIdAndIsNoticeTrueOrderByCreatedAtDesc(regionId)
                 .stream()
-                .map(PostListDto::from)
+                .map(this::convertToPostListDtoWithNickname)
                 .collect(Collectors.toList());
     }
 
@@ -500,7 +515,7 @@ public class CommunityService {
     public List<PostListDto> getPopularPostsByRegion(Long regionId) {
         return postRepository.findTop10ByRegionIdOrderByLikesDesc(regionId)
                 .stream()
-                .map(PostListDto::from)
+                .map(this::convertToPostListDtoWithNickname)
                 .collect(Collectors.toList());
     }
 
@@ -539,7 +554,7 @@ public class CommunityService {
     }
 
     @Transactional
-    public void saveComment(Long postId, Long userId, String author, CommentRequestDto requestDto) {
+    public void saveComment(Long postId, Long userId, CommentRequestDto requestDto) {
         Posts post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. id=" + postId));
 

@@ -5,6 +5,7 @@ export interface PostListDto {
   views: number;
   createdAt: string;
   userId: number;
+  nickname: string;
   category: string;
   regionId: number;
   regionName: string;
@@ -17,7 +18,7 @@ export interface PostListDto {
 export interface DetailProps {
   id: number;
   title: string;
-  author: string;
+  nickname: string;
   createdAt: string;
   views: number;
   likes: number;

@@ -21,9 +21,8 @@ export default function PostDetail({ detail }: Props) {
   const router = useRouter();
   const regionCode = params.regionCode;
   const { openReportModal } = useReportStore();
-  const isAuthor = user && user.username === detail.author;
+  const isAuthor = user && ((user.nickname && user.nickname === detail.nickname) || (!user.nickname && user.username === detail.nickname));
   const [isDeleting, setIsDeleting] = useState(false);
-  console.log("안녕하세요" + detail.author);
 
   const handleDeletePost = async () => {
     if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) {
@@ -60,7 +59,7 @@ export default function PostDetail({ detail }: Props) {
                 onClick={() =>
                   openReportModal("POST", detail.id, {
                     title: detail.title,
-                    authorName: detail.author,
+                    authorName: detail.nickname,
                   })
                 }
                 style={{
@@ -131,7 +130,7 @@ export default function PostDetail({ detail }: Props) {
           </div>
         </div>
         <div>
-          <span>작성자: {detail.author}</span>
+          <span>작성자: {detail.nickname}</span>
           <span>작성일: {formatDetailDate(detail.createdAt)}</span>
           <span>조회: {detail.views}</span>
           <span>추천: {detail.likes}</span>

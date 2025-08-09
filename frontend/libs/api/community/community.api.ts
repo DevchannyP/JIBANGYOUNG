@@ -106,7 +106,7 @@ export async function fetchPostDetail(postId: string): Promise<DetailProps> {
   return {
     id: data.id,
     title: data.title,
-    author: data.author,
+    nickname: data.nickname,
     createdAt: data.createdAt,
     views: data.views,
     likes: data.likes,

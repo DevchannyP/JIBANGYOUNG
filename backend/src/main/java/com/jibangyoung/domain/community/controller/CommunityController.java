@@ -157,9 +157,8 @@ public class CommunityController {
         }
 
         Long userId = userPrincipal.getId();
-        String author = userPrincipal.getUsername();
-        log.info("댓글 작성, userId: {}, author: {}", userId, author);
-        communityService.saveComment(postId, userId, author, requestDto);
+        log.info("댓글 작성, userId: {}", userId);
+        communityService.saveComment(postId, userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

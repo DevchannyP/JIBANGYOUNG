@@ -48,8 +48,9 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
       <table className={styles.table}>
         <thead>
           <tr className={styles.headerRow}>
-            <th className={styles.authorColumn}>카테고리</th>
+            <th className={styles.categoryColumn}>카테고리</th>
             <th className={styles.titleColumn}>제목</th>
+            <th className={styles.authorColumn}>작성자</th>
             <th className={styles.dateColumn}>작성일</th>
             <th className={styles.viewsColumn}>조회</th>
             <th className={styles.commentsColumn}>추천</th>
@@ -63,7 +64,7 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
               className={`${styles.tableRow} ${styles.noticeRow}`}
               style={{ backgroundColor: "#c4c4c475" }}
             >
-              <td className={styles.authorCell}>
+              <td className={styles.categoryCell}>
                 <span className={styles.categoryBadge}>공지</span>
               </td>
               <td className={styles.titleCell}>
@@ -73,6 +74,9 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
                 >
                   {post.title}
                 </Link>
+              </td>
+              <td className={styles.authorCell}>
+                {post.nickname || "알 수 없음"}
               </td>
               <td className={styles.dateCell}>
                 {formatBoardDate(post.createdAt)}
@@ -85,7 +89,7 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
           {/* 일반 게시글 */}
           {posts.map((post) => (
             <tr key={`post-${post.id}`} className={styles.tableRow}>
-              <td className={styles.authorCell}>
+              <td className={styles.categoryCell}>
                 <span className={styles.categoryBadge}>
                   {categoryMap[post.category] || post.category}
                 </span>
@@ -97,6 +101,9 @@ const BoardTable: React.FC<BoardTableProps> = ({ posts, regionCode }) => {
                 >
                   {post.title}
                 </Link>
+              </td>
+              <td className={styles.authorCell}>
+                {post.nickname || "알 수 없음"}
               </td>
               <td className={styles.dateCell}>
                 {formatBoardDate(post.createdAt)}
