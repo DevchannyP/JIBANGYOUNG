@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "posts")
-@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ?") // 삭제 시 실제로는 UPDATE 실행
+@SQLDelete(sql = "UPDATE posts SET is_deleted = true WHERE id = ? AND version = ?")
 @SQLRestriction("is_deleted = false") // 조회 시 항상 is_deleted = false 조건 자동 추가
 public class Posts {
 

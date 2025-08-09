@@ -282,6 +282,37 @@ export async function updateCommunityPost(
   }
 }
 
+// 게시글 삭제
+// DELETE /api/community/post/{postId}
+export async function deleteCommunityPost(postId: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/community/post/${postId}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    let errorMessage = "게시글 삭제에 실패했습니다.";
+    
+    if (res.status === 403) {
+      errorMessage = "게시글을 삭제할 권한이 없습니다.";
+    } else if (res.status === 404) {
+      errorMessage = "존재하지 않는 게시글입니다.";
+    } else if (errorText) {
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        // JSON 파싱 실패 시 기본 메시지 유지
+      }
+    }
+    
+    throw new Error(errorMessage);
+  }
+}
+
 // 신고 데이터 타입
 export interface CreateReportRequest {
   targetType: "POST" | "COMMENT" | "USER" | "POLICY" | "ETC";

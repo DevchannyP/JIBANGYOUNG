@@ -196,6 +196,23 @@ public class CommunityController {
         return ResponseEntity.ok().build();
     }
 
+    // 게시글 삭제
+    @DeleteMapping("/post/{postId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            log.warn("인증된 사용자 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = userPrincipal.getId();
+        log.info("게시글 삭제 요청, postId: {}, userId: {}", postId, userId);
+        communityService.deletePost(postId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     // 게시글 추천
     @PostMapping("/post/{postId}/recommend")
     @PreAuthorize("isAuthenticated()")

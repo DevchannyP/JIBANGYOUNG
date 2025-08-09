@@ -89,4 +89,28 @@ public class S3ImageManager {
     public String getPublicUrl(String key) {
         return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;
     }
+
+    // HTML 콘텐츠에서 S3 이미지 키 추출 (삭제용)
+    public List<String> extractImageKeysFromContent(String htmlContent) {
+        List<String> imageKeys = new ArrayList<>();
+        if (htmlContent == null || htmlContent.isBlank()) {
+            return imageKeys;
+        }
+
+        String bucketUrl = "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/";
+        Matcher matcher = IMG_TAG_PATTERN.matcher(htmlContent);
+        
+        while (matcher.find()) {
+            String imageUrl = matcher.group(1);
+            if (imageUrl.startsWith(bucketUrl)) {
+                String key = imageUrl.substring(bucketUrl.length());
+                // post-images/ 또는 temp/ 경로만 삭제 대상으로 함
+                if (key.startsWith("post-images/") || key.startsWith("temp/")) {
+                    imageKeys.add(key);
+                }
+            }
+        }
+        
+        return imageKeys;
+    }
 }

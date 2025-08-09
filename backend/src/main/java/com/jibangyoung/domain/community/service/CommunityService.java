@@ -37,7 +37,9 @@ import com.jibangyoung.domain.community.repository.PostRecommendationRepository;
 import com.jibangyoung.domain.community.repository.PostRepository;
 import com.jibangyoung.domain.community.support.S3ImageManager;
 import com.jibangyoung.domain.mypage.entity.Comment;
+import com.jibangyoung.domain.mypage.entity.UserActivityEvent;
 import com.jibangyoung.domain.mypage.repository.CommentRepository;
+import com.jibangyoung.domain.mypage.repository.UserActivityEventRepository;
 import com.jibangyoung.domain.policy.entity.Region;
 import com.jibangyoung.domain.policy.repository.RegionRepository;
 import com.jibangyoung.global.exception.BusinessException;
@@ -50,12 +52,29 @@ import lombok.RequiredArgsConstructor;
 public class CommunityService {
     private final PostRepository postRepository;
     private final RegionRepository regionRepository;
-    private final CommentRepository commentRepository; // 의존성 추가
-    private final UserRepository userRepository; // UserRepository 주입
-    private final PostRecommendationRepository postRecommendationRepository; // PostRecommendationRepository 주입
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final PostRecommendationRepository postRecommendationRepository;
+    private final UserActivityEventRepository userActivityEventRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final S3ImageManager s3ImageManager;
+
+    private void logActivity(Long userId, Integer regionId, String actionType, Long refId, Long parentRefId, Integer scoreDelta) {
+        try {
+            UserActivityEvent event = UserActivityEvent.builder()
+                    .userId(userId)
+                    .regionId(regionId)
+                    .actionType(actionType)
+                    .refId(refId)
+                    .parentRefId(parentRefId)
+                    .scoreDelta(scoreDelta)
+                    .build();
+            userActivityEventRepository.save(event);
+        } catch (Exception e) {
+            // 로그 실패는 메인 로직에 영향 주지 않음
+        }
+    }
 
     @Transactional
     public void recommendPost(Long postId, Long userId, String recommendationType) {
@@ -329,7 +348,10 @@ public class CommunityService {
 
         // 게시글 저장
         Posts post = request.toEntity(thumbnailUrl, content);
-        postRepository.save(post);
+        Posts savedPost = postRepository.save(post);
+        
+        // 활동 로그 기록
+        logActivity(savedPost.getUserId(), (int) savedPost.getRegionId(), "POST", savedPost.getId(), null, 10);
     }
 
     // 게시글 수정
@@ -412,6 +434,21 @@ public class CommunityService {
         
         // 명시적으로 저장
         postRepository.save(post);
+    }
+
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Posts post = postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_FOUND));
+
+        if (post.getUserId() != userId) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED);
+        }
+
+        // 활동 로그 기록 (삭제 전에 기록)
+        logActivity(userId, (int) post.getRegionId(), "POST", postId, null, -10);
+        
+        postRepository.delete(post);
     }
 
     @Transactional
@@ -524,7 +561,10 @@ public class CommunityService {
                 .parent(parent)
                 .build();
 
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+        
+        // 활동 로그 기록
+        logActivity(userId, (int) post.getRegionId(), "COMMENT", savedComment.getId(), postId, 2);
     }
 
     @Transactional
@@ -536,6 +576,13 @@ public class CommunityService {
         if (!comment.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("댓글을 삭제할 권한이 없습니다.");
         }
+
+        // 게시글 정보 조회 (regionId 확인용)
+        Posts post = postRepository.findById(comment.getTargetPostId())
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        // 활동 로그 기록 (삭제 전에 기록)
+        logActivity(userId, (int) post.getRegionId(), "COMMENT", commentId, comment.getTargetPostId(), -2);
 
         commentRepository.delete(comment);
     }
