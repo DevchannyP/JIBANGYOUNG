@@ -151,8 +151,26 @@ export function MentorReportList() {
       ];
     }
     if (userRole === "MENTOR_B") {
+      if (
+        selectedReport.reviewResultCode === "IGNORED" ||
+        selectedReport.reviewResultCode === "INVALID" ||
+        selectedReport.reviewResultCode === "REJECTED"
+      ) {
+        return [
+          {
+            label: "닫기",
+            onClick: () => setSelectedReport(null),
+            type: "secondary" as const,
+          },
+        ];
+      }
       if (selectedReport.reviewResultCode === "PENDING") {
         return [
+          {
+            label: "승인 요청",
+            onClick: () => handleChangeStatus(selectedReport.id, "REQUESTED"),
+            type: "primary" as const,
+          },
           {
             label: "무시",
             onClick: () => handleChangeStatus(selectedReport.id, "IGNORED"),
@@ -175,6 +193,11 @@ export function MentorReportList() {
           label: "닫기",
           onClick: () => setSelectedReport(null),
           type: "secondary" as const,
+        },
+        {
+          label: "승인요청 취소",
+          onClick: () => handleChangeStatus(selectedReport.id, "PENDING"),
+          type: "danger" as const,
         },
       ];
     }

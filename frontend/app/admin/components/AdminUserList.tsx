@@ -75,7 +75,7 @@ export function AdminUserList() {
     [users, regionOptions]
   );
 
-  // 🔎 검색어 입력 (디바운스 SearchBar에서 전달됨)
+  // 검색어 입력 (디바운스 SearchBar에서 전달됨)
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
@@ -84,7 +84,7 @@ export function AdminUserList() {
     [filterData, selectedRegionCode]
   );
 
-  // 🌎 지역 탭 변경
+  // 지역 탭 변경
   const handleRegionChange = useCallback(
     (_region: string, code: number) => {
       setSelectedRegionCode(code);
@@ -168,7 +168,7 @@ export function AdminUserList() {
               <th>이메일</th>
               <th>전화번호</th>
               <th>생년월일</th>
-              <th>지역</th>
+              <th>관심지역</th>
               <th>권한</th>
             </tr>
           </thead>

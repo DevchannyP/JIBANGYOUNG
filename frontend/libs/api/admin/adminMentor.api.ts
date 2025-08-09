@@ -22,7 +22,13 @@ export async function fetchMentorReports(type?: string): Promise<Report[]> {
 // 3. 신고 상태 변경
 export async function requestReportApproval(
   id: number,
-  status: "REQUESTED" | "IGNORED" | "INVALID" | "PENDING"
+  status:
+    | "PENDING"
+    | "APPROVED"
+    | "REJECTED"
+    | "IGNORED"
+    | "INVALID"
+    | "REQUESTED"
 ): Promise<void> {
   await api.patch(`/api/mentor/report/${id}/status`, { status });
 }
@@ -50,8 +56,8 @@ export async function approveMentorRequestSecond(id: number) {
 }
 
 // 멘토 신청목록 처리상태_반려(미승인)
-export async function rejectMentorRequest(id: number) {
-  await api.patch(`/api/mentor/request/${id}/reject`);
+export async function rejectMentorRequest(id: number, reason: string) {
+  return api.patch(`/api/mentor/request/${id}/reject`, { reason });
 }
 
 // 멘토 신청목록 처리상태_승인요청

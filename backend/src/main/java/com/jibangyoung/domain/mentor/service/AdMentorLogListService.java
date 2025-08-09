@@ -18,7 +18,12 @@ public class AdMentorLogListService {
     private final AdMentorUserRepository adMentorUserRepository;
 
     // 멘토 데시보드_멘토 활동로그 리스트
-    public List<AdMentorLogListDTO> getMentorLogList(Long userId) {
+    public List<AdMentorLogListDTO> getMentorLogList(Long userId, boolean isAdmin) {
+
+        if (isAdmin) {
+            return adMentorLogListQueryRepository.findMentorLogListAllRegions();
+        }
+
         List<Long> regionIds = adMentorUserRepository.findRegionIdByUserId(userId);
 
         if (regionIds == null || regionIds.isEmpty()) {

@@ -10,7 +10,7 @@ export interface AdMentorRequest {
   id: number;
   userId: number;
   userName: string;
-  nickname: string;
+  nickname: string | null;
   userEmail: string;
   regionId: number;
   reason: string;

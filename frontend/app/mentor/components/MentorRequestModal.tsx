@@ -7,7 +7,8 @@ interface MentorRequestModalProps {
   userRole?: string;
   onRequest?: () => void;
   onFirstApprove?: () => void;
-  onSecondApprove?: () => void;
+  onSecondApprove?: () => void; // MENTOR_A (2차 승인)
+  onFinalApprove?: () => void; // ADMIN (최종 승인 = FINAL_APPROVED)
   onReject: (reason: string) => void;
   onClose: () => void;
   regionOptions: { code: number; name: string }[];
@@ -20,6 +21,7 @@ export function MentorRequestModal({
   onRequest,
   onFirstApprove,
   onSecondApprove,
+  onFinalApprove,
   onReject,
   onClose,
 }: MentorRequestModalProps) {
@@ -48,8 +50,29 @@ export function MentorRequestModal({
     resetReject();
   };
 
-  // 기본 버튼(역할/상태별)
+  // 역할/상태별 기본 버튼
   const getBaseButtons = (): ModalButton[] => {
+    // ADMIN: FIRST_APPROVED, REQUESTED, PENDING, SECOND_APPROVED → 최종 승인, 반려
+    if (
+      userRole === "ADMIN" &&
+      ["FIRST_APPROVED", "REQUESTED", "PENDING", "SECOND_APPROVED"].includes(
+        data.status
+      )
+    ) {
+      return [
+        onFinalApprove && {
+          label: "최종 승인",
+          onClick: () => onFinalApprove?.(),
+          type: "primary",
+        },
+        {
+          label: "반려",
+          onClick: () => setIsRejecting(true),
+          type: "danger",
+        },
+      ].filter(Boolean) as ModalButton[];
+    }
+
     // MENTOR_A: FIRST_APPROVED, REQUESTED, PENDING → 2차 승인, 반려
     if (
       userRole === "MENTOR_A" &&
@@ -69,12 +92,12 @@ export function MentorRequestModal({
       ].filter(Boolean) as ModalButton[];
     }
 
-    // MENTOR_A: SECOND_APPROVED → 2차 승인 취소(=1차 승인 API 호출)
+    // MENTOR_A: SECOND_APPROVED → 2차 승인 취소(= 1차 승인 API 호출)
     if (userRole === "MENTOR_A" && data.status === "SECOND_APPROVED") {
       return [
         {
           label: "2차 승인 취소",
-          onClick: () => onFirstApprove?.(), // 기존 1차 승인 API 호출
+          onClick: () => onFirstApprove?.(),
           type: "warning",
         },
         {
@@ -134,7 +157,7 @@ export function MentorRequestModal({
     return [];
   };
 
-  // 반려 모드일 때 버튼 교체
+  // 반려 모드일 때 버튼
   const getButtons = (): ModalButton[] => {
     if (isRejecting) {
       return [
@@ -182,6 +205,19 @@ export function MentorRequestModal({
               style={{ width: "100%", height: 100 }}
             />
           </div>
+
+          {data.status === "REJECTED" && (
+            <div>
+              <p>
+                <b>반려사유:</b>
+              </p>
+              <textarea
+                value={data.rejectionReason || ""}
+                readOnly
+                style={{ width: "100%", height: 100 }}
+              />
+            </div>
+          )}
 
           {isRejecting && (
             <div>

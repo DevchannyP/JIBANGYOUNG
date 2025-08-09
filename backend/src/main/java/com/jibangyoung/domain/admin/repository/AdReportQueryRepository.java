@@ -38,7 +38,7 @@ public class AdReportQueryRepository {
         QAdminPosts p2 = new QAdminPosts("p2");
         QReportReason rr = QReportReason.reportReason;
 
-        var reviewStatusList = Arrays.asList(ReviewResultCode.REQUESTED, ReviewResultCode.APPROVED);
+        var reviewStatusList = Arrays.asList(ReviewResultCode.values());
         var whereBuilder = r.reviewResultCode.in(reviewStatusList);
         if (type != null) {
             whereBuilder = whereBuilder.and(r.targetType.eq(type));

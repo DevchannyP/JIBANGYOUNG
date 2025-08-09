@@ -95,16 +95,17 @@ public class MentorCertificationRequests {
         }
     }
 
-    // 멘토 신고목록_처리상태 + 담당자 + 수정시간 변경
+    // 멘토 신고목록_처리상태 + 담당자 + 수정시간 + 반려사유 변경
     public void setStatus(Status status) {
         this.status = status;
     }
-
     public void setReviewedBy(Long reviewedBy) {
         this.reviewedBy = reviewedBy;
     }
-
     public void setReviewedAt(LocalDateTime reviewedAt) {
         this.reviewedAt = reviewedAt;
+    }
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason; 
     }
 }

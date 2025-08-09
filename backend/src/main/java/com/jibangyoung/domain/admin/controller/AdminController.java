@@ -24,7 +24,10 @@ import com.jibangyoung.domain.admin.dto.AdUserRoleDTO;
 import com.jibangyoung.domain.admin.service.AdPostService;
 import com.jibangyoung.domain.admin.service.AdRegionService;
 import com.jibangyoung.domain.admin.service.AdReportService;
+import com.jibangyoung.domain.admin.service.AdRequestService;
 import com.jibangyoung.domain.admin.service.AdUserService;
+import com.jibangyoung.domain.mentor.dto.AdMentorRequestDTO;
+import com.jibangyoung.global.common.ApiResponse;
 import com.jibangyoung.global.security.CustomUserPrincipal;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class AdminController {
     private final AdPostService postService;
     private final AdRegionService regionService;
     private final AdReportService adReportService;
+    private final AdRequestService adRequestService;
 
     // [유저관리]
     @GetMapping("/users")
@@ -113,6 +117,23 @@ public class AdminController {
         String status = request.get("status");
         Long adminId = loginUser.getId();
         adReportService.updateReportStatus(id, status, adminId);
+        return ResponseEntity.ok().build();
+    }
+
+    // [멘토 신청] 전체 리스트 (프론트: res.data.data 기대)
+    @GetMapping("/mentor/request/list")
+    public ResponseEntity<ApiResponse<List<AdMentorRequestDTO>>> getAllMentorRequestsForAdmin(
+            @AuthenticationPrincipal CustomUserPrincipal loginUser
+    ) {
+        List<AdMentorRequestDTO> list = adRequestService.getAllMentorRequests();
+        return ResponseEntity.ok(ApiResponse.success(list));
+    }
+    @PatchMapping("/mentor/request/{id}/approve/final")
+    public ResponseEntity<Void> approveFinal(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserPrincipal loginUser
+    ) {
+        adRequestService.approveFinal(id, loginUser.getId());
         return ResponseEntity.ok().build();
     }
 }

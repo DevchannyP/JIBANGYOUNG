@@ -42,7 +42,6 @@ public class AdReportService {
         Report report = adReportRepository.findById(reportId)
             .orElseThrow(() -> new IllegalArgumentException("해당 신고내역이 존재하지 않습니다: " + reportId));
         report.setReviewResultCode(ReviewResultCode.valueOf(status));
-        report.setReviewedBy(reviewedBy);
         report.setReviewedAt(LocalDateTime.now());
 
         // 승인 처리(논리적 삭제)

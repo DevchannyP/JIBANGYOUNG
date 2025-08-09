@@ -1,5 +1,6 @@
 import api from "@/libs/api/axios";
 import { Report } from "@/types/api/adMentorReport";
+import { AdMentorRequest } from "@/types/api/adMentorRequest";
 import { AdminPost } from "@/types/api/adminPost";
 import { AdminRegion } from "@/types/api/adminRegion";
 import { AdminUser, ChangeUserStatusPayload } from "@/types/api/adminUser";
@@ -40,7 +41,13 @@ export async function changeUserStatus(
 // 관리자 데시보드_신고목록_처리상태(승인/반려)
 export async function adminApproveOrRejectReport(
   id: number,
-  status: "APPROVED" | "REJECTED" | "REQUESTED"
+  status:
+    | "APPROVED"
+    | "IGNORED"
+    | "INVALID"
+    | "PENDING"
+    | "REJECTED"
+    | "REQUESTED"
 ): Promise<void> {
   await api.patch(`/api/admin/report/${id}/status`, { status });
 }
@@ -92,6 +99,30 @@ export async function restoreAdminPost(id: number): Promise<void> {
     await api.patch(`/api/admin/posts/${id}/restore`);
   } catch (error: any) {
     const msg = error.response?.data?.message || "게시글 복구 실패";
+    throw new Error(msg);
+  }
+}
+
+// 관리자 데시보드_멘토 신청 전체 리스트
+export async function fetchAdminAllMentorRequestList(): Promise<
+  AdMentorRequest[]
+> {
+  try {
+    const response = await api.get("/api/admin/mentor/request/list");
+    return response.data.data;
+  } catch (error: any) {
+    const msg =
+      error.response?.data?.message || "멘토 신청 전체 목록 조회 실패";
+    throw new Error(msg);
+  }
+}
+
+// 관리자 데시보드_멘토 신청 최종 승인(FINAL_APPROVED)
+export async function approveMentorRequestFinal(id: number): Promise<void> {
+  try {
+    await api.patch(`/api/admin/mentor/request/${id}/approve/final`);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "최종 승인 처리 실패";
     throw new Error(msg);
   }
 }

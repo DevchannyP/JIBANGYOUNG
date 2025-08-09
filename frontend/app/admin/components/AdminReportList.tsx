@@ -1,7 +1,9 @@
 import { CommonModal } from "@/app/admin/components/AdminModal";
+import { AdminRegionTab } from "@/app/admin/components/AdminRegionTab"; // ✅ 추가
 import { AdminReportTab } from "@/app/admin/components/AdminReportTab";
 import { AdminSearch } from "@/app/admin/components/AdminSearch";
 import { Pagination } from "@/app/admin/components/Pagination";
+import { useAdminRegion } from "@/app/admin/hooks/useAdminRegion"; // ✅ 추가
 import {
   adminApproveOrRejectReport,
   changeUserStatus,
@@ -31,6 +33,11 @@ export function AdminReportList() {
   const [reports, setReports] = useState<Report[]>([]);
   const [searchResult, setSearchResult] = useState<Report[]>([]);
   const [selectedType, setSelectedType] = useState<ReportTabType>("게시글");
+
+  // ✅ 지역 탭 상태/옵션
+  const [selectedRegionCode, setSelectedRegionCode] = useState(0);
+  const { regionOptions, loading: regionLoading } = useAdminRegion();
+
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +54,10 @@ export function AdminReportList() {
       .then((data) => {
         setReports(data);
         setSearchResult(data);
+        // ✅ 탭 변경 시 필터 초기화
+        setSelectedRegionCode(0);
+        setSearchKeyword("");
+        setCurrentPage(1);
       })
       .catch((e) => {
         alert(e.message || "신고 목록 조회 실패");
@@ -60,29 +71,57 @@ export function AdminReportList() {
     }
   }, [selectedReport]);
 
-  // 검색 필터
+  // ✅ 공통 필터 함수 (지역 + 키워드)
   const filterData = useCallback(
-    (keyword: string) => {
+    (regionCode: number, keyword: string) => {
       const trimmed = keyword.trim().toLowerCase();
-      let filtered = reports.filter(
-        (r) =>
+
+      const filtered = reports.filter((r) => {
+        // 지역 정규화(천 단위) — AdminPostList와 동일하게 동작
+        // 예: 30123 -> 30000, 30100 선택 시 같은 그룹으로 간주
+        const codePrefix =
+          typeof r.regionId === "number"
+            ? Math.floor(r.regionId / 1000) * 1000
+            : 0;
+        const normalizedRegionCode =
+          regionCode === 0 ? 0 : Math.floor(regionCode / 1000) * 1000;
+
+        const matchRegion =
+          normalizedRegionCode === 0 || codePrefix === normalizedRegionCode;
+
+        const matchKeyword =
           trimmed === "" ||
           (r.reasonDetail?.toLowerCase().includes(trimmed) ?? false) ||
-          (r.reasonCode?.toLowerCase().includes(trimmed) ?? false)
-      );
+          (r.reasonCode?.toLowerCase().includes(trimmed) ?? false) ||
+          (r.reasonDescription?.toLowerCase().includes(trimmed) ?? false) ||
+          (r.targetTitle?.toLowerCase().includes(trimmed) ?? false) ||
+          (r.reviewerName?.toLowerCase().includes(trimmed) ?? false);
+
+        return matchRegion && matchKeyword;
+      });
+
       setSearchResult(filtered);
       setCurrentPage(1);
     },
     [reports]
   );
 
+  // ✅ 지역 탭 핸들러
+  const handleRegionChange = useCallback(
+    (_regionName: string, code: number) => {
+      setSelectedRegionCode(code);
+      filterData(code, searchKeyword);
+    },
+    [filterData, searchKeyword]
+  );
+
   // 검색 핸들러
   const handleSearch = useCallback(
     (keyword: string) => {
       setSearchKeyword(keyword);
-      filterData(keyword);
+      filterData(selectedRegionCode, keyword);
     },
-    [filterData]
+    [filterData, selectedRegionCode]
   );
 
   // URL 클릭 핸들러
@@ -95,68 +134,96 @@ export function AdminReportList() {
   const handleApprove = useCallback(async () => {
     if (!selectedReport) return;
     try {
-      // 유저 신고일 때만 유저 상태 변경
       if (selectedReport.targetType === "USER") {
         await changeUserStatus(selectedReport.targetId, userStatus);
       }
-      // 신고 승인 처리
       await adminApproveOrRejectReport(selectedReport.id, "APPROVED");
-
-      // 목록 갱신
       const data = await fetchAdminReports(reportTabToType[selectedType]);
       setReports(data);
-      setSearchResult(data);
+      // ✅ 현재 필터 유지 반영
+      filterData(selectedRegionCode, searchKeyword);
       setSelectedReport(null);
       alert("유저 상태 변경 및 승인 완료!");
     } catch (e: any) {
       alert(e.message || "승인 처리 실패");
     }
-  }, [selectedReport, userStatus, selectedType]);
+  }, [
+    selectedReport,
+    userStatus,
+    selectedType,
+    filterData,
+    selectedRegionCode,
+    searchKeyword,
+  ]);
 
-  // 반려 처리 (기존대로)
+  // 반려 처리
   const handleReject = useCallback(async () => {
     if (!selectedReport) return;
     try {
       await adminApproveOrRejectReport(selectedReport.id, "REJECTED");
       const data = await fetchAdminReports(reportTabToType[selectedType]);
       setReports(data);
-      setSearchResult(data);
+      filterData(selectedRegionCode, searchKeyword); // ✅ 필터 유지
       setSelectedReport(null);
       alert("반려 처리 완료!");
     } catch (e: any) {
       alert(e.message || "반려 처리 실패");
     }
-  }, [selectedReport, selectedType]);
+  }, [
+    selectedReport,
+    selectedType,
+    filterData,
+    selectedRegionCode,
+    searchKeyword,
+  ]);
 
-  // 승인취소 처리 (기존대로)
+  // 승인취소 처리
   const handleRequest = useCallback(async () => {
     if (!selectedReport) return;
     try {
       await adminApproveOrRejectReport(selectedReport.id, "REQUESTED");
       const data = await fetchAdminReports(reportTabToType[selectedType]);
       setReports(data);
-      setSearchResult(data);
+      filterData(selectedRegionCode, searchKeyword); // ✅ 필터 유지
       setSelectedReport(null);
       alert("승인 취소 완료!");
     } catch (e: any) {
       alert(e.message || "승인취소 실패");
     }
-  }, [selectedReport, selectedType]);
+  }, [
+    selectedReport,
+    selectedType,
+    filterData,
+    selectedRegionCode,
+    searchKeyword,
+  ]);
 
   const paginatedData = searchResult.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
+  if (regionLoading) return <div>지역 정보 불러오는 중...</div>;
+
   return (
     <div>
       <h1 className={styles.title}>신고 목록</h1>
+
+      <AdminRegionTab
+        regionOptions={regionOptions}
+        selectedRegionCode={selectedRegionCode}
+        onSelectRegion={handleRegionChange}
+      />
       <AdminReportTab
         selectedType={selectedType}
         onSelectType={setSelectedType}
         tabOptions={REPORT_TAB_OPTIONS}
       />
-      <AdminSearch placeholder="사유 검색" onSearch={handleSearch} />
+      <AdminSearch
+        placeholder="사유/제목/담당자 검색"
+        onSearch={handleSearch}
+      />
+
       <div className={styles.tableWrapper}>
         <table className={styles.userTable}>
           <thead>
@@ -211,7 +278,6 @@ export function AdminReportList() {
                 <p>
                   <b>신고대상:</b> {selectedReport.targetTitle}
                 </p>
-                {/* 유저 신고일 때만 select 렌더링 */}
                 {selectedReport.targetType === "USER" && (
                   <AdUserStatusControl
                     value={userStatus}
@@ -225,7 +291,7 @@ export function AdminReportList() {
                   <b>담당자:</b> {selectedReport.reviewerName ?? "미지정"}
                 </p>
                 <p>
-                  <b>신고사유:</b>{" "}
+                  <b>신고사유:</b>
                 </p>
                 <textarea
                   value={

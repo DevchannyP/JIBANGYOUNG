@@ -11,6 +11,20 @@ import com.jibangyoung.domain.auth.entity.User;
 import com.jibangyoung.domain.mentor.dto.AdMentorUserDTO;
 
 public interface AdMentorUserRepository extends JpaRepository<User, Long> {
+    // 내 지역 멘토목록_전체(admin)
+    @Query("""
+        SELECT new com.jibangyoung.domain.mentor.dto.AdMentorUserDTO(
+            u.id,
+            u.nickname,
+            u.role,
+            m.warningCount,
+            m.regionId,
+            m.currentScore
+        )
+        FROM MentorTest m
+        JOIN User u ON m.userId = u.id
+    """)
+    List<AdMentorUserDTO> findAllMentorUsers();
 
     @Query("""
         SELECT new com.jibangyoung.domain.mentor.dto.AdMentorUserDTO(
@@ -34,12 +48,4 @@ public interface AdMentorUserRepository extends JpaRepository<User, Long> {
         WHERE m.userId = :userId
     """)
     List<Long> findRegionIdByUserId(@Param("userId") Long userId);
-
-    // 로그인 유저 ID로 nickname 조회
-    @Query("""
-        SELECT u.nickname
-        FROM User u
-        WHERE u.id = :userId
-    """)
-    String findNicknameByUserId(@Param("userId") Long userId);
 }

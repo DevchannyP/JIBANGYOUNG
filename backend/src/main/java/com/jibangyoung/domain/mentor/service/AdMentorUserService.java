@@ -16,9 +16,14 @@ public class AdMentorUserService {
 
     private final AdMentorUserRepository adMentorUserRepository;
 
+    // 멘토 대시보드_전체 멘토 리스트(admin)
+    public List<AdMentorUserDTO> getAllMentorUsers() {
+        return adMentorUserRepository.findAllMentorUsers();
+    }
+
     // 멘토 대시보드_내 지역 멘토 리스트
     public List<AdMentorUserDTO> getAdMentorId(Long mentorId) {
-        // mentorId로 regionId(들) 조회
+        // mentorId로 regionId 조회
         List<Long> regionIds = adMentorUserRepository.findRegionIdByUserId(mentorId);
         if (regionIds == null || regionIds.isEmpty()) {
             return Collections.emptyList();

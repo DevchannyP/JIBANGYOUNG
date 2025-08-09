@@ -10,7 +10,7 @@ import {
   requestMentorApproval,
 } from "@/libs/api/admin/adminMentor.api";
 import { AdMentorRequest } from "@/types/api/adMentorRequest";
-import { useCallback, useEffect, useMemo, useState } from "react"; // ✅ useMemo 추가
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "../../admin/AdminPage.module.css";
 import { MentorRequestModal } from "./MentorRequestModal";
 import { MentorRequestRow } from "./MentorRequestRow";
@@ -25,12 +25,13 @@ export function MentorRequestList() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [userRole, setUserRole] = useState<string | undefined>(undefined);
+  const [currentNickname, setCurrentNickname] = useState<string | undefined>();
   const ITEMS_PER_PAGE = 10;
 
   // 전체 지역 옵션
   const { regionOptions: allRegionOptions } = useAdminRegion();
 
-  // 로컬스토리지에서 userRole 가져오기 (초기 1회만)
+  // 로컬스토리지에서 로그인 유저 역할/닉네임
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
@@ -38,9 +39,11 @@ export function MentorRequestList() {
         if (raw) {
           const user = JSON.parse(raw)?.state?.user;
           setUserRole(user?.role);
+          setCurrentNickname(user?.nickname);
         }
       } catch {
         setUserRole(undefined);
+        setCurrentNickname(undefined);
       }
     }
   }, []);
@@ -59,7 +62,7 @@ export function MentorRequestList() {
       });
   }, []);
 
-  // ✅ 데이터에 등장하는 regionId만 추출 (중복 제거)
+  // 데이터에 등장하는 regionId만 추출 (중복 제거)
   const availableRegionIds = useMemo(
     () => Array.from(new Set(applications.map((a) => a.regionId))),
     [applications]
@@ -114,6 +117,19 @@ export function MentorRequestList() {
     [applications]
   );
 
+  // 공통 패처: 한 행만 부분 업데이트 (applications + searchResult 동시 갱신)
+  const patchRow = useCallback(
+    (id: number, patch: Partial<AdMentorRequest>) => {
+      setApplications((prev) =>
+        prev.map((app) => (app.id === id ? { ...app, ...patch } : app))
+      );
+      setSearchResult((prev) =>
+        prev.map((app) => (app.id === id ? { ...app, ...patch } : app))
+      );
+    },
+    []
+  );
+
   // 지역 변경 핸들러
   const handleRegionChange = useCallback(
     (_region: string, code: number) => {
@@ -133,108 +149,103 @@ export function MentorRequestList() {
   );
 
   // 1차 승인
-  const handleFirstApprove = useCallback((id: number) => {
-    approveMentorRequestFirst(id)
-      .then(() => {
-        setApplications((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "FIRST_APPROVED" } : app
-          )
-        );
-        setSearchResult((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "FIRST_APPROVED" } : app
-          )
-        );
-        setSelectedMentor(null);
-        alert("1차 승인 처리 완료되었습니다!");
-      })
-      .catch((e) => {
-        alert(
-          e?.response?.data?.message ||
-            e?.message ||
-            "처리 중 오류가 발생했습니다."
-        );
-      });
-  }, []);
+  const handleFirstApprove = useCallback(
+    (id: number) => {
+      approveMentorRequestFirst(id)
+        .then(() => {
+          patchRow(id, {
+            status: "FIRST_APPROVED",
+            nickname: currentNickname ?? null,
+          });
+          setSelectedMentor(null);
+          alert("1차 승인 처리 완료되었습니다!");
+        })
+        .catch((e) => {
+          alert(
+            e?.response?.data?.message ||
+              e?.message ||
+              "처리 중 오류가 발생했습니다."
+          );
+        });
+    },
+    [patchRow, currentNickname]
+  );
 
   // 2차 승인
-  const handleSecondApprove = useCallback((id: number) => {
-    approveMentorRequestSecond(id)
-      .then(() => {
-        setApplications((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "SECOND_APPROVED" } : app
-          )
-        );
-        setSearchResult((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "SECOND_APPROVED" } : app
-          )
-        );
-        setSelectedMentor(null);
-        alert("2차 승인 처리 완료되었습니다!");
-      })
-      .catch((e) => {
-        alert(
-          e?.response?.data?.message ||
-            e?.message ||
-            "처리 중 오류가 발생했습니다."
-        );
-      });
-  }, []);
+  const handleSecondApprove = useCallback(
+    (id: number) => {
+      approveMentorRequestSecond(id)
+        .then(() => {
+          patchRow(id, {
+            status: "SECOND_APPROVED",
+            nickname: currentNickname ?? null,
+          });
+          setSelectedMentor(null);
+          alert("2차 승인 처리 완료되었습니다!");
+        })
+        .catch((e) => {
+          alert(
+            e?.response?.data?.message ||
+              e?.message ||
+              "처리 중 오류가 발생했습니다."
+          );
+        });
+    },
+    [patchRow, currentNickname]
+  );
 
   // 반려
-  const handleReject = useCallback((id: number) => {
-    rejectMentorRequest(id)
-      .then(() => {
-        setApplications((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "REJECTED" } : app
-          )
-        );
-        setSearchResult((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "REJECTED" } : app
-          )
-        );
-        setSelectedMentor(null);
-        alert("반려 처리 완료되었습니다!");
-      })
-      .catch((e) => {
-        alert(
-          e?.response?.data?.message ||
-            e?.message ||
-            "처리 중 오류가 발생했습니다."
-        );
-      });
-  }, []);
+  const handleReject = useCallback(
+    (id: number, reason: string) => {
+      const trimmed = reason.trim();
+      if (!trimmed) {
+        alert("반려 사유를 입력해 주세요.");
+        return;
+      }
+
+      rejectMentorRequest(id, trimmed)
+        .then(() => {
+          patchRow(id, {
+            status: "REJECTED",
+            nickname: currentNickname ?? null,
+            rejectionReason: trimmed,
+          });
+          setSelectedMentor(null);
+          alert("반려 처리 완료되었습니다!");
+        })
+        .catch((e) => {
+          alert(
+            e?.response?.data?.message ||
+              e?.message ||
+              "반려 처리 중 오류가 발생했습니다."
+          );
+        });
+    },
+    [patchRow, currentNickname]
+  );
 
   // 승인요청
-  const handleRequest = useCallback((id: number) => {
-    requestMentorApproval(id)
-      .then(() => {
-        setApplications((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "REQUESTED" } : app
-          )
-        );
-        setSearchResult((prev) =>
-          prev.map((app) =>
-            app.id === id ? { ...app, status: "REQUESTED" } : app
-          )
-        );
-        setSelectedMentor(null);
-        alert("승인요청 처리 완료되었습니다!");
-      })
-      .catch((e) => {
-        alert(
-          e?.response?.data?.message ||
-            e?.message ||
-            "처리 중 오류가 발생했습니다."
-        );
-      });
-  }, []);
+  const handleRequest = useCallback(
+    (id: number) => {
+      requestMentorApproval(id)
+        .then(() => {
+          patchRow(id, {
+            status: "REQUESTED",
+            nickname: currentNickname ?? null,
+          });
+          setSelectedMentor(null);
+          alert("승인요청 처리 완료되었습니다!");
+        })
+        .catch((e) => {
+          alert(
+            e?.response?.data?.message ||
+              e?.message ||
+              "처리 중 오류가 발생했습니다."
+          );
+        });
+    },
+    [patchRow, currentNickname]
+  );
 
   const totalPages = Math.ceil(searchResult.length / ITEMS_PER_PAGE);
   const paginatedData = searchResult.slice(
@@ -246,7 +257,6 @@ export function MentorRequestList() {
     <div>
       <h1 className={styles.title}>멘토 신청 목록</h1>
 
-      {/* ✅ 담당(등장) 지역만 노출 */}
       <AdminRegionTab
         regionOptions={filteredRegionOptions}
         selectedRegionCode={selectedRegionId}
@@ -290,7 +300,7 @@ export function MentorRequestList() {
                   index={index + (currentPage - 1) * ITEMS_PER_PAGE}
                   total={searchResult.length}
                   onClick={() => setSelectedMentor(app)}
-                  regionOptions={filteredRegionOptions} // ✅ 일관성 유지
+                  regionOptions={filteredRegionOptions}
                 />
               ))
             )}
@@ -310,9 +320,9 @@ export function MentorRequestList() {
           onRequest={() => handleRequest(selectedMentor.id)}
           onFirstApprove={() => handleFirstApprove(selectedMentor.id)}
           onSecondApprove={() => handleSecondApprove(selectedMentor.id)}
-          onReject={() => handleReject(selectedMentor.id)}
+          onReject={(reason) => handleReject(selectedMentor.id, reason)}
           onClose={() => setSelectedMentor(null)}
-          regionOptions={filteredRegionOptions} // ✅ 모달도 동일 옵션
+          regionOptions={filteredRegionOptions}
         />
       )}
     </div>
