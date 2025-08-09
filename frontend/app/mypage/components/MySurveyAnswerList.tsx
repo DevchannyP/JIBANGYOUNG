@@ -1,12 +1,11 @@
 "use client";
 
+import { getSurveyResponseGroups } from "@/libs/api/mypage.api";
+import type { SurveyResponseGroupDto } from "@/types/api/mypage.types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { getSurveyResponseGroups } from "@/libs/api/mypage.api";
-import type { SurveyResponseGroupDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
-
 
 interface MySurveyResponseGroupListProps {
   userId?: number;
@@ -97,20 +96,20 @@ export default function MySurveyResponseGroupList({ userId }: MySurveyResponseGr
       </header>
       <ul className={styles.mypageList} role="list" aria-live="polite">
         {data.responses.map((g: SurveyResponseGroupDto) => (
-          <li
-            key={g.responseId}
-            className={styles.mypageListItem}
-            tabIndex={0}
-            aria-label={`설문응답번호: ${g.responseId}, 문항수: ${g.answerCount}, 작성일: ${formatDate(g.submittedAt)}`}
-            onClick={() => router.push(`/recommend-region-result?responseId=${g.responseId}`)}
-            style={{ cursor: "pointer" }}
-          >
-            <div className={styles.mypageListTitle}>
-              <span>설문응답번호: {g.responseId}</span>
-              <span className={styles.answerText}>문항 {g.answerCount}개</span>
-            </div>
-            <span className={styles.mypageListTime}>{formatDate(g.submittedAt)}</span>
-          </li>
+<li
+  key={g.responseId}
+  className={styles.mypageListItem}
+  tabIndex={0}
+  aria-label={`설문응답번호: ${g.responseId}, 문항수: ${g.answerCount}, 작성일: ${formatDate(g.submittedAt)}`}
+  onClick={() => router.push("/policy/recommendedList")} // ✅ 변경
+  style={{ cursor: "pointer" }}
+>
+  <div className={styles.mypageListTitle}>
+    <span>설문응답번호: {g.responseId}</span>
+    <span className={styles.answerText}>문항 {g.answerCount}개</span>
+  </div>
+  <span className={styles.mypageListTime}>{formatDate(g.submittedAt)}</span>
+</li>
         ))}
       </ul>
       <Pagination />

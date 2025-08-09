@@ -151,27 +151,41 @@ export default function Header() {
           className="header-actions"
           style={{ display: "flex", alignItems: "center", gap: 10 }}
         >
-          {/* 👱‍♂️ 노란색 마이페이지 이모지 버튼 */}
-          <button
-            type="button"
-            className="btn-mypage"
-            aria-label="마이페이지"
-            onClick={handleMypage}
-            style={{
-              background: "none",
-              border: "none",
-              fontSize: 22,
-              padding: 0,
-              cursor: "pointer",
-              marginRight: 4,
-              transition: "opacity 0.18s",
-            }}
-            title="마이페이지"
-          >
-            <span role="img" aria-label="마이페이지">
-              👱‍♂️
-            </span>
-          </button>
+{/* 마이페이지 아이콘 버튼 */}
+{/* 헤더 배경색과 일치하는 마이페이지 버튼 - 경계선 제거 */}
+<button
+  type="button"
+  className="btn-mypage"
+  aria-label="마이페이지"
+  onClick={handleMypage}
+  style={{
+    background: "transparent", // 완전히 투명하게
+    border: "none",
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "4px", // 점 간격 넓히기
+    boxShadow: "none", // 그림자도 제거해서 더 자연스럽게
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.08)"; // 호버시 살짝 어둡게
+    e.currentTarget.style.transform = "translateY(-1px) scale(1.03)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = "transparent"; // 원래대로
+    e.currentTarget.style.transform = "translateY(0) scale(1)";
+  }}
+  title="마이페이지"
+>
+  <div style={{ width: "4px", height: "4px", backgroundColor: "#333", borderRadius: "50%" }}></div>
+  <div style={{ width: "4px", height: "4px", backgroundColor: "#333", borderRadius: "50%" }}></div>
+  <div style={{ width: "4px", height: "4px", backgroundColor: "#333", borderRadius: "50%" }}></div>
+</button>
           {!isLoggedIn ? (
             <Link href="/auth/login" className="btn-primary">
               로그인

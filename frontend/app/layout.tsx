@@ -17,8 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      {/* suppressHydrationWarning 제거: SSR/CSR 결과 일치시 불필요 */}
-      <body>
+      <body suppressHydrationWarning={true}>
         <Providers>
           <Header />
           <main className="container">{children}</main>

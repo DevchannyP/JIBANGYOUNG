@@ -209,7 +209,7 @@ export default function ReviewCard() {
                   role="option"
                   aria-selected={isActive}
                   tabIndex={0}
-                  aria-label={`${idx + 1}위. ${post.title} - ${post.regionName}`}
+                  aria-label={`${idx + 1}위. ${post.title}`}
                   onFocus={() => setActiveIdx(idx)}
                   onMouseEnter={() => setActiveIdx(idx)}
                   onMouseLeave={() => setActiveIdx(-1)}
@@ -241,11 +241,6 @@ export default function ReviewCard() {
                     {/* 제목 */}
                     <span className={styles.itemTitle}>
                       {truncatedTitle}
-                    </span>
-                    
-                    {/* 지역명 */}
-                    <span className={styles.regionName}>
-                      {post.regionName}
                     </span>
                   </div>
                 </div>

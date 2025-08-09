@@ -17,9 +17,13 @@ import com.jibangyoung.domain.auth.entity.UserStatus;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
+
     Optional<User> findByEmail(String email);
+
     Optional<User> findByUsernameAndStatus(String username, UserStatus status);
+
     boolean existsByUsername(String username);
+
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.status = :status AND u.lastLoginAt < :date")
@@ -28,12 +32,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :startDate AND u.createdAt < :endDate")
     long countUsersByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
-
-    
-//     // === [비밀번호 해시코드로 변경 코드] ===
-// @Modifying(clearAutomatically = true, flushAutomatically = true)
-// @Query("update User u set u.password = :encoded where u.id = :id")
-// void updatePasswordById(@Param("id") Long id, @Param("encoded") String encoded);
+    // // === [비밀번호 해시코드로 변경 코드] ===
+    // @Modifying(clearAutomatically = true, flushAutomatically = true)
+    // @Query("update User u set u.password = :encoded where u.id = :id")
+    // void updatePasswordById(@Param("id") Long id, @Param("encoded") String
+    // encoded);
 }
-
-

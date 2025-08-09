@@ -14,12 +14,25 @@ import com.jibangyoung.domain.mypage.entity.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    /** 논리 삭제되지 않은 댓글만(일반 사용자용) */
-    Page<Comment> findByUserAndIsDeletedFalseOrderByCreatedAtDesc(
-            User user, Pageable pageable);
+    /** 논리 삭제되지 않은 댓글만(일반 사용자용) - posts 테이블과 조인하여 regionId도 함께 조회 */
+    @Query(value = "SELECT c.id, c.content, c.created_at, c.is_deleted, c.parent_id, " +
+            "c.target_post_id, c.target_post_title, c.updated_at, c.user_id, p.region_id " +
+            "FROM comment c JOIN posts p ON c.target_post_id = p.id " +
+            "WHERE c.user_id = :#{#user.id} AND c.is_deleted = false " +
+            "ORDER BY c.created_at DESC", countQuery = "SELECT COUNT(c.id) FROM comment c " +
+                    "JOIN posts p ON c.target_post_id = p.id " +
+                    "WHERE c.user_id = :#{#user.id} AND c.is_deleted = false", nativeQuery = true)
+    Page<Object[]> findByUserAndIsDeletedFalseWithRegionIdOrderByCreatedAtDesc(
+            @Param("user") User user, Pageable pageable);
 
-    @Query("SELECT c FROM Comment c WHERE c.user = :user ORDER BY c.createdAt DESC")
-    Page<Comment> findAllByUserIncludeDeleted(@Param("user") User user, Pageable pageable);
+    @Query(value = "SELECT c.id, c.content, c.created_at, c.is_deleted, c.parent_id, " +
+            "c.target_post_id, c.target_post_title, c.updated_at, c.user_id, p.region_id " +
+            "FROM comment c JOIN posts p ON c.target_post_id = p.id " +
+            "WHERE c.user_id = :#{#user.id} " +
+            "ORDER BY c.created_at DESC", countQuery = "SELECT COUNT(c.id) FROM comment c " +
+                    "JOIN posts p ON c.target_post_id = p.id " +
+                    "WHERE c.user_id = :#{#user.id}", nativeQuery = true)
+    Page<Object[]> findAllByUserIncludeDeletedWithRegionId(@Param("user") User user, Pageable pageable);
 
     @Query("SELECT c FROM Comment c WHERE c.user = :user AND c.isDeleted = true ORDER BY c.createdAt DESC")
     Page<Comment> findDeletedByUser(@Param("user") User user, Pageable pageable);

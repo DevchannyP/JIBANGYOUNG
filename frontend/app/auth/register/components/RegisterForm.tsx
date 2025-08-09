@@ -5,6 +5,7 @@ import type { DebouncedFunc } from "lodash";
 import debounce from "lodash.debounce";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { REGION_INDEX, regionLabel } from "../../../../components/constants/region-map"; // 2번째 파일에서 import
 import {
   useCheckEmail,
   useCheckUsername,
@@ -40,9 +41,16 @@ function PasswordRules({ password, visible }: { password: string; visible: boole
 
 type MessageState = { type: "success" | "error" | "info"; text: string };
 
-const REGION_OPTIONS = [
-  "서울", "경기도", "전라남도", "부산", "대전", "강원도", "제주도", "전주시", "포항", "서귀포시"
-];
+// REGION_INDEX에서 지역 옵션 생성 (구군2 > 구군1 > 시도 순으로 표시)
+const REGION_OPTIONS = Object.entries(REGION_INDEX)
+  .filter(([code, data]) => code !== "99999") // 전국 제외
+  .map(([code, data]) => ({
+    code,
+    label: regionLabel(code), // 구군2 > 구군1 > 시도 순으로 라벨 반환
+  }))
+  .filter(item => item.label.trim() !== "") // 빈 라벨 제외
+  .sort((a, b) => a.label.localeCompare(b.label)); // 가나다순 정렬
+
 const MAX_REGION_SELECT = 3;
 const GENDER_OPTIONS = [
   { value: "", label: "성별 선택" },
@@ -246,14 +254,14 @@ export default function RegisterForm() {
     setPwMsg({ type: "success", text: "비밀번호 일치" });
   }, [form.password, form.passwordConfirm]);
 
-  // --- 지역 실시간 필터링 ---
+  // --- 지역 실시간 필터링 (REGION_OPTIONS 사용) ---
   const filteredRegionOptions = REGION_OPTIONS.filter(
     (region) =>
-      region
+      region.label
         .toLowerCase()
         .replace(/ /g, "")
         .includes(regionQuery.trim().toLowerCase().replace(/ /g, "")) &&
-      !form.regionMulti.includes(region)
+      !form.regionMulti.includes(region.code)
   );
 
   // --- 폼 제출 ---
@@ -553,16 +561,28 @@ export default function RegisterForm() {
                   <input
                     name="phone"
                     value={form.phone}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, phone: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // 숫자만 추출
+                      const numbersOnly = value.replace(/[^0-9]/g, '');
+                      // 자동 하이픈 추가 (010-1234-5678 형식)
+                      let formatted = numbersOnly;
+                      if (numbersOnly.length > 3) {
+                        formatted = numbersOnly.slice(0, 3) + '-' + numbersOnly.slice(3);
+                      }
+                      if (numbersOnly.length > 7) {
+                        formatted = numbersOnly.slice(0, 3) + '-' + numbersOnly.slice(3, 7) + '-' + numbersOnly.slice(7, 11);
+                      }
+                      setForm((f) => ({ ...f, phone: formatted }));
+                    }}
                     className={styles.inputField}
-                    placeholder="휴대폰 번호(- 포함)"
+                    placeholder="휴대폰 번호 (010-1234-5678)"
                     inputMode="tel"
                     autoComplete="tel"
                     disabled={signupMut.isPending}
                     required
                     aria-label="휴대폰 번호"
+                    maxLength={13}
                   />
                 </div>
                 <div className={styles.formRow}>
@@ -625,21 +645,21 @@ export default function RegisterForm() {
                         </div>
                       ) : (
                         filteredRegionOptions.map((region) => {
-                          const isChecked = form.regionMulti.includes(region);
+                          const isChecked = form.regionMulti.includes(region.code);
                           const isDisabled = !isChecked && form.regionMulti.length >= MAX_REGION_SELECT;
                           return (
-                            <label key={region} className={styles.checkboxLabel} style={{ opacity: isDisabled ? 0.5 : 1 }}>
+                            <label key={region.code} className={styles.checkboxLabel} style={{ opacity: isDisabled ? 0.5 : 1 }}>
                               <input
                                 type="checkbox"
-                                value={region}
+                                value={region.code}
                                 checked={isChecked}
                                 disabled={isDisabled || signupMut.isPending}
                                 onChange={(e) => {
                                   setForm((prev) => {
                                     const selected = prev.regionMulti;
                                     const next = e.target.checked
-                                      ? [...selected, region]
-                                      : selected.filter((r) => r !== region);
+                                      ? [...selected, region.code]
+                                      : selected.filter((r) => r !== region.code);
                                     return { ...prev, regionMulti: next };
                                   });
                                 }}
@@ -671,7 +691,7 @@ export default function RegisterForm() {
                                   }} />
                                 )}
                               </span>
-                              {region}
+                              {region.label}
                             </label>
                           );
                         })
@@ -680,19 +700,19 @@ export default function RegisterForm() {
                   )}
                   {/* 선택된 지역 태그 */}
                   <div className={styles.tagWrap}>
-                    {form.regionMulti.map((r) => (
-                      <span key={r} className={styles.tag}>
-                        {r}
+                    {form.regionMulti.map((code) => (
+                      <span key={code} className={styles.tag}>
+                        {regionLabel(code)}
                         <button
                           type="button"
                           onClick={() =>
                             setForm((prev) => ({
                               ...prev,
-                              regionMulti: prev.regionMulti.filter((item) => item !== r),
+                              regionMulti: prev.regionMulti.filter((item) => item !== code),
                             }))
                           }
                           className={styles.tagClose}
-                          aria-label={`${r} 제거`}
+                          aria-label={`${regionLabel(code)} 제거`}
                           tabIndex={0}
                         >
                           ×

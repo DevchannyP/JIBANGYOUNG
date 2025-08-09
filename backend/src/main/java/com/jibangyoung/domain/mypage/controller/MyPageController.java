@@ -48,13 +48,12 @@ public class MyPageController {
     }
 
     // --- [2] 댓글 ---
-    // ⭐️ 내 댓글 목록 조회 (Dto 변환)
+    // ⭐️ 내 댓글 목록 조회 (서비스에서 이미 CommentPreviewDto 반환)
     @GetMapping("/users/{userId}")
     public Page<CommentPreviewDto> getMyComments(
             @PathVariable Long userId,
             Pageable pageable) {
-        return commentService.getMyComments(userId, pageable)
-                .map(CommentPreviewDto::from);
+        return commentService.getMyComments(userId, pageable);
     }
 
     // 내 댓글 소프트딜리트
@@ -70,9 +69,7 @@ public class MyPageController {
     public Page<CommentPreviewDto> getAllMyCommentsIncludeDeleted(
             @PathVariable Long userId,
             Pageable pageable) {
-        Page<CommentPreviewDto> page = commentService.getAllMyCommentsIncludeDeleted(userId, pageable)
-                .map(CommentPreviewDto::from);
-        return page;
+        return commentService.getAllMyCommentsIncludeDeleted(userId, pageable);
     }
 
     // --- [3] 게시글 ---
@@ -92,5 +89,4 @@ public class MyPageController {
         List<MyReportDto> reports = myReportService.getMyReports(userId);
         return ResponseEntity.ok(reports);
     }
-
 }

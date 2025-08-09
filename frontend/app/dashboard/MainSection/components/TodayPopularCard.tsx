@@ -1,10 +1,11 @@
 // app/dashboard/MainSection/components/TodayPopularCard.tsx
 "use client";
 import type { PostListDto as _PostListDto } from "@/app/community/types";
+import { fetchPopularPostsByPeriod } from "@/libs/api/community/community.api";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "../MainSection.module.css";
-import { usePopularPostsQuery } from "./usePopularPostsQuery";
 
 // 타입 확장 (썸네일 대응)
 type PostListDto = _PostListDto & { thumbnailUrl?: string };
@@ -13,9 +14,17 @@ const rankEmoji = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7�
 const FALLBACK = "/default-profile.webp";
 
 export default function TodayPopularCard() {
-  const { data, isLoading, isError } = usePopularPostsQuery();
+  const { data, isLoading, isError } = useQuery<PostListDto[]>({
+    queryKey: ["today-popular-posts"],
+    queryFn: () => fetchPopularPostsByPeriod("today"),
+    staleTime: 1000 * 60 * 5, // 5분
+    gcTime: 1000 * 60 * 30, // 30분
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+  
   // ✅ posts를 useMemo로!
-  const posts: PostListDto[] = useMemo(() => data?.posts ?? [], [data]);
+  const posts: PostListDto[] = useMemo(() => data ?? [], [data]);
 
   // UI 상태
   const [open, setOpen] = useState(false);
@@ -186,102 +195,102 @@ export default function TodayPopularCard() {
             onKeyDown={handleKeyDown}
             aria-live="polite"
           >
- {posts.slice(0, 10).map((post, idx) => {
-  const thumb = post.thumbnailUrl || FALLBACK;
-  return (
-    <li
-      ref={idx === 0 ? firstItemRef : undefined}
-      key={post.id ?? `noid-${idx}`}
-      className={idx === activeIdx ? styles.top10ListItemActive : ""}
-      role="option"
-      aria-selected={idx === activeIdx}
-      tabIndex={0}
-      aria-label={`[${rankEmoji[idx]}] ${post.title}${post.title?.length > 32 ? " (더보기)" : ""}`}
-      onFocus={() => setActiveIdx(idx)}
-      onMouseEnter={() => setActiveIdx(idx)}
-      onMouseLeave={() => setActiveIdx(-1)}
-      onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
-      title={post.title?.length > 32 ? post.title : undefined}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 7,                 // 6 → 7
-        padding: "4px 6px",     // 3px 5px → 4px 6px
-        minHeight: 31,          // 26 → 31
-        fontSize: "1.07rem",    // 0.91rem → 1.07rem
-        borderRadius: 9,        // 8 → 9
-        cursor: "pointer",
-        outline: "none",
-        background: idx === activeIdx ? "#fff7e1" : "none",
-        color: idx === activeIdx ? "#eab82c" : "#232323",
-        fontWeight: idx === activeIdx ? "bold" : undefined,
-        boxShadow: idx === activeIdx ? "0 2px 8px 0 rgba(234,184,44,0.03)" : undefined,
-        transition: "background 0.15s, color 0.13s, box-shadow 0.13s"
-      }}
-    >
-      <span
-        style={{
-          display: "inline-block",
-          width: 26,             // 22 → 26
-          height: 26,            // 22 → 26
-          borderRadius: 5,       // 4 → 5
-          marginRight: 4,        // 3 → 4
-          background: "#f5eedc",
-          overflow: "hidden",
-        }}
-      >
-        <Image
-          src={thumb}
-          alt={post.title || "썸네일"}
-          width={26}
-          height={26}
-          style={{
-            objectFit: "cover",
-            width: 26,
-            height: 26,
-            borderRadius: 5,
-            background: "#f5eedc",
-            filter: idx === activeIdx ? "brightness(1.08)" : "brightness(0.95)",
-            transition: "filter .13s",
-          }}
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            if (target.src !== FALLBACK) target.src = FALLBACK;
-          }}
-        />
-      </span>
-      <span
-        style={{
-          fontSize: "1.09em",   // 0.92em → 1.09em
-          marginRight: 2,
-          minWidth: 16,         // 그대로
-          color: "#ecc94b",
-          fontWeight: "bold",
-          textAlign: "right",
-          flexShrink: 0,
-        }}
-      >
-        {rankEmoji[idx]}
-      </span>
-      <span
-        style={{
-          flex: "1 1 0",
-          minWidth: 0,
-          fontSize: "1.09em",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          lineHeight: 1.18,
-        }}
-      >
-        {post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}
-      </span>
-    </li>
-  );
-})}
-
-</ul>
+            {posts.slice(0, 10).map((post, idx) => {
+              const thumb = post.thumbnailUrl || FALLBACK;
+              return (
+                <li
+                  ref={idx === 0 ? firstItemRef : undefined}
+                  key={post.id ?? `noid-${idx}`}
+                  className={idx === activeIdx ? styles.top10ListItemActive : ""}
+                  role="option"
+                  aria-selected={idx === activeIdx}
+                  tabIndex={0}
+                  aria-label={`[${rankEmoji[idx]}] ${post.title}${post.title?.length > 32 ? " (더보기)" : ""}`}
+                  onFocus={() => setActiveIdx(idx)}
+                  onMouseEnter={() => setActiveIdx(idx)}
+                  onMouseLeave={() => setActiveIdx(-1)}
+                  onClick={() => window.location.href = `/community/${post.regionId}/${post.id}`}
+                  title={post.title?.length > 32 ? post.title : undefined}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,                 // 6 → 7
+                    padding: "4px 6px",     // 3px 5px → 4px 6px
+                    minHeight: 31,          // 26 → 31
+                    fontSize: "1.07rem",    // 0.91rem → 1.07rem
+                    borderRadius: 9,        // 8 → 9
+                    cursor: "pointer",
+                    outline: "none",
+                    background: idx === activeIdx ? "#fff7e1" : "none",
+                    color: idx === activeIdx ? "#eab82c" : "#232323",
+                    fontWeight: idx === activeIdx ? "bold" : undefined,
+                    boxShadow: idx === activeIdx ? "0 2px 8px 0 rgba(234,184,44,0.03)" : undefined,
+                    transition: "background 0.15s, color 0.13s, box-shadow 0.13s"
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 26,             // 22 → 26
+                      height: 26,            // 22 → 26
+                      borderRadius: 5,       // 4 → 5
+                      marginRight: 4,        // 3 → 4
+                      background: "#f5eedc",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Image
+                      src={thumb}
+                      alt={post.title || "썸네일"}
+                      width={26}
+                      height={26}
+                      style={{
+                        objectFit: "cover",
+                        width: 26,
+                        height: 26,
+                        borderRadius: 5,
+                        background: "#f5eedc",
+                        filter: idx === activeIdx ? "brightness(1.08)" : "brightness(0.95)",
+                        transition: "filter .13s",
+                      }}
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (target.src !== FALLBACK) target.src = FALLBACK;
+                      }}
+                      unoptimized
+                    />
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "1.09em",   // 0.92em → 1.09em
+                      marginRight: 2,
+                      minWidth: 16,         // 그대로
+                      color: "#ecc94b",
+                      fontWeight: "bold",
+                      textAlign: "right",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {rankEmoji[idx]}
+                  </span>
+                  <span
+                    style={{
+                      flex: "1 1 0",
+                      minWidth: 0,
+                      fontSize: "1.09em",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      lineHeight: 1.18,
+                    }}
+                  >
+                    {post.title?.length > 32 ? post.title.slice(0, 32) + "..." : post.title}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     </section>

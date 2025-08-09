@@ -1,19 +1,20 @@
 "use client";
 
+import { getMyPosts } from "@/libs/api/mypage.api";
+import { useUserStore } from "@/store/userStore";
+import type { PostPreviewDto } from "@/types/api/mypage.types";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { useUserStore } from "@/store/userStore";
-import { getMyPosts } from "@/libs/api/mypage.api";
-import type { PostPreviewDto } from "@/types/api/mypage.types";
 import styles from "../MyPageLayout.module.css";
 
-
-// 카테고리 문자열 → 숫자 매핑 (필요시 수정)
+// 🔥 카테고리 매핑을 완전히 정의 (공지사항 포함)
 const CATEGORY_MAP: Record<string, number> = {
   FREE: 30,
   QUESTION: 40,
   SETTLEMENT_REVIEW: 50,
-  // ... 실제 프로젝트에 맞게 추가
+  NOTICE: 10,        // ← 공지사항 매핑 추가
+  ANNOUNCEMENT: 10,  // ← 공지사항의 다른 표현도 대응
+  // 필요한 다른 카테고리들도 추가
 };
 
 function formatDate(dateStr: string) {
@@ -83,11 +84,23 @@ export default function MyPostList() {
       </div>
       <ul className={styles.mypageList}>
         {data.posts.map((p: PostPreviewDto) => {
-          // category가 숫자면 그대로, 아니면 매핑
-          const categoryId =
-            typeof p.category === "number"
-              ? p.category
-              : CATEGORY_MAP[p.category] ?? p.category;
+          // 🔥 개선된 카테고리 매핑 로직
+          let categoryId: number;
+          
+          if (typeof p.category === "number") {
+            // 이미 숫자면 그대로 사용
+            categoryId = p.category;
+          } else {
+            // 문자열이면 매핑 테이블에서 찾기
+            const mappedId = CATEGORY_MAP[p.category];
+            if (mappedId !== undefined) {
+              categoryId = mappedId;
+            } else {
+              // 🔥 매핑되지 않은 카테고리 처리
+              console.warn(`카테고리 매핑되지 않음: ${p.category}, 기본값 30 사용`);
+              categoryId = 30; // 기본 카테고리 ID (FREE 등)
+            }
+          }
 
           return (
             <li key={`${p.id}-${p.createdAt}`} className={styles.mypageListItem}>

@@ -167,7 +167,7 @@ export default function MyCommentList({ userId }: MyCommentListProps) {
             <div className={styles.mypageListTime}>
               <a
                 className={styles.mypageCommentTarget}
-                href={`/community/post/${c.targetPostId}`}
+                href={c.regionId ? `/community/${c.regionId}/${c.targetPostId}` : `/community/post/${c.targetPostId}`}
                 tabIndex={-1}
                 aria-label="해당 게시글로 이동"
                 target="_blank"

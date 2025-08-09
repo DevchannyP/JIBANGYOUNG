@@ -1,7 +1,7 @@
 // ---------- [1] ENUM/공통 타입 ----------
 export type UserRole = "USER" | "ADMIN" | "MENTOR_A" | "MENTOR_B" | "MENTOR_C";
 export type UserStatus = "ACTIVE" | "DEACTIVATED" | "LOCKED" | "PENDING";
-export type PostCategory = "FREE" | "QUESTION" | "SETTLEMENT_REVIEW";
+export type PostCategory = "FREE" | "QUESTION" | "NOTICE" | "REVIEW";
 
 // 좌측 메뉴 - "alerts" 완전 제거
 export type Tab =
@@ -54,11 +54,11 @@ export interface PostPreviewDto {
 export interface CommentPreviewDto {
   id: number;
   content: string;
-  targetPostTitle: string;
   targetPostId: number;
+  targetPostTitle: string;
   createdAt: string;
+  regionId: number; // 이 필드 추가
 }
-
 export interface SurveyAnswerDto {
   answerId: number;
   responseId: number;

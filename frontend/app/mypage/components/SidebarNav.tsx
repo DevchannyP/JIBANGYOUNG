@@ -37,6 +37,12 @@ const QUICKLINKS: SidebarMenuItem[] = [
     external: true,
     path: "/policy/recommendedList",
   },
+  {
+    key: "favoritePolicy",
+    label: "찜정책",
+    external: true,
+    path: "/policy/rec_Policies",
+  },
   // ✅ [추가] 멘토 신청 버튼 (모두에게 노출, 외부 URL)
   {
     key: "mentorApply",

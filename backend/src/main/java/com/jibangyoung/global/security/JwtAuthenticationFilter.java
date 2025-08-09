@@ -83,6 +83,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 정책 GET 요청 중 일부는 공개
         if (uri.startsWith("/api/policy/") && "GET".equals(method)) {
+            // ✅ totalPolicies는 무조건 공개
+            if (uri.contains("/totalPolicies")) {
+                return true;
+            }
             // 찜 관련과 추천 리스트를 제외한 나머지는 공개
             if (!uri.contains("/favorites") && !uri.contains("/recList")) {
                 return true;

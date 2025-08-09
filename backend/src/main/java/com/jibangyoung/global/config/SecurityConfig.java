@@ -92,6 +92,8 @@ public class SecurityConfig {
 
                                                 // 정책 - 대부분 공개, 찜 관련은 인증 필요
                                                 .requestMatchers(HttpMethod.GET, "/api/policy/policy.c").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/policy/totalPolicies")
+                                                .permitAll() // ✅ totalPolicies 공개 허용
                                                 .requestMatchers(HttpMethod.GET, "/api/policy/**").permitAll()
                                                 .requestMatchers("/api/policy/sync").authenticated()
                                                 .requestMatchers("/api/policy/favorites/**").authenticated()
